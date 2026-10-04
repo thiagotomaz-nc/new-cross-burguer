@@ -57,7 +57,6 @@ void Item::setNextItem(Item * nextItem){
     this->nextItem = nextItem;
 }
 
-
 void Item::setProductItem(Product* newProduct) { // tualiza o produto adicionado ao item;
     // preciso reiniciar todas as informçlões
     if (newProduct != nullptr) {

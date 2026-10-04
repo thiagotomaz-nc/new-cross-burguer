@@ -1,6 +1,8 @@
 #include <iostream>
 #include "class/Product.hpp"
 #include "class/ProductsList.hpp"
+#include "class/Order.hpp"
+#include "class/Item.hpp"
 
 #include <string>
 
@@ -12,6 +14,7 @@ void editProduct(ProductsList* productList);
 void deleteProduct(ProductsList* productList);
 void searchProductName(ProductsList* productList);
 void menu(ProductsList* productList);
+void homeOrder();
 void menuDividers();
 
 int main(){
@@ -23,6 +26,7 @@ int main(){
     // head = Endereço apontado pelo ponteiro;
     // &head = Endereço do proprio ponteiro;
     ProductsList productsList;
+    
     // Fim variaveis
     
     cout<<endl;
