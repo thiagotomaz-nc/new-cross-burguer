@@ -4,7 +4,7 @@
 #include "Order.hpp"
 
 #define SIZE_DEFAULT 10
-
+//Pilha encadeada simples
 class PickupStack
 {
 private:

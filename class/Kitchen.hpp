@@ -3,26 +3,19 @@
 
 #include "PreparationQueue.hpp"
 
+// desenfileirado da fila PreparationQueue;
 class Kitchen
 {
 private:
    PreparationQueue *preparationQueue;
 public:
     Kitchen(/* args */);
+
     void callOrder();
     void startPreration();
     void finishPreparation();
+
     ~Kitchen();
 };
-
-Kitchen::Kitchen(/* args */)
-{
-}
-
-Kitchen::~Kitchen()
-{
-}
-
-
 
 #endif

@@ -11,13 +11,13 @@ class ActionItem{
 
     private:
         int typeOperation;
-        Items *affectedItem;        
+        Item *affectedItem;        
     public:
         string getTypeOperation();
         void setTypeOperation(string);
 
-        Items * getAffectedItems();
-        void setAffectedItem(Items*);
+        Item * getAffectedItems();
+        void setAffectedItem(Item*);
 
         int getPreviousQuantity();
         void setPreviousQuantity(int quantity);

@@ -2,29 +2,37 @@
 #define _ORDER_HPP_
 
 #include <string>
+#include "Item.hpp"
 
 using namespace std;
 
 class Order
 {
 private:
-    int number;
+    int numberOrder = 0;
     int numberTable;
-    string nomeCliente;
-    // Itens itens[];
-    double priceTotal = 0;
-    int statusOrder;
- 
-
+    string nameClient;
+    // head que mostra onde inicia os items de um pedido;
+    Item * headItems = nullptr; // marca qual o inicio do cabeça dos items; 
+    double priceTotalToOrder = 0;
+    // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
+    int statusOrder; 
 
 public:
-
+    Order(Item * newItem,int newNumberTable);
     Order();
-    void addItem();
-    void removeItem();
-    void sumPriceTotal();
-    void updatePriceTotal(double piceitem, int typeOperationAddSubtract);
-    double getPriceTotal();
+
+    void addItemToOrder();
+    void removeItemFromOrder();
+    void sumTotalPriceToOrder();
+    double getTotalPriceToOrder();
+    int generateNumberOrder();
+
+    void setNumberOrder(int numberOrder);
+    void setNumberTable(int numberTable);
+    int getNumberOrder();
+    int getNumberTable();
+  
     ~Order();
 };
 

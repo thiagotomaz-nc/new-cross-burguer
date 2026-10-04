@@ -33,7 +33,7 @@ class ProductsList{
         Product* getHeadProduct();
         void setHeadProduct(Product* nextHeadProduct);
 
-        bool isEmpty();
+        bool isEmpty(); // lista vazia
         void setLength(int newLength);
 
         void showProducts(Product * head); // sber onde inicir a lista encadeda;

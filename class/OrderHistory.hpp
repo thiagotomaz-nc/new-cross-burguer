@@ -3,14 +3,13 @@
 
 #include "Order.hpp"
 
+// Lista duplamente encadeada - historico do  dia
 class OrderHistory
 {
 private:
-   Order data;
-   OrderHistory *previous;
+    Order * data;
+    OrderHistory *previous;
     OrderHistory *next;
-    int size;
-    int length;
 
 
 public:
