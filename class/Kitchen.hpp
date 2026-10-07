@@ -7,7 +7,8 @@
 class Kitchen
 {
 private:
-   PreparationQueue *preparationQueue;
+   Order *data3
+   ;
 public:
     Kitchen(/* args */);
 

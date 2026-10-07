@@ -14,7 +14,7 @@ class ProductsList{
 
     private:
         Product * headProduct = nullptr; // marca qual o inicio do cabeça dos produtos;
-        int n_elements;       
+        int n_elements = 0;       
         
     public:
         ProductsList();

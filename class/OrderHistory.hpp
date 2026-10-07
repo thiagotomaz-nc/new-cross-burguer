@@ -7,7 +7,7 @@
 class OrderHistory
 {
 private:
-    Order * data;
+    Order data;
     OrderHistory *previous;
     OrderHistory *next;
 

@@ -38,7 +38,7 @@ void  ProductsList::addProduto(Product*  newProduct){
            
         }
 
-       
+       setNElements(1);
 
         cout<<"\n---------------------------------------------------------"<<endl;
         cout<<"Produto cadastrado com sucesso!"<<endl;
@@ -231,7 +231,7 @@ void ProductsList::showProducts(Product * head){
             cout<<"----------------------------------"<<endl;
         }while (aux != nullptr);
 
-        cout<<"Total: "<< getNElements()<<"\n";
+        cout<<"Total produtos: "<< getNElements()<<"\n";
     }
 }
 

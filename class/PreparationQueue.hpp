@@ -9,7 +9,7 @@
 class PreparationQueue
 {
 private:
-    Order data;
+    Order* data;
     PreparationQueue* next;
 
 public:
@@ -18,7 +18,10 @@ public:
     void enqueue(Order * order); // ponteiro ou não
     void dequeue();
     int isEmpty();
+    
     Order* peek();
+    // utilizar a copia do primeiro elemento da pilha,para não permitir exclusão;
+    // protegendo a estrutura;
 
     ~PreparationQueue();
 };

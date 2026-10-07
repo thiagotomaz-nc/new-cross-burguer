@@ -11,7 +11,9 @@ class Product{
         int barCode;
         string description;
         double unitPrice;
-        Product * nextProduct;
+        //size;
+        //lenght;
+        
 
     public:
         Product(int barCode, string description, double unitPrice, Product * nextProduct);
