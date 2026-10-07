@@ -11,13 +11,12 @@ class Product{
         int barCode;
         string description;
         double unitPrice;
-        //size;
-        //lenght;
-        
+        int category;
 
     public:
-        Product(int barCode, string description, double unitPrice, Product * nextProduct);
         Product();
+        Product(const Product & product);
+    
 
         int getBarCode();
         string getDescription();

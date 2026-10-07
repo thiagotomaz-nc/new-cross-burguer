@@ -165,7 +165,7 @@ void editProduct(ProductsList* productList){
     cin>>barCode;
 
     cin.ignore();
-    Product* updateProductList = productList->searchProduct(barCode);
+    Product* updateProductList = productList->searchProduct(barCode);   
     
     if (updateProductList != nullptr){
         cout<<"---------------------------------------------------------"<<endl;
