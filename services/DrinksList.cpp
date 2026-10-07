@@ -1,48 +1,24 @@
-#include "ProductsList.hpp"
+#include "../models/DrinksList.hpp"
+
 
 //construtor vazio;
-ProductsList::ProductsList(){
-    this->headProduct=nullptr;
-    this->n_elements=0;
-}
+DrinksList::DrinksList(){}
 
-void  ProductsList::addProduto(Product*  newProduct){
-    
-
+void  DrinksList::addProduto(Product  newProduct){
     // verificar se já existe produto como código cadastrado, false significa que não existe;
-    if (!constainsBarCode(newProduct->getBarCode())){
+    if (!constainsBarCode(newProduct.getBarCode())){
         // vou cadastrar o produto dinamicamente
-        Product * product = new Product(); // produto criado dinamicamente
-
-        //converte maiusculas para minusculas
-        product->setDescription(toLowerText(newProduct->getDescription()));
-
-        product->setBarCode(newProduct->getBarCode());
-        product->setUnitPrice(newProduct->getUnitPrice());
+        Product*  product = new Product(newProduct);// produto criado dinamicamente
 
         // atualizar o head
-        if (isEmpty()){
-            product->setNext(nullptr);
-            this->headProduct = product;
-             
-            
-        //se não for vazio, precisa-se percorrer todos os elementos até encontrar o ultimo para atualizar o next
-        }else{
-            Product* aux = this->headProduct;
-            
-            while (aux->getNext() != nullptr){
-                aux = aux->getNext();
-            }
-
-            aux->setNext(product);
+        if (this->size >= this->lenght){
            
+        }else{
+            // realoca o espaço da lista
         }
 
-       setNElements(1);
-
         cout<<"\n---------------------------------------------------------"<<endl;
-        cout<<"Produto cadastrado com sucesso!"<<endl;
-         
+        cout<<"Produto cadastrado com sucesso!"<<endl; 
         cout<<"---------------------------------------------------------\n"<<endl;
     }else{
         cout<<"\n---------------------------------------------------------"<<endl;
@@ -52,6 +28,7 @@ void  ProductsList::addProduto(Product*  newProduct){
    
 }
 
+/* 
 void ProductsList::updateProduct(Product* updateproduto, string newDescription, double newPrice){
     //validar dados
     if (newDescription=="" && newPrice <= 0){
@@ -120,13 +97,6 @@ void  ProductsList::removeProduct(int barCode){
     
 }
 
-void  ProductsList::setNElements(int newNElements){
-  this->n_elements += newNElements;
-}
-
-int  ProductsList::getNElements(){
-    return this->n_elements;
-}
 
 bool ProductsList::constainsBarCode(int codigoProduto){
     Product* aux = getHeadProduct();
@@ -237,4 +207,4 @@ void ProductsList::showProducts(Product * head){
 
 ProductsList::~ProductsList(){
     delete this->headProduct;
-}
+} */
