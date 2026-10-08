@@ -1,35 +1,45 @@
-#include <iostream>
-#include "class/Product.hpp"
-#include "class/ProductsList.hpp"
-#include "class/Order.hpp"
-#include "class/Item.hpp"
+#include "models/Product.hpp"
+#include "models/Order.hpp"
+#include "models/Item.hpp"
 
-#include <string>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
+/*
+void AddProduct(vector<Product> menu);
+void editProduct(vector<Product> menu);
+void deleteProduct(vector<Product> menu);
+void searchProductName(vector<Product> menu);
+void menu(vector<Product> menu);
+void searchProductBarCode(vector<Product> menu);  //metodo de busca por codigo de barras
+*/
 
-void AddProduct(ProductsList* productList);
-void editProduct(ProductsList* productList);
-void deleteProduct(ProductsList* productList);
-void searchProductName(ProductsList* productList);
-void menu(ProductsList* productList);
-void homeOrder();
+//void homeOrder();
 void menuDividers();
+
+void exibirProdutos(vector<Product>& menu);
+void AddProduct(vector<Product>& menu);
+void menu(vector<Product>& menu);
 
 int main(){
     //inicio variaveis
     int response = 0;
     bool continuar = true;
+    Product product;
+    vector<Product> Menu;
+    //products.add(product);
+    
     //cabeçalho que aponta para o primeiro elemento do propduto;    
     // *head = valor que head aponta;
     // head = Endereço apontado pelo ponteiro;
     // &head = Endereço do proprio ponteiro;
-    ProductsList productsList;
+    
     
     // Fim variaveis
     
-    cout<<endl;
+    cout<< endl;
    
     //criar um menu, através dos produtos, podendo inclusive cadastrar novos produtos, editar, excluir (desativas), consultar
     do{
@@ -41,12 +51,13 @@ int main(){
         cout<<"2 - Cancelar pedido"<<endl;
         cout<<"3 - Gerenciar Menu"<<endl;
         cout<<"4 - Sair do sistema"<<endl;
+        cout << "\nDigite a opção desejada: ";
         cin>>response;
 
         switch (response)
         {
         case 3:
-            menu(&productsList);
+            menu(Menu);
             break;
         case 4:
             /* code */
@@ -65,15 +76,15 @@ int main(){
     return 0;
 }
 
-void menu(ProductsList* productList){
+void menu(vector<Product>& menu){
     int responseMenu=0;
 
     menuDividers();
     cout<<"Menu - Produtos cadastrados"<<endl;
     cout<<"**********************************************************"<<endl;
-    productList->showProducts(productList->getHeadProduct());//lista todos os produtos da lista
-    cout<< endl;
-    
+    //lista todos os produtos da lista
+    exibirProdutos(menu);
+    cout<< "\n\n";
     cout<<"Informe uma opcao"<<endl;
     cout<<"**********************************************************"<<endl;
     cout<<"1 - Cadastrar um produto"<<endl;
@@ -81,14 +92,15 @@ void menu(ProductsList* productList){
     cout<<"3 - Remover um produto"<<endl; 
     cout<<"4 - Consultar um produto pelo nome "<<endl;
     cout<<"5 - Voltar ao menu principal"<<endl;
+    cout << "\nDigite a opção desejada: ";
     cin >> responseMenu; 
 
     switch (responseMenu)
     {
     case 1:
-        AddProduct(productList);
+        AddProduct(menu);
         break;
-    case 3:
+/*    case 3:
         deleteProduct(productList);
         break;
     case 2:
@@ -99,10 +111,13 @@ void menu(ProductsList* productList){
         break;    
     default:
         break;
+        */
     }
 }
 
-void AddProduct(ProductsList* productList){
+
+
+void AddProduct(vector<Product>& menu){
     char continueClear;
      // cabeça inicia em null, significa que não tem nenhum produto cadastrado na lista encadeada;
     string description;
@@ -133,19 +148,21 @@ void AddProduct(ProductsList* productList){
     product.setBarCode(barCode);
     product.setUnitPrice(price);
 
-    productList->addProduto(&product);
+    menu.push_back(product);
 
-    cout<<"pressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..."<<endl;
+    exibirProdutos(menu);
+
+    cout<<"\n\npressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..."<<endl;
     cin >> continueClear;
 
     if(continueClear == 's' || continueClear == 'S' ){
         system("clear");
-    }
-        
-    menu(productList);          
-     
+    }   
 }
 
+
+
+/*
 void editProduct(ProductsList* productList){
     char continueClear;
      // cabeça inicia em null, significa que não tem nenhum produto cadastrado na lista encadeada;
@@ -247,6 +264,14 @@ void searchProductName(ProductsList* productList){
     }
         
     menu(productList);
+}
+
+*/
+
+void exibirProdutos(vector<Product> &menu) {
+    for (size_t i = 0; i < menu.size(); i++) {  // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
+        menu[i].show(); // Em C++ usa-se menu[i] em vez de menu.get(i)
+    }   
 }
 
 void menuDividers(){

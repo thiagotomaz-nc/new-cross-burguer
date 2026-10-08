@@ -1,75 +1,76 @@
-# Prerequisites
-*.d
+    # Prerequisites
+    *.d
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-.vscode/
+    # Compiled Object files
+    *.slo
+    *.lo
+    *.o
+    *.obj
+    .vscode/
 
-# Precompiled Headers
-*.gch
-*.pch
+    # Precompiled Headers
+    *.gch
+    *.pch
 
-# Linker files
-*.ilk
+    # Linker files
+    *.ilk
 
-# Debugger Files
-*.pdb
+    # Debugger Files
+    *.pdb
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-*.so.*
+    # Compiled Dynamic libraries
+    *.so
+    *.dylib
+    *.dll
+    *.so.*
 
 
-# Fortran module files
-*.mod
-*.smod
+    # Fortran module files
+    *.mod
+    *.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+    # Compiled Static libraries
+    *.lai
+    *.la
+    *.a
+    *.lib
 
-# Executables
-*.exe
-*.out
-*.app
+    # Executables
+    *.exe
+    *.out
+    *.app
 
-# Build directories
-build/
-Build/
-build-*/
+    # Build directories
+    build/
+    Build/
+    build-*/
 
-# CMake generated files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-install_manifest.txt
-compile_commands.json
+    # CMake generated files
+    CMakeFiles/
+    CMakeCache.txt
+    cmake_install.cmake
+    Makefile
+    install_manifest.txt
+    compile_commands.json
 
-# Temporary files
-*.tmp
-*.log
-*.bak
-*.swp
+    # Temporary files
+    *.tmp
+    *.log
+    *.bak
+    *.swp
 
-# vcpkg
-vcpkg_installed/
+    # vcpkg
+    vcpkg_installed/
 
-# debug information files
-*.dwo
+    # debug information files
+    *.dwo
 
-# test output & cache
-Testing/
-.cache/
-.vscode/
+    # test output & cache
+    Testing/
+    .cache/
+    .vscode/
 
-#arquivos 
-main
-main.exe
+    # Arquivos e diretorios de compilação locais
+    output/
+    main
+    main.exe

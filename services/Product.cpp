@@ -1,46 +1,45 @@
-#include "Product.hpp"
+#include "models/Product.hpp"
 
-Product::Product(int barCode, string description, double unitPrice, Product * nextProduct){
-    this-> barCode = barCode;
-    this-> description =description;
-    this->unitPrice = unitPrice;
-    this->nextProduct = nextProduct;
+Product::Product() {
+    this->barCode = 0;
+    this->description = "";
+    this->unitPrice = 0;
 }
 
-Product::Product(){}
+Product::Product(int barCode, string description, float unitPrice) {
+    this->barCode = barCode;
+    this->description = description;
+    this->unitPrice = unitPrice;
+}
 
-int Product::getBarCode(){
+int Product::getBarCode() {
     return this->barCode;
 }
 
-void Product::setBarCode(int newBarCode){
-    this->barCode = newBarCode;
-}
-
-string Product::getDescription(){
+string Product::getDescription() {
     return this->description;
 }
 
-void Product::setDescription(string newDescription){
-    this->description = newDescription;
-}
-
-Product* Product::getNext(){
-    return this->nextProduct;
-}
-
-void Product::setNext(Product * product){
-    this->nextProduct = product;
-}  
-  
-float Product::getUnitPrice(){
+float Product::getUnitPrice() {
     return this->unitPrice;
 }
 
-void Product::setUnitPrice(double newUnitPrice){
+void Product::setBarCode(int newBarCode) {
+    this->barCode = newBarCode;
+}
+
+void Product::setDescription(string newDescription) {
+    this->description = newDescription;
+}
+
+void Product::setUnitPrice(float newUnitPrice) {
     this->unitPrice = newUnitPrice;
 }
 
-void Product::show(){
-    cout<<this->barCode << " | " << this->description << " | " << this->unitPrice<<endl;
+void Product::show() {
+    cout << endl;
+    cout << "Nome: " << this->description
+         << "| Código: " << this->barCode 
+         << "| Valor: R$ " << this->unitPrice;
+
 }

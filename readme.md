@@ -16,5 +16,8 @@ Valores para fechar pedido = ENUM;
 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
 
 
-g++ main.cpp class/ProductsList.cpp class/Product.cpp class/Order.cpp class/Item.cpp -o main
-./main
+Criar o arquivo na pasta output:
+mkdir -p output && g++ -Wall -Wextra -g3 -I. main.cpp services/*.cpp -o output/main && ./output/main
+
+Rodar o arquivo na pasta output, se não houve alteração no código:
+./output/main

@@ -1,4 +1,4 @@
-#include "Item.hpp"
+#include "models/Item.hpp"
 
 Item::Item(Product* product, int quantity) {
     this->product = product;
