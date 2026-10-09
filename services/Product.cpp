@@ -2,25 +2,25 @@
 
 Product::Product() {
     this->barCode = 0;
-    this->description = "";
+    this->name = "";
     this->unitPrice = 0;
 }
 
-Product::Product(int barCode, string description, float unitPrice) {
+Product::Product(int barCode, string name, float unitPrice) {
     this->barCode = barCode;
-    this->description = description;
+    this->name = name;
     this->unitPrice = unitPrice;
 }
 
-int Product::getBarCode() {
+int Product::getBarCode() const {
     return this->barCode;
 }
 
-string Product::getDescription() {
-    return this->description;
+string Product::getName() const {
+    return this->name;
 }
 
-float Product::getUnitPrice() {
+float Product::getUnitPrice() const {
     return this->unitPrice;
 }
 
@@ -28,18 +28,16 @@ void Product::setBarCode(int newBarCode) {
     this->barCode = newBarCode;
 }
 
-void Product::setDescription(string newDescription) {
-    this->description = newDescription;
+void Product::setName(string newName) {
+    this->name = newName;
 }
 
 void Product::setUnitPrice(float newUnitPrice) {
     this->unitPrice = newUnitPrice;
 }
 
-void Product::show() {
-    cout << endl;
-    cout << "Nome: " << this->description
-         << "| Código: " << this->barCode 
-         << "| Valor: R$ " << this->unitPrice;
-
+void Product::show() const {
+    cout << this->barCode
+         << "  |  " << this->name 
+         << "   | R$ " << this->unitPrice;
 }

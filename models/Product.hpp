@@ -9,22 +9,22 @@ using namespace std;
 class Product {
 private:
     int barCode;
-    string description;
+    string name;
     float unitPrice;
 
 public:
     Product();
-    Product(int barCode, string description, float unitPrice);
+    Product(int barCode, string name, float unitPrice);
 
-    int getBarCode();
-    string getDescription();
-    float getUnitPrice();
+    int getBarCode() const;
+    string getName() const;
+    float getUnitPrice() const;
 
     void setBarCode(int newBarCode);
-    void setDescription(string newDescription);
+    void setName(string newName);
     void setUnitPrice(float newUnitPrice);
 
-    void show();
+    void show() const;
 };
 
 #endif
