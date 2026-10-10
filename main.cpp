@@ -139,7 +139,7 @@ void addProduct(vector<Product>& menu){
         cout << "Informe o NOME do produto: ";
         getline(cin, name);
 
-        if (name.empty()) {
+        if (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos) {
             cout << "\n---------------------------------------------------------\n";
             cout << "[Erro] O nome do produto deve ser diferente de vazio! Tente novamente.\n";
             cout << "---------------------------------------------------------\n\n";
@@ -148,7 +148,8 @@ void addProduct(vector<Product>& menu){
             cout << "[Erro] Ja existe um produto cadastrado com o nome " << name << "! Tente novamente.\n";
             cout << "---------------------------------------------------------\n\n";
         }
-    } while (name.empty() || productExists(menu, name));
+    } while (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos || productExists(menu, name));
+
 
     //Loop para garantir a inserção de um preço válido (positivo)
     do {
@@ -204,21 +205,41 @@ void editProduct(vector<Product>& menu) {
          
         cin.ignore(); // Limpa o buffer do cin para ler o getline sem pular
 
-        cout << "\nInforme o novo NOME do produto OU tecle [ENTER] para manter o mesmo nome: ";
-        getline(cin, newName);
+        //Loop para garantir a inserção de um nome válido e único
+        do {
+            cout << "\nInforme o novo NOME do produto OU tecle [ENTER] para manter o mesmo nome: ";
+            getline(cin, newName);
 
-        cout << "Informe o novo VALOR UNITARIO do produto ou digite [0] zero para manter o mesmo valor: ";
-        cin >> newPrice;
+            if (newName.empty()) {
+                break; // Mantém o nome atual, sai do loop
+            } else if (newName.find_first_not_of(" \t\n\r") == string::npos) { // Verifica se o nome não contem espaços
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] O nome nao pode conter apenas espacos! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";    
+            } else if (productExists(menu, newName)) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] Ja existe um produto cadastrado com o nome " << newName << "! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            }
+        } while (newName.empty() || newName.find_first_not_of(" \t\n\r") == string::npos || productExists(menu, newName));
+        // Atualiza a descrição apenas se o utilizador digitou um novo nome válido
+        menu[productIndex].setName(newName);
 
-        // Atualiza a descrição apenas se o utilizador digitou um novo nome
-        if (!newName.empty()) {
-            menu[productIndex].setName(newName);
-        }
 
-        // Atualiza o preço apenas se for digitado um valor maior que zero
-        if (newPrice > 0) {
-            menu[productIndex].setUnitPrice(newPrice);
-        }
+        //Loop para garantir a inserção de um preço válido (positivo)
+        do {
+            cout << "Informe o novo VALOR UNITARIO do produto ou digite [0] zero para manter o mesmo valor: ";
+            cin >> newPrice;
+
+            if (newPrice < 0) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] O valor unitario deve ser positivo! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            } 
+        } while (newPrice < 0);
+
+        //Atualiza o preço apenas se for digitado um valor maior que zero
+        menu[productIndex].setUnitPrice(newPrice);
 
         cout << "\n---------------------------------------------------------" << endl;
         cout << "Produto atualizado com sucesso!" << endl;
