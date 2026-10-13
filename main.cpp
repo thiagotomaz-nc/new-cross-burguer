@@ -25,6 +25,7 @@ int main(){
     bool continuar = true;
     Product product;
     vector<Product> Menu;
+    
         
     cout<< endl;
    
@@ -247,6 +248,7 @@ void editProduct(vector<Product>& menu) {
 void deleteTerminal(){
     system("cls");
 }
+
 //Deletar um produto do menu
 void deleteProduct(vector<Product>& menu) {
     char continueClear;

@@ -4,7 +4,7 @@ Order::Order(Item * newItem, int newNumberTable){ // inserindo itens no final
     if (newItem!=nullptr){
         // passo o valor do ponteiro newItem par ao construtor de copia, 
         // que cria uma copia em outro endereço baseado nos valores de newItem;
-        // vantagem, não precisa fazer uso do set no item e dos get no newItem
+        // vantagem, não precisa fazer uso do set no item e dos get no newItem;
         Item * item = new Item(*newItem); 
         this->numberOrder = generateNumberOrder();
         this->numberTable=newNumberTable;
