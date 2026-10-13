@@ -22,9 +22,9 @@ int main(){
     int response = 0;
     bool continuar = true;
     //cabeçalho que aponta para o primeiro elemento do propduto;    
-    // *head = valor que head aponta;
-    // head = Endereço apontado pelo ponteiro;
-    // &head = Endereço do proprio ponteiro;
+        // *head = valor que head aponta;
+        // head = Endereço apontado pelo ponteiro;
+        // &head = Endereço do proprio ponteiro;
     ProductsList productsList;
     
     // Fim variaveis
