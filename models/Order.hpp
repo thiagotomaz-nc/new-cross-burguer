@@ -2,7 +2,7 @@
 #define _ORDER_HPP_
 
 #include <string>
-#include "Item.hpp"
+#include "models/Item.hpp"
 
 using namespace std;
 
@@ -32,6 +32,8 @@ public:
     void setNumberTable(int numberTable);
     int getNumberOrder();
     int getNumberTable();
+
+    void showOrder();
   
     ~Order();
 };

@@ -1,10 +1,10 @@
-#include "Order.hpp"
+#include "models/Order.hpp"
 
 Order::Order(Item * newItem, int newNumberTable){ // inserindo itens no final
     if (newItem!=nullptr){
         // passo o valor do ponteiro newItem par ao construtor de copia, 
         // que cria uma copia em outro endereço baseado nos valores de newItem;
-        // vantagem, não precisa fazer uso do set no item e dos get no newItem
+        // vantagem, não precisa fazer uso do set no item e dos get no newItem;
         Item * item = new Item(*newItem); 
         this->numberOrder = generateNumberOrder();
         this->numberTable=newNumberTable;
@@ -28,6 +28,9 @@ Order::Order(Item * newItem, int newNumberTable){ // inserindo itens no final
         }
     }
 }
+
+// adicionar item
+// adicinar item na pilha de ações
 
 Order::Order(){}
 
@@ -56,6 +59,10 @@ void Order::sumTotalPriceToOrder(){
 
 double Order::getTotalPriceToOrder(){
     return this->priceTotalToOrder;
+}
+
+void Order::showOrder(){
+    
 }
 
 Order::~Order(){}

@@ -1,36 +1,30 @@
-#ifndef _PRODUCT_HPP_
-#define _PRODUCT_HPP_
+#ifndef PRODUCT_HPP
+#define PRODUCT_HPP
 
 #include <string>
 #include <iostream>
+
 using namespace std;
 
-class Product{
+class Product {
+private:
+    int barCode;
+    string name;
+    float unitPrice;
 
-    private:
-        int barCode;
-        string description;
-        double unitPrice;
-        int category;
+public:
+    Product();
+    Product(int barCode, string name, float unitPrice);
 
-    public:
-        Product();
-        Product(const Product & product);
-    
+    int getBarCode() const;
+    string getName() const;
+    float getUnitPrice() const;
 
-        int getBarCode();
-        string getDescription();
-        float getUnitPrice();
-        Product* getNext();
-        
-        void setDescription(string newDescription);
-        void setBarCode(int newBarCode);
-        void setUnitPrice(double newUnitPrice);
-        void setNext(Product * product);    
+    void setBarCode(int newBarCode);
+    void setName(string newName);
+    void setUnitPrice(float newUnitPrice);
 
-
-        void show();
-        
+    void show() const;
 };
 
 #endif
