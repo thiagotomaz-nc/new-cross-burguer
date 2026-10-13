@@ -29,6 +29,9 @@ Order::Order(Item * newItem, int newNumberTable){ // inserindo itens no final
     }
 }
 
+// adicionar item
+// adicinar item na pilha de ações
+
 Order::Order(){}
 
 int Order::generateNumberOrder(){
@@ -56,6 +59,10 @@ void Order::sumTotalPriceToOrder(){
 
 double Order::getTotalPriceToOrder(){
     return this->priceTotalToOrder;
+}
+
+void Order::showOrder(){
+    
 }
 
 Order::~Order(){}
