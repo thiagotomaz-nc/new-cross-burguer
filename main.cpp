@@ -17,6 +17,7 @@ void searchProductName(const vector<Product>& menu);
 int searchProductBarCode(const vector<Product>& menu);
 bool productExists(const vector<Product>& menu, int barCode);
 bool productExists(const vector<Product>& menu, const string& name);
+void deleteTerminal();
 
 int main(){
     //inicio variaveis
@@ -180,7 +181,7 @@ void addProduct(vector<Product>& menu){
     cin >> continueClear;
 
     if (continueClear == 's' || continueClear == 'S') {
-        system("clear");
+       deleteTerminal();
     }   
 }
 
@@ -204,42 +205,21 @@ void editProduct(vector<Product>& menu) {
         cout << "\n---------------------------------------------------------\n";
          
         cin.ignore(); // Limpa o buffer do cin para ler o getline sem pular
-
-        //Loop para garantir a inserção de um nome válido e único
-        do {
-            cout << "\nInforme o novo NOME do produto OU tecle [ENTER] para manter o mesmo nome: ";
-            getline(cin, newName);
-
-            if (newName.empty()) {
-                break; // Mantém o nome atual, sai do loop
-            } else if (newName.find_first_not_of(" \t\n\r") == string::npos) { // Verifica se o nome não contem espaços
-                cout << "\n---------------------------------------------------------\n";
-                cout << "[Erro] O nome nao pode conter apenas espacos! Tente novamente.\n";
-                cout << "---------------------------------------------------------\n\n";    
-            } else if (productExists(menu, newName)) {
-                cout << "\n---------------------------------------------------------\n";
-                cout << "[Erro] Ja existe um produto cadastrado com o nome " << newName << "! Tente novamente.\n";
-                cout << "---------------------------------------------------------\n\n";
-            }
-        } while (newName.empty() || newName.find_first_not_of(" \t\n\r") == string::npos || productExists(menu, newName));
-        // Atualiza a descrição apenas se o utilizador digitou um novo nome válido
-        menu[productIndex].setName(newName);
-
-
-        //Loop para garantir a inserção de um preço válido (positivo)
-        do {
-            cout << "Informe o novo VALOR UNITARIO do produto ou digite [0] zero para manter o mesmo valor: ";
-            cin >> newPrice;
-
-            if (newPrice < 0) {
-                cout << "\n---------------------------------------------------------\n";
-                cout << "[Erro] O valor unitario deve ser positivo! Tente novamente.\n";
-                cout << "---------------------------------------------------------\n\n";
-            } 
-        } while (newPrice < 0);
+        
+        cout << "\nInforme o novo NOME do produto OU tecle [ENTER] para manter o mesmo nome: ";
+        getline(cin, newName);
+        cout << "Informe o novo VALOR UNITARIO do produto ou digite [0] zero para manter o mesmo valor: ";
+        cin >> newPrice;
+        
 
         //Atualiza o preço apenas se for digitado um valor maior que zero
-        menu[productIndex].setUnitPrice(newPrice);
+        if (!newName.empty()){
+             menu[productIndex].setName(newName);
+        }
+        if (newPrice>0){
+            menu[productIndex].setUnitPrice(newPrice);
+        }
+        
 
         cout << "\n---------------------------------------------------------" << endl;
         cout << "Produto atualizado com sucesso!" << endl;
@@ -260,10 +240,13 @@ void editProduct(vector<Product>& menu) {
     cin >> continueClear;
 
     if (continueClear == 's' || continueClear == 'S') {
-        system("clear");
+        deleteTerminal();
     }
 }
 
+void deleteTerminal(){
+    system("cls");
+}
 //Deletar um produto do menu
 void deleteProduct(vector<Product>& menu) {
     char continueClear;
@@ -295,7 +278,7 @@ void deleteProduct(vector<Product>& menu) {
     cin >> continueClear;
 
     if (continueClear == 's' || continueClear == 'S') {
-        system("clear");
+        deleteTerminal();
     }   
 }
 
@@ -335,7 +318,7 @@ void searchProductName(const vector<Product>& menu){
     cin >> continueClear;
 
     if(continueClear == 's' || continueClear == 'S' ){
-        system("clear");
+       deleteTerminal();
     }
         
 }
@@ -369,13 +352,14 @@ int searchProductBarCode(const vector<Product>& menu) {
 
 //Listar todos os produtos cadastrados no sistema
 void showProducts(const vector<Product>& menu) {
+    if (menu.size() > 0){
     cout<< "\nCodigo | Nome | Valor"<<endl;
     cout<< "-------------------"<<endl;
     for (size_t i = 0; i < menu.size(); i++) {  // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
         menu[i].show();
         cout<<"\n"; // Em C++ usa-se menu[i] em vez de menu.get(i)
     }
-    if(menu.size() == 0){
+    }else{
         cout<<"\nNenhum produto cadastrado.\n";
     }
 }
