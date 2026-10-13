@@ -78,8 +78,9 @@ void menu(vector<Product>& menu){
     cout<<"1 - Cadastrar um produto"<<endl;
     cout<<"2 - Editar um produto"<<endl;
     cout<<"3 - Remover um produto"<<endl; 
-    cout<<"4 - Consultar um produto pelo nome "<<endl;
-    cout<<"5 - Voltar ao menu principal"<<endl;
+    cout<<"4 - Consultar um produto pelo nome"<<endl;
+    cout<<"5 - Consultar lista de produtos cadastrados"<<endl;
+    cout<<"6 - Voltar ao menu principal"<<endl;
     cout << "\nDigite a opção desejada: ";
     cin >> responseMenu; 
 
@@ -96,7 +97,14 @@ void menu(vector<Product>& menu){
         break;
     case 4:
         searchProductName(menu);
-        break;    
+        break;
+    case 5:
+        menuDividers();
+        cout<<"Menu - Produtos cadastrados"<<endl;
+        cout<<"**********************************************************"<<endl;
+        showProducts(menu);
+        cout<< "\n";
+        break;  
     default:
         break;
     }
