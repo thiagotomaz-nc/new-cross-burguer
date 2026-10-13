@@ -58,4 +58,8 @@ double Order::getTotalPriceToOrder(){
     return this->priceTotalToOrder;
 }
 
+void Order::showOrder(){
+    
+}
+
 Order::~Order(){}
