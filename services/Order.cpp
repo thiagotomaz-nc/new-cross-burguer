@@ -118,9 +118,8 @@ void Order::showResumeOrder()
 {
 
     cout << this->numberOrder << " | " << this->numberTable << " | " << this->nameClient << endl;
-    cout << " Etapa do pedido: " << statusToString(this->statusOrder);
-    cout << "**********************************************************" << endl;
-    cout << "itens do pedido: " << endl;
+    cout << "\nEtapa do pedido: " << statusToString(this->statusOrder) << endl;
+    cout << "\nitens do pedido: " << endl;
 
     if (this->items.size() > 0)
     {
@@ -132,10 +131,12 @@ void Order::showResumeOrder()
 
             cout << i + 1 << "  " << Product.getName() << "  "
                  << Product.getUnitPrice() << " x " << this->items[i].getQuantityItem() << " = "
-                 << this->items[i].getPriceTotalItem();
+                 << this->items[i].getPriceTotalItem() << endl;
         }
 
         cout << "\nTotal do pedido:  R$ " << this->priceTotalToOrder << endl;
+        cout << "-------------------------------------------" << endl;
+
     }
     else
     {

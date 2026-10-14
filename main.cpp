@@ -27,6 +27,9 @@ bool productExistsName(vector<Product>& menu, const string& name);
 // orders
 void showOrders(vector<Order>& order);
 int searchOrderNumber(vector<Order>& order);
+void menuAddOrder(vector<Order>& orders, vector<Product>& menu);
+void menuCancelOrder(vector<Order>& orders);
+void menuEditOrder(Order * order);
 
 //configurações
 void deleteTerminal();
@@ -51,16 +54,15 @@ int main(){
    
     //criar um order, através dos produtos, podendo inclusive cadastrar novos produtos, editar, excluir (desativas), consultar
     do{
-        menuDividers(); 
         cout << "New Cross Burguer" << endl;
-        cout<<"====================================="<< endl;
-        cout<<"informe uma opcao"<<endl;
-        cout<<"1 - Iniciar pedido"<<endl;
-        cout<<"2 - Cancelar pedido"<<endl;
-        cout<<"3 - Gerenciar Menu"<<endl;
-        cout<<"4 - Sair do sistema"<<endl;
+        cout << "====================================="<< endl;
+        cout << "informe uma opcao"<<endl;
+        cout << "1 - Pedidos"<<endl;
+        cout << "2 - Cancelar pedido"<<endl;
+        cout << "3 - Gerenciar Menu"<<endl;
+        cout << "4 - Sair do sistema"<<endl;
         cout << "\nDigite a opção desejada: ";
-        cin>>response;
+        cin >> response;
 
         switch (response)
         {
@@ -75,9 +77,9 @@ int main(){
             break;
         case 4:
             /* code */
-            cout<<endl;
-            cout<<"Saindo do sistema!!!\nAte mais!!"<<endl;
-            cout<<endl;
+            cout << endl;
+            cout << "Saindo do sistema!!!\nAte mais!!"<<endl;
+            cout << endl;
             continuar=false;
             break;
         
@@ -93,8 +95,130 @@ int main(){
 // =======================================================
 // MENU PEDIDOS
 // =======================================================
+
 //Menu de gerenciamento dos pedidos
 void menuOrder(vector<Order>& orders, vector<Product>& menu) {
+    
+    int responseMenuOrder = 0;
+
+    menuDividers();
+
+    cout << "Menu - Pedidos" << endl;
+    cout << "=========================================================" << endl;
+    cout << "informe uma opcao" << endl;
+    cout << "1 - Adicionar um pedido" << endl;
+    cout << "2 - Cancelar um pedido" << endl;
+    cout << "3 - Editar pedido" << endl;
+    cout << "4 - Fechar pedido" << endl;
+    cout << "5 - Relatorio de pedidos" << endl;
+    cout << "6 - Voltar ao menu principal" << endl;
+    cout << "\nDigite a opção desejada: ";
+    cin >> responseMenuOrder;
+
+    switch (responseMenuOrder)
+    {
+        case 1:
+            menuAddOrder(orders, menu);
+            break;
+        case 2:
+            menuCancelOrder(orders);
+            break;
+        case 3:{
+            int responseMenuEditOrder = 0;
+
+            cout << "Editar pedido" << endl;
+            cout << "**********************************************************" << endl;
+            cout << "1 - Adicionar um item" << endl;
+            cout << "2 - Remover um item" << endl;
+            cout << "3 - Desfazer a ultima ação do um item" << endl;
+            cout << "4 - editar o nome do cliente: " << endl;
+            cout << "5 - editar a mesa: " << endl;
+
+            cout << "6 - sair" << endl;
+            cin >> responseMenuEditOrder;
+            switch (responseMenuEditOrder){
+                case 1:
+                    //menuAddOrderItem(orders);
+                    break;
+                case 2:
+                    //menuRemoveOrderItem(orders);
+                    // ao remover o item deve colocar ele na pilha de ação e caso o cliente mude ele é recolocado no pedido
+                    break;
+                /*case 3:
+                    // pilha de ações
+                    break;*/
+                case 4:{
+                    int orderIndex;
+                    string newName = "";
+
+                    cout << "\n Informe o numero do pedido que deseja editar : " << endl;
+                    cin >> orderIndex;
+                    Order* order;
+
+                    try {
+                        // .at() lança std::out_of_range se o índice for inválido
+                        order = &orders.at(orderIndex-1); 
+                        cout << "\n pedido: " << order->getNumberOrder()<< " selecionado!" << endl;
+                    } 
+                    catch (const std::out_of_range& e) {
+                        // Captura o erro out_of_range especificamente
+                        cout << "[ERRO] Posição fora do limite do vetor!" << endl;
+                        return;
+                    }
+                    cin.ignore();
+                    cout << "\n informe o novo nome do cliente ou tecle [ENTER] para manter o mesmo nome: ";
+                    getline(cin, newName);
+                    if (!newName.empty() || !newName.find_first_not_of(" \t\n\r") == string::npos) {
+                        order->setNameClient(newName);
+                        cout << "\n---------------------------------------------------------\n";
+                        cout << "Nome do cliente atualizado com sucesso!\n";
+                        cout << "---------------------------------------------------------\n\n";
+                        
+                    }else{
+                        cout << "\n---------------------------------------------------------\n";
+                        cout << "[Erro] O nome do cliente deve ser diferente de vazio! Tente novamente.\n";
+                        cout << "---------------------------------------------------------\n\n";
+                        return;
+                    }
+                    //salvar na lista de pedidos
+                }
+                    break;
+                case 5:
+                    
+                    break;
+                default:
+                    break;
+            }            
+        }
+    
+            break;
+            case 5:
+            menuDividers();
+            cout<<"Relatorio de pedidos"<<endl;
+            cout<<"**********************************************************"<<endl;
+            cout << "Numero do pedido | Numero da mesa | Cliente" << endl;
+            cout << "-------------------------------------------" << endl;
+            if (orders.size() > 0){
+
+            for (size_t i = 0; i < orders.size(); i++) {  // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
+                orders[i].showResumeOrder();
+                cout<<"\n"; // Em C++ usa-se order[i] em vez de order.get(i)
+            }
+        }else{
+            cout<<"\nNenhum produto cadastrado.\n";
+        }
+
+            break;
+            
+        default:
+            break;
+    }
+
+
+}
+
+//Menu de gerenciamento dos pedidos
+void menuAddOrder(vector<Order>& orders, vector<Product>& menu) {
     int barCode;
     char confirmProduct;
     char confirm;
@@ -161,6 +285,7 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
 
     if (closeOrder == 's' || closeOrder == 'S') {
         currentOrder.setStatusOrder(StatusOrder::FECHADO);
+
     }
     
     string clientName;
@@ -170,13 +295,11 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     cin >> clientName;
     cout << "Digite a mesa do cliente: ";
     cin >> clientSeat;
-    cout << "Digite o numero do pedido:";
 
     // informar o numero do pedido
     currentOrder.setNumberOrder((orders.size() > 0) ? orders[orders.size()-1].getNumberOrder() : 0);
     currentOrder.setNameClient(clientName);
     currentOrder.setNumberTable(clientSeat);
-    currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
 
     currentOrder.sumTotalPriceToOrder();
     
