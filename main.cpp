@@ -17,7 +17,8 @@ void menuEditProduct(vector<Product>& menu);
 void menuDeleteProduct(vector<Product>& menu);
 void searchProductName(vector<Product>& menu);
 int searchProductBarCode( vector<Product>& menu);
-bool productExists(vector<Product>& menu, int barCode);
+int getProductIndex(const vector<Product>& menu, int barCode);
+bool productExists(const vector<Product>& menu, int barCode);
 bool productExistsName(vector<Product>& menu, const string& name);
 
 
@@ -86,11 +87,12 @@ int main(){
 // =======================================================
 //Menu de gerenciamento dos pedidos
 void menuOrder(vector<Order>& orders, vector<Product>& menu) {
-    cout << "Digite os produtos e a quantidade que deseja comprar: " << endl;
-    cout << "****************************************" << endl;
     int barCode;
+    char confirmProduct;
+    char confirm;
+    int quantity;
 
-     (void)orders;
+    (void)orders;
     (void)menu;
   
     // peguntar sobre o produto;
@@ -99,30 +101,76 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     // fechar o pedido
     // informar o nome do cliente
     // informar a mesa do cliente
-    
+
+    showProducts(menu);
+
     cout << "\nDeseja adicionar um novo produto ao pedido?(s/n): ";
-        char confirm;
-        cin >> confirm;
+    cin >> confirm;
 
-        while(confirm == 's' || confirm == 'S') {
-            cout << "Informe o CODIGO do produto: ";
-            cin >> barCode;
+    if (confirm != 's' && confirm != 'S') {
+        return;
+    }
 
-        }
+    Order currentOrder;
 
-    while(true) {
-        
+    while(confirm == 's' || confirm == 'S') {
         cout << "Informe o CODIGO do produto: ";
         cin >> barCode;
-       
-        /*
-        item.setBarCode(order[productIndex].getBarCode());
-        item.setName(order[productIndex].getName());
-        item.setPrice(order[productIndex].getUnitPrice());
-        order.addItemToOrder(item);
-        orders.push_back(order);
-        */
+        
+        if (!productExists(menu, barCode)) {
+            cout << "\nNenhum produto cadastrado com esse codigo.\n";
+            cout << "\nDeseja tentar outro codigo? (s/n): ";
+            cin >> confirm;
+            continue;
+        }
+
+        int index = getProductIndex(menu, barCode);
+
+        cout << "\nProduto selecionado: " << endl;
+        cout << "\nCodigo | Nome | Valor" << endl;
+        cout << "-------------------" << endl;
+        
+        menu[index].show(); 
+        cout << "\n";
+        
+        cout << "\nDeseja adicionar este produto ao pedido? (s/n): ";
+        cin >> confirmProduct;
+        
+        if (confirmProduct == 's' || confirmProduct == 'S') {
+            cout << "\nDigite a quantidade desejada: ";
+            cin >> quantity;
+
+            if (quantity > 0) {
+                Item newItem(&menu[index], quantity);
+                cout << "-> Subtotal do Item: R$ " << newItem.getPriceTotalItem() << endl;
+
+                //currentOrder.addItemToOrder(newItem);
+            } else {
+                cout << "\n[ERRO] A quantidade deve ser maior que zero!\n";
+            }
+        }
+
+        cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): ";
+        cin >> confirm;
     }
+
+    string clientName;
+    string clientSeat;
+
+    cout << "\nDigite o nome do cliente: ";
+    cin >> clientName;
+    cout << "Digite a mesa do cliente: ";
+    cin >> clientSeat;
+
+    currentOrder.setClientName(clientName);
+    currentOrder.setClientSeat(clientSeat);
+
+    orders.push_back(currentOrder);
+
+    cout << "\n========================================" << endl;
+    cout << " Pedido Nº " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
+    cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
+    cout << "========================================\n" << endl;
 }
 
 // função cancelar Pedido
@@ -190,9 +238,6 @@ void menuProducts(vector<Product>& menu){
     int responseMenu=0;
 
     menuDividers();
-    cout<<"Menu - Produtos cadastrados"<<endl;
-    cout<<"**********************************************************"<<endl;
-    cout<< "\n";
 
     cout<<"Informe uma opcao"<<endl;
     cout<<"**********************************************************"<<endl;
@@ -231,79 +276,87 @@ void menuProducts(vector<Product>& menu){
     }
 }
 
-//Adicionar um produto ao order
-void menuAddProduct(vector<Product>& menu){
+// Adicionar um produto ao menu
+void menuAddProduct(vector<Product>& menu) {
     char continueClear;
-    string name;
-    int barCode;
-    double price;
-    Product product;
+    char confirmMore;
 
-    menuDividers();
-
-    cout << "Cadastrar produto " << endl;
-    cout << "**********************************************************" << endl;
-
-    //Loop para garantir a inserção de um código válido e único
     do {
-        cout << "Informe o CODIGO do produto: ";
-        cin >> barCode;
+        string name;
+        int barCode;
+        double price;
+        Product product;
 
-        if (barCode < 0) {
-            cout << "\n---------------------------------------------------------\n";
-            cout << "[Erro] O codigo de barras deve ser positivo! Tente novamente.\n";
-            cout << "---------------------------------------------------------\n\n";
-        } 
-        else if (productExists(menu, barCode)) {
-            cout << "\n---------------------------------------------------------\n";
-            cout << "[Erro] Ja existe um produto cadastrado com o codigo " << barCode << "! Tente novamente.\n";
-            cout << "---------------------------------------------------------\n\n";
-        }
-    } while (barCode < 0 || productExists(menu, barCode));
+        menuDividers();
 
-    // Limpa o \n deixado pelo cin >> barCode antes de entrar no getline
-    cin.ignore();
+        cout << "Cadastrar produto " << endl;
+        cout << "**********************************************************" << endl;
 
-    //Loop para garantir a inserção de um nome válido e único
-    do {
-        cout << "Informe o NOME do produto: ";
-        getline(cin, name);
+        // Loop para garantir a inserção de um código válido e único
+        do {
+            cout << "Informe o CODIGO do produto: ";
+            cin >> barCode;
 
-        if (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos) {
-            cout << "\n---------------------------------------------------------\n";
-            cout << "[Erro] O nome do produto deve ser diferente de vazio! Tente novamente.\n";
-            cout << "---------------------------------------------------------\n\n";
-        } else if (productExistsName(menu, name)) {
-            cout << "\n---------------------------------------------------------\n";
-            cout << "[Erro] Ja existe um produto cadastrado com o nome " << name << "! Tente novamente.\n";
-            cout << "---------------------------------------------------------\n\n";
-        }
-    } while (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos || productExistsName(menu, name));
+            if (barCode < 0) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] O codigo de barras deve ser positivo! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            } 
+            else if (productExists(menu, barCode)) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] Ja existe um produto cadastrado com o codigo " << barCode << "! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            }
+        } while (barCode < 0 || productExists(menu, barCode));
 
+        // Limpa o \n deixado pelo cin >> barCode antes de entrar no getline
+        cin.ignore();
 
-    //Loop para garantir a inserção de um preço válido (positivo)
-    do {
-        cout << "Informe o VALOR UNITARIO do produto: ";
-        cin >> price;
+        // Loop para garantir a inserção de um nome válido e único
+        do {
+            cout << "Informe o NOME do produto: ";
+            getline(cin, name);
 
-        if (price < 0) {
-            cout << "\n---------------------------------------------------------\n";
-            cout << "[Erro] O valor unitario deve ser positivo! Tente novamente.\n";
-            cout << "---------------------------------------------------------\n\n";
-        } 
-    } while (price < 0);
+            if (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] O nome do produto deve ser diferente de vazio! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            } else if (productExistsName(menu, name)) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] Ja existe um produto cadastrado com o nome " << name << "! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            }
+        } while (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos || productExistsName(menu, name));
 
-    // Salva os dados no objeto
-    product.setName(name);
-    product.setBarCode(barCode);
-    product.setUnitPrice(price);
-    
-    // Adiciona o produto ao final do vetor (order)
-    menu.push_back(product);
+        // Loop para garantir a inserção de um preço válido (positivo)
+        do {
+            cout << "Informe o VALOR UNITARIO do produto: ";
+            cin >> price;
 
-    cout << "\n---------------------------------------------------------" << endl;
-    cout << "Produto cadastrado com sucesso!" << endl;
-    cout << "---------------------------------------------------------" << endl;
+            if (price < 0) {
+                cout << "\n---------------------------------------------------------\n";
+                cout << "[Erro] O valor unitario deve ser positivo! Tente novamente.\n";
+                cout << "---------------------------------------------------------\n\n";
+            } 
+        } while (price < 0);
+
+        // Salva os dados no objeto
+        product.setName(name);
+        product.setBarCode(barCode);
+        product.setUnitPrice(price);
+        
+        // Adiciona o produto ao vetor do menu
+        menu.push_back(product);
+
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "Produto cadastrado com sucesso!" << endl;
+        cout << "---------------------------------------------------------" << endl;
+
+        // Pergunta se deseja cadastrar outro produto
+        cout << "\nDeseja cadastrar outro produto? (s/n): ";
+        cin >> confirmMore;
+
+    } while (confirmMore == 's' || confirmMore == 'S');
 
     cout << "\npressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
     cin >> continueClear;
@@ -374,7 +427,7 @@ void menuEditProduct(vector<Product>& menu) {
 
 
 //Deletar um produto do menu
-void deleteProduct(vector<Product>& menu) {
+void menuDeleteProduct(vector<Product>& menu) {
     char continueClear;
 
     // Chama a busca por código, que já pede o código do produto e retorna a posição
@@ -490,14 +543,27 @@ void showProducts(vector<Product>& menu) {
     }
 }
 
-//Verifica se o produto existe no order pelo código de barras, mas sem retornar texto
-bool productExists( vector<Product>& menu, int barCode) {
+//Retorna a posição do produto no vetor
+int getProductIndex(const vector<Product>& menu, int barCode) {
     for (size_t i = 0; i < menu.size(); i++) {
         if (menu[i].getBarCode() == barCode) {
-            return true;
+            return i; // Retorna a posição (0, 1, 2...) onde o produto está no vetor
         }
     }
-    return false;
+    return -1; // Retorna -1 se não encontrar
+}
+
+//Verifica se o produto existe no order pelo código de barras, mas sem retornar texto
+bool productExists(const vector<Product>& menu, int barCode) {
+
+    int posicaoEncontrada = getProductIndex(menu, barCode);  //Procura em que posição o produto está no vetor
+
+    //Testa se a posição é válida
+    if (posicaoEncontrada != -1) {
+        return true;  // Se a posição for diferente de -1, o produto existe na lista!
+    } else {
+        return false;  // Se for igual a -1, o produto não existe na lista!
+    }
 }
 
 // Nova versão do productExists, mas para NOME (mesmo nome de função, parâmetros diferentes)

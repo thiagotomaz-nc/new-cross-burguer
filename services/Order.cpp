@@ -38,6 +38,26 @@ int Order::generateNumberOrder(){
     return this->numberOrder+1;
 }
     
+int Order::getNumberOrder() const {
+    return this->numberOrder;
+}
+
+void Order::setClientName(const string& name) {
+    this->nameClient = name;
+}
+
+void Order::setClientSeat(const string& seat) {
+    this->clientSeat = seat;
+}
+
+string Order::getClientName() const {
+    return this->nameClient;
+}
+
+string Order::getClientSeat() const {
+    return this->clientSeat;
+}
+
 void Order::addItemToOrder(){}// ver estrutura
 
 void Order::removeItemFromOrder(){} // ver estrutura

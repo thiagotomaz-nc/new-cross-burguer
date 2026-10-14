@@ -12,11 +12,12 @@ private:
     int numberOrder = 0;
     int numberTable;
     string nameClient;
+    string clientSeat; 
     // head que mostra onde inicia os items de um pedido;
     Item * headItems = nullptr; // marca qual o inicio do cabeça dos items; 
     double priceTotalToOrder = 0;
     // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
-    int statusOrder; 
+    int statusOrder;
 
 public:
     Order(Item * newItem,int newNumberTable);
@@ -30,8 +31,13 @@ public:
 
     void setNumberOrder(int numberOrder);
     void setNumberTable(int numberTable);
-    int getNumberOrder();
+    int getNumberOrder()const;
     int getNumberTable();
+
+    void setClientName(const string& name);
+    void setClientSeat(const string& seat);
+    string getClientName() const;
+    string getClientSeat() const;
 
     void showOrder();
   
