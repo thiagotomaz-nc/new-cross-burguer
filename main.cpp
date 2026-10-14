@@ -2,6 +2,8 @@
 #include "models/Order.hpp"
 #include "models/Item.hpp"
 
+#include "enuns/enumStatusOrder.h"
+
 #include <iostream>
 #include <vector>
 
@@ -169,6 +171,7 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
 
     currentOrder.setNameClient(clientName);
     currentOrder.setNumberTable(clientSeat);
+    currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
 
     orders.push_back(currentOrder);
 
