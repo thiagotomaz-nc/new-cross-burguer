@@ -151,7 +151,7 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
 
                 cout << "-> Subtotal do Item: R$ " << newItem.getPriceTotalItem() << endl;
 
-                //currentOrder.addItemToOrder(newItem);
+                currentOrder.addItemToOrder(newItem);
             } else {
                 cout << "\n[ERRO] A quantidade deve ser maior que zero!\n";
             }
@@ -169,6 +169,7 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     cout << "Digite a mesa do cliente: ";
     cin >> clientSeat;
 
+    currentOrder.generateNumberOrder();
     currentOrder.setNameClient(clientName);
     currentOrder.setNumberTable(clientSeat);
     currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
@@ -178,7 +179,7 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     orders.push_back(currentOrder);
 
     cout << "\n========================================" << endl;
-    cout << " Pedido Nº " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
+    cout << " Pedido N. " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
     cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
     cout << "========================================\n" << endl;
 }
