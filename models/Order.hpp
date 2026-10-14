@@ -2,7 +2,13 @@
 #define _ORDER_HPP_
 
 #include <string>
-#include "models/Item.hpp"
+#include <iostream>
+#include <vector>
+#include <utility>
+
+#include "../enuns/enumStatusOrder.h"
+
+#include "../models/Item.hpp"
 
 using namespace std;
 
@@ -12,34 +18,34 @@ private:
     int numberOrder = 0;
     int numberTable;
     string nameClient;
-    string clientSeat; 
-    // head que mostra onde inicia os items de um pedido;
-    Item * headItems = nullptr; // marca qual o inicio do cabeça dos items; 
+    vector<Item> items; // marca qual o inicio do cabeça dos items; 
     double priceTotalToOrder = 0;
-    // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
-    int statusOrder;
+    int statusOrder; // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
 
 public:
-    Order(Item * newItem,int newNumberTable);
     Order();
 
-    void addItemToOrder();
-    void removeItemFromOrder();
+    void addItemToOrder(Item item);
+    void removeItemFromOrder(int index);
+
+    pair<bool, Item> getItemToIndex(int index);
+ 
     void sumTotalPriceToOrder();
     double getTotalPriceToOrder();
     int generateNumberOrder();
 
-    void setNumberOrder(int numberOrder);
-    void setNumberTable(int numberTable);
-    int getNumberOrder()const;
+    
+    void setNumberTable(int newNumberTable);
+    int getNumberOrder();
     int getNumberTable();
+    void setNameClient(string newNameClient);
+    string getNameClient();
+    void setStatusOrder(StatusOrder newStatusOrder);
+    int getStatusOrder();
 
-    void setClientName(const string& name);
-    void setClientSeat(const string& seat);
-    string getClientName() const;
-    string getClientSeat() const;
+    void showResumeOrder();
 
-    void showOrder();
+    string statusToString(int status);
   
     ~Order();
 };

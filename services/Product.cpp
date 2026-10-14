@@ -1,16 +1,6 @@
-#include "models/Product.hpp"
+#include "../models/Product.hpp"
 
-Product::Product() {
-    this->barCode = 0;
-    this->name = "";
-    this->unitPrice = 0;
-}
-
-Product::Product(int barCode, string name, float unitPrice) {
-    this->barCode = barCode;
-    this->name = name;
-    this->unitPrice = unitPrice;
-}
+Product::Product() {}
 
 int Product::getBarCode() const {
     return this->barCode;
