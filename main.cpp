@@ -1,255 +1,620 @@
-#include <iostream>
-#include "class/Product.hpp"
-#include "class/ProductsList.hpp"
-#include "class/Order.hpp"
-#include "class/Item.hpp"
+/*
+Sintaxe
+    vector<Order>&: recebe o vetor original por referência /  acessa a variável original;
+    vector<Order>*: recebe um ponteiro para o vetor / aponta para o endereço de memória;
+    vector<Order>: recebe uma cópia do vetor / recebe uma copia do valor;
+*/
 
-#include <string>
+#include "models/Product.hpp"
+#include "models/Order.hpp"
+#include "models/Item.hpp"
+
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
+void showProducts(vector<Product> &menu);
 
-void AddProduct(ProductsList* productList);
-void editProduct(ProductsList* productList);
-void deleteProduct(ProductsList* productList);
-void searchProductName(ProductsList* productList);
-void menu(ProductsList* productList);
-void homeOrder();
+// menus
+void menuProducts(vector<Product> &menu);
+void menuOrder(vector<Order> &orders, vector<Product> &menu);
+void menuCancelOrder(vector<Order> &menu);
+void menuAddProduct(vector<Product> &menu);
+void menuEditProduct(vector<Product> &menu);
+void menuDeleteProduct(vector<Product> &menu);
+void searchProductName(vector<Product> &menu);
+int searchProductBarCode(vector<Product> &menu);
+bool productExists(vector<Product> &menu, int barCode);
+bool productExistsName(vector<Product> &menu, const string &name);
+
+// orders
+void menuShowAllOrders(vector<Order> &order);
+int searchOrderNumber(vector<Order> &order);
+void menuShowOrder(vector<Order> &order);
+
+// configurações
+void deleteTerminal();
 void menuDividers();
 
-int main(){
-    //inicio variaveis
+// cadastros prévios
+void cadastrosPrevios(vector<Order> &order, vector<Product> &menu);
+
+int main()
+{
+    // inicio variaveis
     int response = 0;
     bool continuar = true;
-    //cabeçalho que aponta para o primeiro elemento do propduto;    
-        // *head = valor que head aponta;
-        // head = Endereço apontado pelo ponteiro;
-        // &head = Endereço do proprio ponteiro;
-    ProductsList productsList;
-    
-    // Fim variaveis
-    
-    cout<<endl;
-   
-    //criar um menu, através dos produtos, podendo inclusive cadastrar novos produtos, editar, excluir (desativas), consultar
-    do{
-        menuDividers(); 
+    Product product;
+    vector<Product> menu_products;
+    vector<Order> orders;
+
+    cout << endl;
+    // realizar os cadastros prévios
+    cadastrosPrevios(orders, menu_products);
+
+    // criar um order, através dos produtos, podendo inclusive cadastrar novos produtos, editar, excluir (desativas), consultar
+    do
+    {
+        menuDividers();
         cout << "New Cross Burguer" << endl;
-        cout<<"====================================="<< endl;
-        cout<<"informe uma opcao"<<endl;
-        cout<<"1 - Iniciar pedido"<<endl;
-        cout<<"2 - Cancelar pedido"<<endl;
-        cout<<"3 - Gerenciar Menu"<<endl;
-        cout<<"4 - Sair do sistema"<<endl;
-        cin>>response;
+        cout << "=====================================" << endl;
+        cout << "informe uma opcao" << endl;
+        cout << "1 - Iniciar pedido" << endl;
+        cout << "2 - Cancelar pedido" << endl;
+        cout << "3 - Gerenciar Menu" << endl;
+        cout << "4 - Sair do sistema" << endl;
+        cout << "\nDigite a opcao desejada: ";
+        cin >> response;
 
         switch (response)
         {
+        case 1:
+            menuOrder(orders, menu_products);
+            break;
+        case 2:
+            menuCancelOrder(orders);
+            break;
         case 3:
-            menu(&productsList);
+            menuProducts(menu_products);
             break;
         case 4:
             /* code */
-            cout<<endl;
-            cout<<"Saindo do sistema!!!\nAte mais!!"<<endl;
-            cout<<endl;
-            continuar=false;
+            cout << endl;
+            cout << "Saindo do sistema!!!\nAte mais!!" << endl;
+            cout << endl;
+            continuar = false;
             break;
-        
+
         default:
             continue;
             break;
         }
-    }while(continuar);
+    } while (continuar);
 
     return 0;
 }
 
-void menu(ProductsList* productList){
-    int responseMenu=0;
+// =======================================================
+// MENU PEDIDOS
+// =======================================================
+// Menu de gerenciamento dos pedidos
+void menuOrder(vector<Order> &orders, vector<Product> &menu)
+{
+    menuDividers();
+    cout << "Menu Pedidos " << endl;
+    cout << "****************************************" << endl;
+    int barCode;
+
+    (void)orders;
+    (void)menu;
+
+    // peguntar sobre o produto;
+    // informar o produto completo por código do produto;
+    // informar a quantidade
+    // fechar o pedido
+    // informar o nome do cliente
+    // informar a mesa do pedido
+
+    cout << "\nDeseja adicionar um novo produto ao pedido?(s/n): ";
+    char confirm;
+    cin >> confirm;
+
+    while (confirm == 's' || confirm == 'S')
+    {
+        cout << "Informe o CODIGO do produto: ";
+        cin >> barCode;
+    }
+
+    while (true)
+    {
+
+        cout << "Informe o CODIGO do produto: ";
+        cin >> barCode;
+
+        /*
+        item.setBarCode(order[productIndex].getBarCode());
+        item.setName(order[productIndex].getName());
+        item.setPrice(order[productIndex].getUnitPrice());
+        order.addItemToOrder(item);
+        orders.push_back(order);
+        */
+    }
+}
+
+// função cancelar Pedido
+void menuCancelOrder(vector<Order> &orders)
+{
+    char continueClear;
+
+    // Chama a busca por código, que já pede o código do produto e retorna a posição
+    int OrderIndex = searchOrderNumber(orders);
+
+    cout << "Cadastrar produto " << endl;
+    cout << "**********************************************************" << endl;
+
+    // Se o índice for 0 ou maior, o produto existe na lista
+    if (OrderIndex >= 0)
+    {
+        cout << "\nTem certeza que deseja apagar o produto: "
+             << orders[OrderIndex].getNumberOrder() << "? (s/n): ";
+
+        char confirm;
+        cin >> confirm;
+
+        if (confirm == 's' || confirm == 'S')
+        {
+            // Apaga o produto do vetor usando o iterador
+            orders.erase(orders.begin() + OrderIndex);
+            cout << "\n---------------------------------------------------------" << endl;
+            cout << "Produto removido com sucesso!" << endl;
+            cout << "---------------------------------------------------------" << endl;
+        }
+        else
+        {
+            cout << "\nOperacao cancelada." << endl;
+        }
+    }
+
+    cout << "\nPressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
+    cin >> continueClear;
+
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
+    }
+}
+
+int searchOrderNumber(vector<Order> &order)
+{
+    (void)order;
+    return 1;
+}
+
+// Listar todos os produtos cadastrados no sistema
+void menuShowOrder(Order &order)
+{
+    order.showResumeOrder();
+}
+
+// Listar todos os produtos cadastrados no sistema
+void menuShowAllOrders(vector<Order> &order)
+{
+    if (order.size() > 0)
+    {
+        cout << "\nResumo do pedido" << endl;
+        cout << "---------------------------------------------------------\n";
+        cout << "n. pedido  |  N. Mesa  | Nome Cliente" << endl;
+
+        for (size_t i = 0; i < order.size(); i++)
+        {
+            
+            // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
+            order[i].showResumeOrder();
+            cout << "\n"; // Em C++ usa-se order[i] em vez de order.get(i)
+        }
+    }
+    else
+    {
+        cout << "\nNenhum produto cadastrado.\n";
+    }
+}
+
+// =======================================================
+// MENU PRODUTOS
+// =======================================================
+// Menu de gerenciamento dos produtos
+void menuProducts(vector<Product> &menu)
+{
+    int responseMenu = 0;
 
     menuDividers();
-    cout<<"Menu - Produtos cadastrados"<<endl;
-    cout<<"**********************************************************"<<endl;
-    productList->showProducts(productList->getHeadProduct());//lista todos os produtos da lista
-    cout<< endl;
-    
-    cout<<"Informe uma opcao"<<endl;
-    cout<<"**********************************************************"<<endl;
-    cout<<"1 - Cadastrar um produto"<<endl;
-    cout<<"2 - Editar um produto"<<endl;
-    cout<<"3 - Remover um produto"<<endl; 
-    cout<<"4 - Consultar um produto pelo nome "<<endl;
-    cout<<"5 - Voltar ao menu principal"<<endl;
-    cin >> responseMenu; 
+
+    cout << "Informe uma opcao" << endl;
+    cout << "**********************************************************" << endl;
+    cout << "1 - Cadastrar um produto" << endl;
+    cout << "2 - Editar um produto" << endl;
+    cout << "3 - Remover um produto" << endl;
+    cout << "4 - Consultar um produto pelo nome" << endl;
+    cout << "5 - Consultar lista de produtos cadastrados" << endl;
+    cout << "6 - Voltar ao order principal" << endl;
+    cout << "\nDigite a opcao desejada: ";
+    cin >> responseMenu;
 
     switch (responseMenu)
     {
     case 1:
-        AddProduct(productList);
-        break;
-    case 3:
-        deleteProduct(productList);
+        menuAddProduct(menu);
         break;
     case 2:
-        editProduct(productList);
+        menuEditProduct(menu);
+        break;
+    case 3:
+        menuDeleteProduct(menu);
         break;
     case 4:
-        searchProductName(productList);
-        break;    
+        searchProductName(menu);
+        break;
+    case 5:
+        menuDividers();
+        cout << "Menu - Produtos cadastrados" << endl;
+        cout << "**********************************************************" << endl;
+        showProducts(menu);
+        cout << "\n";
+        menuProducts(menu);
+        break;
     default:
         break;
     }
 }
 
-void AddProduct(ProductsList* productList){
+// Adicionar um produto ao order
+void menuAddProduct(vector<Product> &menu)
+{
     char continueClear;
-     // cabeça inicia em null, significa que não tem nenhum produto cadastrado na lista encadeada;
-    string description;
+    string name;
     int barCode;
     double price;
-    
-    //Criação do objeto de forma dinamica do objeto da classe produto;
     Product product;
-    cin.ignore();
 
     menuDividers();
 
-    cout<<"Cadastrar produto "<<endl;
-    cout<<"**********************************************************"<<endl;
-     cout<<"Informe o CODIGO do produto: ";
-    cin>>barCode;
-    cin.ignore();
-    cout<<"Informe o NOME do produto: ";
-    getline(cin, description);
-    cout<<"Informe o VALOR UNITARIO do produto: ";
-    cin>>price;
-   
+    // Loop para garantir a inserção de um código válido e único
+    do
+    {
+        cout << "Informe o CODIGO do produto: ";
+        cin >> barCode;
 
-    // validação aqui
-    // Objeto criado e instanciado;
-    // Não precisa destruir, pois é uma vriavel local que vai ser destruida com o metodo;
-    product.setDescription(description);
+        if (barCode < 0)
+        {
+            cout << "\n---------------------------------------------------------\n";
+            cout << "[Erro] O codigo de barras deve ser positivo! Tente novamente.\n";
+            cout << "---------------------------------------------------------\n\n";
+        }
+        else if (productExists(menu, barCode))
+        {
+            cout << "\n---------------------------------------------------------\n";
+            cout << "[Erro] Ja existe um produto cadastrado com o codigo " << barCode << "! Tente novamente.\n";
+            cout << "---------------------------------------------------------\n\n";
+        }
+    } while (barCode < 0 || productExists(menu, barCode));
+
+    // Limpa o \n deixado pelo cin >> barCode antes de entrar no getline
+    cin.ignore();
+
+    // Loop para garantir a inserção de um nome válido e único
+    do
+    {
+        cout << "Informe o NOME do produto: ";
+        getline(cin, name);
+
+        if (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos)
+        {
+            cout << "\n---------------------------------------------------------\n";
+            cout << "[Erro] O nome do produto deve ser diferente de vazio! Tente novamente.\n";
+            cout << "---------------------------------------------------------\n\n";
+        }
+        else if (productExistsName(menu, name))
+        {
+            cout << "\n---------------------------------------------------------\n";
+            cout << "[Erro] Ja existe um produto cadastrado com o nome " << name << "! Tente novamente.\n";
+            cout << "---------------------------------------------------------\n\n";
+        }
+    } while (name.empty() || name.find_first_not_of(" \t\n\r") == string::npos || productExistsName(menu, name));
+
+    // Loop para garantir a inserção de um preço válido (positivo)
+    do
+    {
+        cout << "Informe o VALOR UNITARIO do produto: ";
+        cin >> price;
+
+        if (price < 0)
+        {
+            cout << "\n---------------------------------------------------------\n";
+            cout << "[Erro] O valor unitario deve ser positivo! Tente novamente.\n";
+            cout << "---------------------------------------------------------\n\n";
+        }
+    } while (price < 0);
+
+    // Salva os dados no objeto
+    product.setName(name);
     product.setBarCode(barCode);
     product.setUnitPrice(price);
 
-    productList->addProduto(&product);
+    // Adiciona o produto ao final do vetor (order)
+    menu.push_back(product);
 
-    cout<<"pressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..."<<endl;
+    cout << "\n---------------------------------------------------------" << endl;
+    cout << "Produto cadastrado com sucesso!" << endl;
+    cout << "---------------------------------------------------------" << endl;
+
+    cout << "\npressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
     cin >> continueClear;
 
-    if(continueClear == 's' || continueClear == 'S' ){
-        system("clear");
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
     }
-        
-    menu(productList);          
-     
 }
 
-void editProduct(ProductsList* productList){
+// Editar um produto do order
+void menuEditProduct(vector<Product> &menu)
+{
     char continueClear;
-     // cabeça inicia em null, significa que não tem nenhum produto cadastrado na lista encadeada;
-    string newDescription;
+    string newName;
     double newPrice;
-    int barCode;
-    
-    //Criação do objeto de forma dinamica do objeto da classe produto;
-    
-    cin.ignore();
 
-    menuDividers();
+    // Chama a busca que pede o código e retorna o índice (posição no vetor)
+    int productIndex = searchProductBarCode(menu);
 
-    cout<<"Editar produto "<<endl;
-    cout<<"********************************** "<<endl;
-    cout<<"Informe o CODIGO do produto: ";
-    cin>>barCode;
+    // Valida se o produto foi encontrado (>= 0 inclui o índice 0)
+    if (productIndex >= 0)
+    {
+        cout << "\n---------------------------------------------------------\n";
+        cout << "Produto " << menu[productIndex].getBarCode() << " selecionado!\n";
+        cout << "\nCodigo | Nome | Valor" << endl;
+        cout << "-------------------" << endl;
+        menu[productIndex].show();
+        cout << "\n---------------------------------------------------------\n";
 
-    cin.ignore();
-    Product* updateProductList = productList->searchProduct(barCode);   
-    
-    if (updateProductList != nullptr){
-        cout<<"---------------------------------------------------------"<<endl;
-        cout<<"Produto "<< updateProductList->getBarCode()<< " selecionado!"<<endl;
-        cout<<"**********************************************************"<<endl;
-        cout<<"Informe o novo NOME do produto OU tecle [ENTER] para manter o mesmo nome: ";
-        getline(cin, newDescription);
-        cout<<"Informe o novo VALOR UNITARIO do produto ou digite [0] zero para manter o mesmo valor: ";
+        cin.ignore(); // Limpa o buffer do cin para ler o getline sem pular
+
+        cout << "\nInforme o novo NOME do produto OU tecle [ENTER] para manter o mesmo nome: ";
+        getline(cin, newName);
+        cout << "Informe o novo VALOR UNITARIO do produto ou digite [0] zero para manter o mesmo valor: ";
         cin >> newPrice;
-        //poderia realizar as atualizações pelo updateProduct
-        productList->updateProduct(updateProductList,newDescription,newPrice);
 
+        // Atualiza o preço apenas se for digitado um valor maior que zero
+        if (!newName.empty())
+        {
+            menu[productIndex].setName(newName);
+        }
+        if (newPrice > 0)
+        {
+            menu[productIndex].setUnitPrice(newPrice);
+        }
 
-    }else{
-        cout<<"\n---------------------------------------------------------"<<endl;
-        cout<<"Produto não encontrado!"<<endl;
-        cout<<"---------------------------------------------------------\n"<<endl;
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "Produto atualizado com sucesso!" << endl;
+        cout << "---------------------------------------------------------" << endl;
+
+        cout << "\nCodigo | Nome | Valor" << endl;
+        cout << "-------------------" << endl;
+        menu[productIndex].show();
+        cout << "\n\n";
+    }
+    else
+    {
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "Produto nao encontrado!" << endl;
+        cout << "---------------------------------------------------------\n"
+             << endl;
     }
 
-    cout<<"pressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..."<<endl;
+    cout << "pressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
     cin >> continueClear;
 
-    if(continueClear == 's' || continueClear == 'S' ){
-        system("clear");
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
     }
-        
-    menu(productList);
 }
 
-void deleteProduct(ProductsList* productList){
+// Deletar um produto do menu
+void menuDeleteProduct(vector<Product> &menu)
+{
     char continueClear;
-    int barCode;
-    
-    cin.ignore();
 
-    menuDividers();
+    // Chama a busca por código, que já pede o código do produto e retorna a posição
+    int productIndex = searchProductBarCode(menu);
 
-    cout<<"Deletar produto "<<endl;
-    cout<<"********************************** "<<endl;
-    cout<<"Informe o CODIGO do produto: ";
-    cin>>barCode;
+    // Se o índice for 0 ou maior, o produto existe na lista
+    if (productIndex >= 0)
+    {
+        cout << "\nTem certeza que deseja apagar o produto: "
+             << menu[productIndex].getName() << "? (s/n): ";
 
-    cin.ignore();
-    
-    productList->removeProduct(barCode);
+        char confirm;
+        cin >> confirm;
 
-    cout<<"pressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..."<<endl;
+        if (confirm == 's' || confirm == 'S')
+        {
+            // Apaga o produto do vetor usando o iterador
+            menu.erase(menu.begin() + productIndex);
+            cout << "\n---------------------------------------------------------" << endl;
+            cout << "Produto removido com sucesso!" << endl;
+            cout << "---------------------------------------------------------" << endl;
+            showProducts(menu);
+        }
+        else
+        {
+            cout << "\nOperacao cancelada." << endl;
+        }
+    }
+
+    cout << "\nPressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
     cin >> continueClear;
 
-    if(continueClear == 's' || continueClear == 'S' ){
-        system("clear");
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
     }
-        
-    menu(productList);
 }
 
 // Listar todos os produtos que contenham parte de uma palavra
-void searchProductName(ProductsList* productList){
+void searchProductName(vector<Product> &menu)
+{
     char continueClear;
     string partName;
-    
+
     cin.ignore();
 
     menuDividers();
 
-    cout<<"Consultar produto "<<endl;
-    cout<<"********************************** "<<endl;
-    cout<<"Informe o NOME do produto: ";
-    getline(cin,partName);
+    cout << "Consultar produto " << endl;
+    cout << "********************************** " << endl;
+    cout << "Informe o NOME do produto: ";
+    getline(cin, partName);
 
-    
-    productList->searchProductsName(partName);
+    bool found = false;
+    cout << "\nCodigo | Nome | Valor" << endl;
+    cout << "-------------------" << endl;
+    for (size_t i = 0; i < menu.size(); i++)
+    {
+        // Verifica se o texto digitado em 'partName' está contido na descrição
+        if (menu[i].getName().find(partName) != string::npos)
+        {
+            menu[i].show();
+            cout << "\n";
+            found = true;
+        }
+    }
 
-    cout<<"pressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..."<<endl;
+    if (!found)
+    {
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "\nNenhum produto encontrado com o termo: \"" << partName << "\"\n";
+        cout << "---------------------------------------------------------\n"
+             << endl;
+    }
+
+    cout << "\npressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
     cin >> continueClear;
 
-    if(continueClear == 's' || continueClear == 'S' ){
-        system("clear");
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
     }
-        
-    menu(productList);
 }
 
-void menuDividers(){
-    cout<<"------------------------------------------------------------------"<<endl;
-    cout<<endl;
+// Listar todos os produtos que contenham esse código de barras
+int searchProductBarCode(vector<Product> &menu)
+{
+    int barCode;
+    int foundIndex = -1; // Inicializa o índice como -1, indicando que não foi encontrado
+
+    menuDividers();
+    cout << "Consultar produto " << endl;
+    cout << "********************************** " << endl;
+    cout << "Informe o CODIGO do produto: ";
+    cin >> barCode;
+
+    for (size_t i = 0; i < menu.size(); i++)
+    {
+        if (menu[i].getBarCode() == barCode)
+        {
+            foundIndex = i; // Salva o índice onde o produto está
+            break;          // Encontrou, para o loop
+        }
+    }
+
+    if (foundIndex == -1)
+    {
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "\nProduto com o codigo " << barCode << " nao encontrado!" << endl;
+        cout << "---------------------------------------------------------\n"
+             << endl;
+    }
+
+    return foundIndex; // Retorna o índice do produto encontrado ou -1 se não encontrado
+}
+
+// Listar todos os produtos cadastrados no sistema
+void showProducts(vector<Product> &menu)
+{
+    if (menu.size() > 0)
+    {
+        cout << "\nCodigo | Nome | Valor" << endl;
+        cout << "-------------------" << endl;
+        for (size_t i = 0; i < menu.size(); i++)
+        { // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
+            menu[i].show();
+            cout << "\n"; // Em C++ usa-se order[i] em vez de order.get(i)
+        }
+    }
+    else
+    {
+        cout << "\nNenhum produto cadastrado.\n";
+    }
+}
+
+// Verifica se o produto existe no order pelo código de barras, mas sem retornar texto
+bool productExists(vector<Product> &menu, int barCode)
+{
+    for (size_t i = 0; i < menu.size(); i++)
+    {
+        if (menu[i].getBarCode() == barCode)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Nova versão do productExists, mas para NOME (mesmo nome de função, parâmetros diferentes)
+bool productExistsName(vector<Product> &menu, const string &name)
+{
+    for (size_t i = 0; i < menu.size(); i++)
+    {
+        if (menu[i].getName() == name)
+        { // Compara se os nomes são idênticos
+            return true;
+        }
+    }
+    return false;
+}
+
+// =======================================================
+// CONFIGURÇÕES
+// =======================================================
+void menuDividers()
+{
+    cout << "------------------------------------------------------------------" << endl;
+    cout << endl;
+}
+
+void deleteTerminal()
+{
+    system("cls");
+}
+
+// =======================================================
+// CADASTROS PRÉVIOS
+// =======================================================
+void cadastrosPrevios(vector<Order> &order, vector<Product> &menu)
+{
+
+    Product product;
+
+    product.setBarCode(1);
+    product.setName("coca cola 1 litro");
+    product.setUnitPrice(7);
+
+    menu.push_back(product);
+
+    product.setBarCode(2);
+    product.setName("coca cola 2 litro");
+    product.setUnitPrice(14);
+
+    menu.push_back(product);
 }

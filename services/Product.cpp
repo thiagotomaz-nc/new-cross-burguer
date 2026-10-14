@@ -1,46 +1,33 @@
-#include "Product.hpp"
+#include "../models/Product.hpp"
 
-Product::Product(int barCode, string description, double unitPrice, Product * nextProduct){
-    this-> barCode = barCode;
-    this-> description =description;
-    this->unitPrice = unitPrice;
-    this->nextProduct = nextProduct;
-}
+Product::Product() {}
 
-Product::Product(){}
-
-int Product::getBarCode(){
+int Product::getBarCode() const {
     return this->barCode;
 }
 
-void Product::setBarCode(int newBarCode){
-    this->barCode = newBarCode;
+string Product::getName() const {
+    return this->name;
 }
 
-string Product::getDescription(){
-    return this->description;
-}
-
-void Product::setDescription(string newDescription){
-    this->description = newDescription;
-}
-
-Product* Product::getNext(){
-    return this->nextProduct;
-}
-
-void Product::setNext(Product * product){
-    this->nextProduct = product;
-}  
-  
-float Product::getUnitPrice(){
+float Product::getUnitPrice() const {
     return this->unitPrice;
 }
 
-void Product::setUnitPrice(double newUnitPrice){
+void Product::setBarCode(int newBarCode) {
+    this->barCode = newBarCode;
+}
+
+void Product::setName(string newName) {
+    this->name = newName;
+}
+
+void Product::setUnitPrice(float newUnitPrice) {
     this->unitPrice = newUnitPrice;
 }
 
-void Product::show(){
-    cout<<this->barCode << " | " << this->description << " | " << this->unitPrice<<endl;
+void Product::show() const {
+    cout << this->barCode
+         << "  |  " << this->name 
+         << "   | R$ " << this->unitPrice;
 }

@@ -1,61 +1,139 @@
-#include "Order.hpp"
+#include "../models/Order.hpp"
 
-Order::Order(Item * newItem, int newNumberTable){ // inserindo itens no final
-    if (newItem!=nullptr){
-        // passo o valor do ponteiro newItem par ao construtor de copia, 
-        // que cria uma copia em outro endereço baseado nos valores de newItem;
-        // vantagem, não precisa fazer uso do set no item e dos get no newItem
-        Item * item = new Item(*newItem); 
-        this->numberOrder = generateNumberOrder();
-        this->numberTable=newNumberTable;
-        sumTotalPriceToOrder(); // atualiza o preço total de acordo com os items cadastrados no pedido
-        this->priceTotalToOrder=getTotalPriceToOrder(); // deve ser chamado por função
-        this->statusOrder=1; // inicialmente, em construção;
-        this->nameClient = "avulso"; // nome padrão do cliente
-        
-        if (this->headItems==nullptr){
-            // item já é um ponteiro que aponta para o endereço que contem as informações dos itens;
-            // então o head deve apontar para o mesmo endereço apontando o inicio da lista;
-            this->headItems = item;
-        }else{
-            Item * aux = this->headItems;
-            
-            while (aux->getNextItem() != nullptr){
-                aux = aux->getNextItem();
-            }
+Order::Order() {}
 
-            aux->setNextItem(item);
-        }
+void Order::addItemToOrder(Item item)
+{
+    this->items.push_back(item);
+}
+
+void Order::removeItemFromOrder(int index)
+{
+    if (index > 0 && index < this->items.size())
+    {
+        // Apaga o produto do vetor usando o iterador
+        this->items.erase(items.begin() + index);
+
+        // adicionar a pilha de ações;
     }
 }
 
-Order::Order(){}
-
-int Order::generateNumberOrder(){
-    return this->numberOrder+1;
+// optional armazena o objeto diretamente quando existe
+pair<bool, Item> Order::getItemToIndex(int index)
+{
+    if (index > 0 && index < this->items.size())
+    {
+        return {true, this->items[index]};
+    }
+    return {false, Item{}};
 }
-    
-void Order::addItemToOrder(){}// ver estrutura
 
-void Order::removeItemFromOrder(){} // ver estrutura
-
-void Order::sumTotalPriceToOrder(){
-    
-    Item * aux = this->headItems;
-    
+void Order::sumTotalPriceToOrder()
+{
     double sumPriceTotal = 0.0;
-
-    while (aux!=nullptr){
-        sumPriceTotal += aux->getPriceTotalItem();   
-        aux = aux->getNextItem();
+    // size_t é um tipo inteiro sem sinal
+    for (size_t i = 0; i < this->items.size(); i++)
+    {
+        sumPriceTotal += this->items[i].getPriceTotalItem();
     };
-    
-    this->priceTotalToOrder = sumPriceTotal;
 
+    this->priceTotalToOrder = sumPriceTotal;
 }
 
-double Order::getTotalPriceToOrder(){
+double Order::getTotalPriceToOrder()
+{
     return this->priceTotalToOrder;
 }
 
-Order::~Order(){}
+int Order::generateNumberOrder()
+{
+    return this->numberOrder + 1;
+}
+
+void Order::setNumberTable(int newNumberTable)
+{
+    this->numberTable = newNumberTable;
+}
+
+int Order::getNumberOrder()
+{
+    return this->numberOrder;
+}
+
+int Order::getNumberTable()
+{
+    return this->numberTable;
+}
+
+void Order::setNameClient(string newNameClient){
+    this->nameClient = newNameClient;
+}
+
+string Order::getNameClient(){
+    if (this->nameClient.empty()){
+        return "Cliente Avulso";
+    }
+    return this->nameClient;
+}
+
+void Order::setStatusOrder(int newStatusOrder){
+    if (this->statusOrder > 0){
+        this->statusOrder = newStatusOrder;
+    }else{
+        this->statusOrder=1;
+    }
+}
+
+int Order::getStatusOrder(){
+    return this->statusOrder;
+}
+
+string Order::statusToString(int status)
+{
+    switch (status)
+    {
+    case 0:
+        return "CANCELADO";
+    case 1:
+        return "EM_CONSTRUCAO";
+    case 2:
+        return "FECHADO";
+    case 3:
+        return "PRONTO";
+    }
+}
+
+
+void Order::showResumeOrder()
+{
+
+    cout << this->numberOrder << " | " << this->numberTable << " | " << this->nameClient << endl;
+    cout << " Etapa do pedido: " << statusToString(this->statusOrder);
+    cout << "**********************************************************" << endl;
+    cout << "itens do pedido: " << endl;
+
+    if (this->items.size() > 0)
+    {
+       
+        for (size_t i = 0; i < this->items.size(); i++)
+        {
+
+            Product Product = this->items[i].getProductItem().second;
+
+            cout << i + 1 << "  " << Product.getName() << "  "
+                 << Product.getUnitPrice() << " x " << this->items[i].getQuantityItem() << " = "
+                 << this->items[i].getPriceTotalItem();
+        }
+
+        cout << "\nTotal do pedido:  R$ " << this->priceTotalToOrder << endl;
+    }
+    else
+    {
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "Nenhum item adicionado." << endl;
+        cout << "---------------------------------------------------------\n"
+             << endl;
+    }
+}
+
+Order::~Order() {}
