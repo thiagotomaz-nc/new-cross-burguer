@@ -13,7 +13,6 @@ void Order::removeItemFromOrder(int index)
     {
         // Apaga o produto do vetor usando o iterador
         this->items.erase(items.begin() + index);
-
         // adicionar a pilha de ações;
     }
 }
@@ -76,9 +75,10 @@ string Order::getNameClient(){
     return this->nameClient;
 }
 
-void Order::setStatusOrder(int newStatusOrder){
-    if (this->statusOrder > 0){
-        this->statusOrder = newStatusOrder;
+void Order::setStatusOrder(StatusOrder newStatusOrder){
+    int status = static_cast<int>(newStatusOrder);
+    if (status > 0){
+        this->statusOrder = status;
     }else{
         this->statusOrder=1;
     }
@@ -94,12 +94,19 @@ string Order::statusToString(int status)
     {
     case 0:
         return "CANCELADO";
+        break;
     case 1:
         return "EM_CONSTRUCAO";
+        break;
     case 2:
         return "FECHADO";
+        break;
     case 3:
         return "PRONTO";
+        break;
+    default:
+        return "status não encontrado";
+        break;
     }
 }
 
@@ -137,3 +144,4 @@ void Order::showResumeOrder()
 }
 
 Order::~Order() {}
+

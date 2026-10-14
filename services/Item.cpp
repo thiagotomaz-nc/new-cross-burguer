@@ -37,8 +37,6 @@ pair<bool, Product> Item::getProductItem() { // retorn o produto adicionado ao i
     return {true, this->product};
 }
 
-
-
 void Item::setProductItem(Product newProduct) { // tualiza o produto adicionado ao item;
         this->product = newProduct;
         // Recalcula o total ao alterar o produto

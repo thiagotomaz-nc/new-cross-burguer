@@ -23,7 +23,7 @@ mkdir -p output && g++ -Wall -Wextra -g3 -I. main.cpp services/*.cpp -o output/m
 
 # Windows 
 - Criar o arquivo na pasta output:**
-    - ++ main.cpp ./services/Order.cpp ./services/Item.cpp ./services/Product.cpp -o ./output/main.exe
+    - g++ main.cpp services/Order.cpp services/Item.cpp services/Product.cpp -o ./output/main.exe
 - Rodar o arquivo na pasta output**
     - ./output/main.exe
 

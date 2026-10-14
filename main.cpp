@@ -30,6 +30,9 @@ int searchOrderNumber(vector<Order>& order);
 void deleteTerminal();
 void menuDividers();
 
+// CADASTROS PRÉVIOS
+void cadastrosPrevios(vector<Order> &order, vector<Product> &menu);
+
 int main(){
     //inicio variaveis
     int response = 0;
@@ -37,6 +40,8 @@ int main(){
     Product product;
     vector<Product> menu_products;
     vector<Order> orders;
+
+    cadastrosPrevios(orders,menu_products);
     
         
     cout<< endl;
@@ -91,9 +96,6 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     char confirmProduct;
     char confirm;
     int quantity;
-
-    (void)orders;
-    (void)menu;
   
     // peguntar sobre o produto;
     // informar o produto completo por código do produto;
@@ -141,7 +143,10 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
             cin >> quantity;
 
             if (quantity > 0) {
-                Item newItem(&menu[index], quantity);
+                Item newItem;
+                newItem.setProductItem(menu[index]);
+                newItem.setQuantityItem(quantity);
+
                 cout << "-> Subtotal do Item: R$ " << newItem.getPriceTotalItem() << endl;
 
                 //currentOrder.addItemToOrder(newItem);
@@ -222,7 +227,7 @@ void showOrders(vector<Order>& order) {
     cout<< "\nnúmero do pedido | descrição | Valor"<<endl;
     cout<< "-------------------"<<endl;
     for (size_t i = 0; i < order.size(); i++) {  // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
-        order[i].showOrder();
+        order[i].showResumeOrder();
         cout<<"\n"; // Em C++ usa-se order[i] em vez de order.get(i)
     }
     }else{
@@ -586,4 +591,25 @@ void menuDividers(){
 
 void deleteTerminal(){
     system("cls");
+}
+
+// =======================================================
+// CADASTROS PRÉVIOS
+// =======================================================
+void cadastrosPrevios(vector<Order> &order, vector<Product> &menu)
+{
+
+    Product product;
+
+    product.setBarCode(1);
+    product.setName("coca cola 1 litro");
+    product.setUnitPrice(7);
+
+    menu.push_back(product);
+
+    product.setBarCode(2);
+    product.setName("coca cola 2 litro");
+    product.setUnitPrice(14);
+
+    menu.push_back(product);
 }

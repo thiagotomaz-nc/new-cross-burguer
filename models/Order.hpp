@@ -40,7 +40,7 @@ public:
     int getNumberTable();
     void setNameClient(string newNameClient);
     string getNameClient();
-    void setStatusOrder(int newStatusOrder);
+    void setStatusOrder(StatusOrder newStatusOrder);
     int getStatusOrder();
 
     void showResumeOrder();
