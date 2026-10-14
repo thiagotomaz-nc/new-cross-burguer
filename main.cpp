@@ -42,6 +42,7 @@ int main(){
     Product product;
     vector<Product> menu_products;
     vector<Order> orders;
+    int numberOrder = 0;
 
     cadastrosPrevios(orders,menu_products);
     
@@ -98,6 +99,9 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     char confirmProduct;
     char confirm;
     int quantity;
+    menuDividers();
+    cout << "Menu de pedidos" << endl;
+    cout << "**********************************************************" << endl;
   
     // peguntar sobre o produto;
     // informar o produto completo por código do produto;
@@ -106,18 +110,10 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     // informar o nome do cliente
     // informar a mesa do cliente
 
-    showProducts(menu);
+    //showProducts(menu);
+  Order currentOrder;
 
-    cout << "\nDeseja adicionar um novo produto ao pedido?(s/n): ";
-    cin >> confirm;
-
-    if (confirm != 's' && confirm != 'S') {
-        return;
-    }
-
-    Order currentOrder;
-
-    while(confirm == 's' || confirm == 'S') {
+    do{
         cout << "Informe o CODIGO do produto: ";
         cin >> barCode;
         
@@ -137,10 +133,6 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
         menu[index].show(); 
         cout << "\n";
         
-        cout << "\nDeseja adicionar este produto ao pedido? (s/n): ";
-        cin >> confirmProduct;
-        
-        if (confirmProduct == 's' || confirmProduct == 'S') {
             cout << "\nDigite a quantidade desejada: ";
             cin >> quantity;
 
@@ -154,13 +146,23 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
                 currentOrder.addItemToOrder(newItem);
             } else {
                 cout << "\n[ERRO] A quantidade deve ser maior que zero!\n";
+                return;
             }
-        }
+        
 
         cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): ";
         cin >> confirm;
-    }
+    }while(confirm == 's' || confirm == 'S');
 
+    menuDividers();
+    char closeOrder;
+    cout << "\n Deseja fechar o pedido? (s/n): ";
+    cin >> closeOrder;
+
+    if (closeOrder == 's' || closeOrder == 'S') {
+        currentOrder.setStatusOrder(StatusOrder::FECHADO);
+    }
+    
     string clientName;
     int  clientSeat;
 
@@ -168,13 +170,16 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     cin >> clientName;
     cout << "Digite a mesa do cliente: ";
     cin >> clientSeat;
+    cout << "Digite o numero do pedido:";
 
-    currentOrder.generateNumberOrder();
+    // informar o numero do pedido
+    currentOrder.setNumberOrder((orders.size() > 0) ? orders[orders.size()-1].getNumberOrder() : 0);
     currentOrder.setNameClient(clientName);
     currentOrder.setNumberTable(clientSeat);
     currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
 
     currentOrder.sumTotalPriceToOrder();
+    
 
     orders.push_back(currentOrder);
 

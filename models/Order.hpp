@@ -32,7 +32,7 @@ public:
  
     void sumTotalPriceToOrder();
     double getTotalPriceToOrder();
-    int generateNumberOrder();
+    int setNumberOrder(int newNumberOrder);
 
     
     void setNumberTable(int newNumberTable);

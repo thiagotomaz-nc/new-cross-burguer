@@ -1,6 +1,8 @@
 #include "../models/Order.hpp"
 
-Order::Order() {}
+Order::Order() {
+    this->statusOrder = static_cast<int>(StatusOrder::EM_CONSTRUCAO);
+}
 
 void Order::addItemToOrder(Item item)
 {
@@ -44,9 +46,10 @@ double Order::getTotalPriceToOrder()
     return this->priceTotalToOrder;
 }
 
-int Order::generateNumberOrder()
+int Order::setNumberOrder(int newNumberOrder)
 {
-    return this->numberOrder + 1;
+    return this->numberOrder = newNumberOrder + 1;
+
 }
 
 void Order::setNumberTable(int newNumberTable)
