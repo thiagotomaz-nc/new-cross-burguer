@@ -173,6 +173,8 @@ void menuOrder(vector<Order>& orders, vector<Product>& menu) {
     currentOrder.setNumberTable(clientSeat);
     currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
 
+    currentOrder.sumTotalPriceToOrder();
+
     orders.push_back(currentOrder);
 
     cout << "\n========================================" << endl;
