@@ -5,6 +5,15 @@ Order::Order()
     this->statusOrder = static_cast<int>(StatusOrder::EM_CONSTRUCAO);
 }
 
+Order::Order(const Order & other){
+    this->numberOrder = other.numberOrder;
+    this->numberTable = other.numberTable;
+    this->nameClient = other.nameClient;
+    this->items = other.items;
+    this->priceTotalToOrder = other.priceTotalToOrder;
+    this->statusOrder = other.statusOrder;
+}
+
 void Order::addItemToOrder(Item item)
 {
     this->items.push_back(item);
@@ -12,7 +21,7 @@ void Order::addItemToOrder(Item item)
 
 void Order::removeItemFromOrder(int index)
 {
-    if (index > 0 && index < this->items.size())
+    if (index >= 0 && index < this->items.size())
     {
         // Apaga o produto do vetor usando o iterador
         this->items.erase(items.begin() + index);
@@ -23,7 +32,7 @@ void Order::removeItemFromOrder(int index)
 // optional armazena o objeto diretamente quando existe
 pair<bool, Item> Order::getItemToIndex(int index)
 {
-    if (index > 0 && index < this->items.size())
+    if (index >= 0 && index < this->items.size())
     {
         return {true, this->items[index]};
     }
@@ -149,6 +158,31 @@ void Order::showResumeOrder()
         cout << "---------------------------------------------------------\n"
              << endl;
     }
+}
+
+int Order::findItemIndexByBarCode(int barCode)
+{
+    // Percorre todos os itens atualmente adicionados ao pedido
+    for (size_t i = 0; i < this->items.size(); ++i)
+    {
+        // Auto: Desestrutura o pair<bool, Product> retornado por getProductItem()
+        //extrai automaticamente os elementos de dentro do pair:
+        //hasProduct vira uma variável do tipo bool (recebe o first)
+        //product vira uma variável do tipo Product (recebe o second)
+
+        // hasProduct: indica se existe um produto válido no item
+        // product: objeto do produto
+        auto [hasProduct, product] = this->items[i].getProductItem();
+
+        //Garante que você só vai ler o código de barras (getBarCode()) se o produto realmente existir dentro daquele item do pedido.
+        if (hasProduct && product.getBarCode() == barCode)
+        {
+            return static_cast<int>(i); // Retorna a posição do item no pedido
+        }
+    }
+    
+    // Retorna -1 se o produto não for encontrado na lista de itens deste pedido
+    return -1;
 }
 
 Order::~Order() {}

@@ -2,7 +2,7 @@
 #define _ActionItem_HPP_
                             //açãoItem é uma classe intermediário que vai ser organizada pelo ActionStack
 
-#include "Items.hpp"
+#include "Item.hpp"
 
 #include <iostream>
 using namespace std;

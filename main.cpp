@@ -28,7 +28,9 @@ void showOrders(vector<Order> &order);
 int searchOrderNumber(vector<Order> &order);
 void menuAddOrder(vector<Order> &orders, vector<Product> &menu);
 void menuCancelOrder(vector<Order> &orders);
-void menuEditOrder(vector<Order> &orders);
+void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
+void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
+void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
 
 // configurações
 void deleteTerminal();
@@ -64,7 +66,6 @@ int main()
         cout << "4 - Sair do sistema" << endl;
         cout << "----------------------------------------------" << endl;
         cout << "\nDigite a opcao desejada: ";
-
         cin >> response;
 
         switch (response)
@@ -130,7 +131,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu)
         menuCancelOrder(orders);
         break;
     case 3:
-        menuEditOrder(orders);
+        menuEditOrder(orders, menu);
         break;
     case 4:
     {
@@ -198,34 +199,34 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu)
         }
 
         break;
-
     default:
         break;
     }
 }
 
-void menuEditOrder(vector<Order> &orders)
+void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
 {
 
     int responseMenuEditOrder = 0;
 
-    cout << "Menu - Editar pedido" << endl;
+    cout << "\nMenu - Editar pedido" << endl;
     cout << "**********************************************************" << endl;
     cout << "1 - Adicionar um item" << endl;
     cout << "2 - Remover um item" << endl;
     cout << "3 - Desfazer a ultima ação do um item" << endl;
-    cout << "4 - editar o nome do cliente: " << endl;
-    cout << "5 - editar a mesa: " << endl;
-    cout << "6 - sair" << endl;
+    cout << "4 - Editar o nome do cliente: " << endl;
+    cout << "5 - Editar a mesa: " << endl;
+    cout << "6 - Sair" << endl;
+    cout << "\nDigite a opção desejada: ";
     cin >> responseMenuEditOrder;
 
     switch (responseMenuEditOrder)
     {
     case 1:
-        // menuAddOrderItem(orders);
+        menuAddOrderItem(orders, menu);
         break;
     case 2:
-        // menuRemoveOrderItem(orders);
+        menuRemoveOrderItem(orders, menu);
         //  ao remover o item deve colocar ele na pilha de ação e caso o cliente mude ele é recolocado no pedido
         break;
     /*case 3:
@@ -267,7 +268,7 @@ void menuEditOrder(vector<Order> &orders)
         }
         // salvar na lista de pedidos
     }
-    break;
+        break;
     case 5:
     {
         int orderIndex;
@@ -305,7 +306,7 @@ void menuEditOrder(vector<Order> &orders)
         // salvar na lista de pedidos
     }
 
-    break;
+        break;
     default:
         break;
     }
@@ -321,14 +322,6 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu)
     cout << "Menu - Cadastrar pedido(s)" << endl;
     cout << "**********************************************************" << endl;
 
-    // peguntar sobre o produto;
-    // informar o produto completo por código do produto;
-    // informar a quantidade
-    // fechar o pedido
-    // informar o nome do cliente
-    // informar a mesa do cliente
-
-    // showProducts(menu);
     Order currentOrder;
 
     do
@@ -474,6 +467,175 @@ void showOrders(vector<Order> &order)
     else
     {
         messagesSucess("Nenhum produto cadastrado.");
+    }
+}
+
+//Adicionar itens ao pedido
+void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu){
+    int orderIndex;
+    int barCode;
+    int quantity;
+    char confirm;
+
+    cout << "\n Informe o numero do pedido que deseja adicionar itens : " << endl;
+    cin >> orderIndex;
+    Order *order;
+
+    try
+    {
+        // .at() lança std::out_of_range se o índice for inválido
+        order = &orders.at(orderIndex - 1);
+        messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
+    }
+    catch (const std::out_of_range &e)
+    {
+        // Captura o erro out_of_range especificamente
+        messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
+        return;
+    }
+    cin.ignore();
+
+    if (order->getStatusOrder() == static_cast<int>(StatusOrder::EM_CONSTRUCAO)){
+        cout << "Adicionar Itens" << endl;
+        cout << "**********************************************************" << endl;
+        do
+        {
+            cout << "Informe o CODIGO do produto: ";
+            cin >> barCode;
+
+            if (!productExists(menu, barCode))
+            {
+                messagesErrorsWarning("Nenhum produto cadastrado com esse codigo");
+                cout << "\nDeseja tentar outro codigo? (s/n): ";
+                cin >> confirm;
+                continue;
+            }
+
+            int index = getProductIndex(menu, barCode);
+
+            cout << "\nProduto selecionado: " << endl;
+            cout << "\nCodigo | Nome | Valor" << endl;
+            cout << "-------------------------------------------" << endl;
+
+            menu[index].show();
+            cout << "-------------------------------------------" << endl;
+            cout << "\nDigite a novo valor para a quantidade do item: ";
+            cin >> quantity;
+
+            if (quantity > 0)
+            {
+                Item newItem;
+                newItem.setProductItem(menu[index]);
+                newItem.setQuantityItem(quantity);
+                cout << "\n-------------------------------------------" << endl;
+                cout << "-> Subtotal do Item: R$ " << newItem.getPriceTotalItem() << endl;
+
+                order->addItemToOrder(newItem);
+            }
+            else
+            {
+                messagesErrorsWarning("[ERRO] A quantidade deve ser maior que zero!");
+                return;
+            }
+            cout << "-------------------------------------------" << endl;
+            cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): " << endl;
+            cin >> confirm;
+        } while (confirm == 's' || confirm == 'S');
+    } else {
+        messagesErrorsWarning("Pedido em estado " + to_string(order->getStatusOrder()) + " não permite adicionar itens!");
+    }
+
+    order->sumTotalPriceToOrder();
+
+    cout << "\n========================================" << endl;
+    cout << " Pedido N. " << order->getNumberOrder() << " editado com sucesso!" << endl;
+    cout << " Total: R$ " << order->getTotalPriceToOrder() << endl;
+    cout << "========================================\n"
+         << endl;
+
+}
+
+//Remover item de pedido
+void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu) {
+    int orderIndex;
+    char confirm;
+    char confirmRm;
+
+    cout << "\n Informe o numero do pedido que deseja remover itens : " << endl;
+    cin >> orderIndex;
+    Order *order;
+
+    try
+    {
+        // .at() lança std::out_of_range se o índice for inválido
+        order = &orders.at(orderIndex - 1);
+        messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
+    }
+    catch (const std::out_of_range &e)
+    {
+        messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
+        return;
+    }
+    cin.ignore();
+    
+    if (order->getStatusOrder() == static_cast<int>(StatusOrder::EM_CONSTRUCAO)){
+        cout << "Remover Itens" << endl;
+        cout << "**********************************************************" << endl;
+        do {
+            // Busca o índice do produto no cardápio geral
+            int productIndex = searchProductBarCode(menu);
+
+            if (productIndex >= 0)
+            {
+                // Obtém o código de barras (int) do produto selecionado do menu
+                int barCode = menu[productIndex].getBarCode();
+
+                // Verifica se o produto existe DENTRO do pedido e obtém a sua posição interna
+                int orderItemIndex = order->findItemIndexByBarCode(barCode);
+
+                if (orderItemIndex >= 0)
+                {
+                    cout << "\nTem certeza que deseja apagar o produto: "
+                         << menu[productIndex].getName() << "? (s/n): ";
+                    cin >> confirmRm;
+
+                    if (confirmRm == 's' || confirmRm == 'S')
+                    {
+                        // Remove o produto utilizando o índice relativo ao vetor de itens do pedido
+                        order->removeItemFromOrder(orderItemIndex);
+                        messagesSucess("Produto removido com sucesso!");
+                    }
+                }
+                else
+                {
+                    messagesErrorsWarning("Este produto não consta no pedido selecionado!");
+                }
+            }
+            else
+            {
+                messagesErrorsWarning("Operacao cancelada.");
+            }
+
+            cout << "-------------------------------------------" << endl;
+            cout << "\nDeseja remover mais um produto do pedido?(s/n): " << endl;
+            cin >> confirm;
+        } while (confirm == 's' || confirm == 'S');
+    } else {
+        messagesErrorsWarning("Pedido em estado " + to_string(order->getStatusOrder()) + " não permite remover itens!");
+    }
+
+    order->sumTotalPriceToOrder();
+    cout << "\n========================================" << endl;
+    cout << " Pedido N. " << order->getNumberOrder() << " editado com sucesso!" << endl;
+    cout << " Total: R$ " << order->getTotalPriceToOrder() << endl;
+    cout << "========================================\n" << endl;
+
+    char continueClear;
+    cout << "\nPressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
+    cin >> continueClear;
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
     }
 }
 
@@ -763,8 +925,6 @@ int searchProductBarCode(vector<Product> &menu)
     int foundIndex = -1; // Inicializa o índice como -1, indicando que não foi encontrado
 
     menuDividers();
-    cout << "Consultar produto " << endl;
-    cout << "********************************** " << endl;
     cout << "Informe o CODIGO do produto: ";
     cin >> barCode;
 
@@ -956,8 +1116,8 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu)
     orders.push_back(order_temp);
 
     order_temp.setNameClient("Thiago");
-    order_temp.setNumberOrder(0);
-    order_temp.setNumberTable(1);
+    order_temp.setNumberOrder(1);
+    order_temp.setNumberTable(2);
     item.setProductItem(menu[9]);
     item.setQuantityItem(10);
     order_temp.addItemToOrder(item);

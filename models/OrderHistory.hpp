@@ -7,30 +7,19 @@
 class OrderHistory
 {
 private:
-    Order data;
+    Order order;
     OrderHistory *previous;
     OrderHistory *next;
 
-
 public:
-    OrderHistory(/* args */);
-    void insertBegin(Order *order);
-    void insertEnd(Order *order);
-    void insertMiddle(Order *order);
-    Order searchOrderNumber(int number);
-    Order searchOrderClient(string nameClient);
-    Order searchOrderEnd(int number);
-    int removeOrder(int number);
-    void showReport();
-    int getSize();
-    void setSize(int newSeize);
-    int getLength();
-    void setLength(int newLength);
-    Order getNext();
-    Order getPrevious();
-    void setNext(Order *order);
-    void setPrevious(Order *order);
-    ~OrderHistory();
+    OrderHistory();
+    OrderHistory* getNext();
+    OrderHistory* getPrevious();
+    void setNext(OrderHistory* next);
+    void setPrevious(OrderHistory* previous);
+    void setOrder(Order newOrder);
+    Order getOrder();
+   
 };
 
 #endif

@@ -27,6 +27,7 @@ private:
 
 public:
     Order();
+    Order(const Order & other);
 
     void addItemToOrder(Item item);
     void removeItemFromOrder(int index);
@@ -45,6 +46,8 @@ public:
     string getNameClient();
     void setStatusOrder(StatusOrder newStatusOrder);
     int getStatusOrder();
+
+    int findItemIndexByBarCode(int barCode); // Retorna o índice do item no vetor do pedido ou -1 se não existir
 
     void showResumeOrder();
 
