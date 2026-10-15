@@ -42,3 +42,9 @@ void Item::setProductItem(Product newProduct) { // tualiza o produto adicionado 
         // Recalcula o total ao alterar o produto
         setPriceTotalItem(this->product.getUnitPrice());    
 }
+
+   void Item::showItems(int numberItem){
+    cout << setfill('0') << setw(DECIMAL_PLACES) << numberItem + 1 << "  " << this->product.getName() << "  "
+                 << "R$ " << this->product.getUnitPrice() << " x " << this->quantity << " = "
+                 << "R$ " << this->priceTotalItems << endl;
+   }

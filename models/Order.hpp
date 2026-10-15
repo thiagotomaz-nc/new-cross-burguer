@@ -5,12 +5,15 @@
 #include <iostream>
 #include <vector>
 #include <utility>
+#include <iomanip>
 
 #include "../enuns/enumStatusOrder.h"
 
 #include "../models/Item.hpp"
 
 using namespace std;
+
+#define DECIMAL_PLACES_ORDER 5
 
 class Order
 {

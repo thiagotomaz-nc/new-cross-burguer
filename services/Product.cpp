@@ -27,7 +27,7 @@ void Product::setUnitPrice(float newUnitPrice) {
 }
 
 void Product::show() const {
-    cout << this->barCode
+    cout << setfill('0') << setw(DECIMAL_PLACES) << this->barCode
          << "  |  " << this->name 
-         << "   | R$ " << this->unitPrice;
+         << "   | R$ " << this->unitPrice << endl;
 }

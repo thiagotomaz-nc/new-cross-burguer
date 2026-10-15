@@ -3,6 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <iomanip> 
+
+#define DECIMAL_PLACES 4
 
 using namespace std;
 

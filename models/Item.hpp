@@ -2,10 +2,8 @@
 #define _ITEMS_HPP_
 
 #include "Product.hpp"
-
-#include <iostream>
-using namespace std;
 #include <utility>
+
 
 // uma classe que representa um nó de produtos;
 // representa um nó de uma lista encadeada de produto
@@ -29,6 +27,9 @@ class Item{
 
         pair<bool, Product> getProductItem();
         void setProductItem(Product newProduct);
+
+        void showItems(int numberItem);
+    
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "../models/Order.hpp"
 
-Order::Order() {
+Order::Order()
+{
     this->statusOrder = static_cast<int>(StatusOrder::EM_CONSTRUCAO);
 }
 
@@ -49,7 +50,6 @@ double Order::getTotalPriceToOrder()
 int Order::setNumberOrder(int newNumberOrder)
 {
     return this->numberOrder = newNumberOrder + 1;
-
 }
 
 void Order::setNumberTable(int newNumberTable)
@@ -67,27 +67,35 @@ int Order::getNumberTable()
     return this->numberTable;
 }
 
-void Order::setNameClient(string newNameClient){
+void Order::setNameClient(string newNameClient)
+{
     this->nameClient = newNameClient;
 }
 
-string Order::getNameClient(){
-    if (this->nameClient.empty()){
+string Order::getNameClient()
+{
+    if (this->nameClient.empty())
+    {
         return "Cliente Avulso";
     }
     return this->nameClient;
 }
 
-void Order::setStatusOrder(StatusOrder newStatusOrder){
+void Order::setStatusOrder(StatusOrder newStatusOrder)
+{
     int status = static_cast<int>(newStatusOrder);
-    if (status > 0){
+    if (status > 0)
+    {
         this->statusOrder = status;
-    }else{
-        this->statusOrder=1;
+    }
+    else
+    {
+        this->statusOrder = 1;
     }
 }
 
-int Order::getStatusOrder(){
+int Order::getStatusOrder()
+{
     return this->statusOrder;
 }
 
@@ -113,30 +121,26 @@ string Order::statusToString(int status)
     }
 }
 
-
 void Order::showResumeOrder()
 {
-
-    cout << this->numberOrder << " | " << this->numberTable << " | " << this->nameClient << endl;
-    cout << "\nEtapa do pedido: " << statusToString(this->statusOrder) << endl;
+    cout << "Numero do pedido | Numero da mesa | Cliente | status do pedido" << endl;
+    cout << "----------------------------------------------------------------" << endl;
+    cout << setfill('0')<< setw(DECIMAL_PLACES_ORDER) << this->numberOrder << " | " <<  this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
+    cout << "==========================================================" << endl;
     cout << "\nitens do pedido: " << endl;
+    cout << "Numero | Descricao | Preco unit. x quant.  =  total R$" << endl;
+    cout << "----------------------------------------------------------------" << endl;
 
     if (this->items.size() > 0)
     {
-       
+
         for (size_t i = 0; i < this->items.size(); i++)
         {
-
-            Product Product = this->items[i].getProductItem().second;
-
-            cout << i + 1 << "  " << Product.getName() << "  "
-                 << Product.getUnitPrice() << " x " << this->items[i].getQuantityItem() << " = "
-                 << this->items[i].getPriceTotalItem() << endl;
+            this->items[i].showItems(i);          
         }
 
         cout << "\nTotal do pedido:  R$ " << this->priceTotalToOrder << endl;
-        cout << "-------------------------------------------" << endl;
-
+        cout << "==========================================================" << endl;
     }
     else
     {
@@ -148,4 +152,3 @@ void Order::showResumeOrder()
 }
 
 Order::~Order() {}
-
