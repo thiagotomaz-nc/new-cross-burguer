@@ -15,6 +15,7 @@ void OrderHistoryList::insertBegin(Order newOrder)
     if (this->head == nullptr)
     {
         this->head = orderHistory;
+        this->tail = this->head;
         orderHistory->setNext(this->head);
         orderHistory->setPrevious(this->head);
         return;
@@ -35,6 +36,7 @@ void OrderHistoryList::insertBegin(Order newOrder)
         }
 
         aux->setNext(orderHistory);
+        this->tail = aux;
         this->head = orderHistory;
 
         return;
@@ -49,6 +51,7 @@ void OrderHistoryList::insertEnd(Order newOrder)
     if (this->head == nullptr)
     {
         this->head = orderHistory;
+        this->tail = this->head;
         orderHistory->setNext(this->head);
         orderHistory->setPrevious(this->head);
         return;
@@ -56,7 +59,7 @@ void OrderHistoryList::insertEnd(Order newOrder)
     else
     {
 
-        // alterar o proximo e o anterior do OrderHistory
+        // apontar o ultimo ponteiro para o inicio;
         orderHistory->setNext(this->head);
 
         OrderHistory *aux = this->head;
@@ -66,8 +69,10 @@ void OrderHistoryList::insertEnd(Order newOrder)
             aux = aux->getNext();
         }
 
+        // apontar o primeiro para o ultimo elemento;
         orderHistory->setPrevious(aux);
         aux->setNext(orderHistory);
+        this->tail = aux;
 
         return;
     }
