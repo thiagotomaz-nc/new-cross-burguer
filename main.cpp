@@ -31,7 +31,7 @@ void resumeHistory(OrderHistoryList *orderHistoryList);
 // orders
 void showOrders(vector<Order> &order);
 int searchOrderNumber(vector<Order> &order);
-void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList);
+void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *historyList);
 void menuCancelOrder(vector<Order> &orders);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
@@ -63,7 +63,7 @@ int main()
     // criar um order, através dos produtos, podendo inclusive cadastrar novos produtos, editar, excluir (desativas), consultar
     do
     {
-        cout << "New Cross Burguer - HOME" << endl;
+        cout << "\nNew Cross Burguer - HOME" << endl;
         cout << "**********************************************************" << endl;
         cout << "1 - Pedidos" << endl;
         cout << "2 - Cancelar pedido" << endl;
@@ -323,19 +323,20 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
         break;
     }
 }
-// Menu de gerenciamento dos pedidos
-void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList)
+// Menu de cadastro de pedidos
+void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *historyList)
 {
     int barCode;
-    char confirmProduct;
     char confirm;
     int quantity;
+
     menuDividers();
     cout << "Menu - Cadastrar pedido(s)" << endl;
     cout << "**********************************************************" << endl;
 
     Order currentOrder;
 
+    // Loop para adicionar todos os itens do pedido
     do
     {
         cout << "Informe o CODIGO do produto: ";
@@ -373,48 +374,63 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
         else
         {
             messagesErrorsWarning("[ERRO] A quantidade deve ser maior que zero!");
-
             return;
         }
         cout << "-------------------------------------------" << endl;
-        cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): " << endl;
+        cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): ";
         cin >> confirm;
     } while (confirm == 's' || confirm == 'S');
 
     menuDividers();
+
+    // Pergunta sobre o fechamento do pedido
     char closeOrder;
     cout << "-------------------------------------------" << endl;
-    cout << "\n Deseja fechar o pedido? (s/n): ";
+    cout << "\nDeseja fechar o pedido agora? (s/n): ";
     cin >> closeOrder;
 
-    if (closeOrder == 's' || closeOrder == 'S')
+    bool isClosedNow = (closeOrder == 's' || closeOrder == 'S');
+    if (isClosedNow)
     {
         currentOrder.setStatusOrder(StatusOrder::FECHADO);
-        orderHistoryList->insertBegin(currentOrder);
+    }
+    else
+    {
+        currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
     }
 
+    // Lê os dados cadastrais
     string clientName;
     int clientSeat;
 
     cout << "\nDigite o nome do cliente: ";
     cin >> clientName;
-    cout << "Digite a o numero da mesa: ";
+    cout << "Digite o numero da mesa: ";
     cin >> clientSeat;
 
-    // informar o numero do pedido
-    currentOrder.setNumberOrder((orders.size() > 0) ? orders[orders.size() - 1].getNumberOrder() : 0);
+    // Atribui o número sequencial correto
+    // Garante uma sequência exata: 1, 2, 3, 4, 5...
+    int nextNumber = orders.size() + 1;
+
+    currentOrder.setNumberOrder(nextNumber);
     currentOrder.setNameClient(clientName);
     currentOrder.setNumberTable(clientSeat);
-
     currentOrder.sumTotalPriceToOrder();
 
+    // Salva no vetor ativo
     orders.push_back(currentOrder);
+
+    // Insere no histórico apenas se estiver FECHADO
+    if (isClosedNow && historyList != nullptr)
+    {
+        historyList->insertEnd(currentOrder);
+    }
 
     cout << "\n========================================" << endl;
     cout << " Pedido N. " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
     cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
-    cout << "========================================\n"
-         << endl;
+    cout << " Status: " << (isClosedNow ? "FECHADO" : "EM CONSTRUÇÃO") << endl;
+    cout << "========================================\n" << endl;
 }
 
 // função cancelar Pedido

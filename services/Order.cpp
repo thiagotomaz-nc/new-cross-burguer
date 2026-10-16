@@ -58,7 +58,8 @@ double Order::getTotalPriceToOrder()
 
 int Order::setNumberOrder(int newNumberOrder)
 {
-    return this->numberOrder = newNumberOrder + 1;
+    this->numberOrder = newNumberOrder; // Sem somar + 1 aqui!
+    return this->numberOrder;
 }
 
 void Order::setNumberTable(int newNumberTable)
@@ -148,8 +149,8 @@ void Order::showResumeOrder()
             this->items[i].showItems(i);          
         }
 
-        cout << "\nTotal do pedido:  R$ " << this->priceTotalToOrder << endl;
-        cout << "==========================================================" << endl;
+        cout << "\nTotal do pedido:  R$ " << getTotalPriceToOrder() << endl;
+        cout << "==========================================================\n" << endl;
     }
     else
     {

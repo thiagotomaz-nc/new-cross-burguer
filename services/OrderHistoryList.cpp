@@ -96,19 +96,7 @@ int OrderHistoryList::getSize()
 
 void OrderHistoryList::showReportAll()
 {
-    OrderHistory *aux = this->head;
-    double totalVendido = 0.0;
-
-    if (aux != nullptr)
-    {
-        while (aux != nullptr)
-        {
-            aux->getOrder().showResumeOrder();
-            totalVendido += aux->getOrder().getTotalPriceToOrder();
-            aux = aux->getNext();
-        }
-    }
-    else
+    if (this->head == nullptr)
     {
         cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
         cout << "Historico vazio!" << "\n";
@@ -116,11 +104,32 @@ void OrderHistoryList::showReportAll()
         return;
     }
 
-    cout << "--------------------------------------------"<<endl;
-    cout << "Valor total vendido : R$ "<< totalVendido<< endl;
-    cout << "Quantidade de pedidos: " <<  getSize() << endl;
-    cout << "--------------------------------------------"<<endl;
+    OrderHistory *aux = this->head;
+    double totalVendido = 0.0;
 
+    do
+    {
+        // Garante que o nó atual é válido antes de acessar os dados
+        if (aux == nullptr)
+        {
+            break;
+        }
+
+        Order tempOrder = aux->getOrder();
+        tempOrder.sumTotalPriceToOrder();
+        tempOrder.showResumeOrder();
+
+        totalVendido += tempOrder.getTotalPriceToOrder();
+            
+        // Avança para o próximo nó
+        aux = aux->getNext();
+
+    } while (aux != nullptr && aux != this->head); // Proteção contra ponteiros nulos
+
+    cout << "--------------------------------------------" << endl;
+    cout << "Valor total vendido : R$ " << totalVendido << endl;
+    cout << "Quantidade de pedidos: " << getSize() << endl;
+    cout << "--------------------------------------------" << endl;
 }
 
 pair<bool, OrderHistory> OrderHistoryList::searchOrderNumber(int number)

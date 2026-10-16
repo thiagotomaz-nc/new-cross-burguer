@@ -19,7 +19,7 @@ class Item{
         Item(); // construtor vazio;
         // Item(const Item& copyItem); // construtor de copia
 
-        void setPriceTotalItem(int unitPrice);
+        void setPriceTotalItem(float unitPrice);
         float getPriceTotalItem();
         
         int getQuantityItem();
