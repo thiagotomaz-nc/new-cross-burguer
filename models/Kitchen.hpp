@@ -1,20 +1,20 @@
 #ifndef _KITCHEN_HPP_
 #define _KITCHEN_HPP_
 
-#include "PreparationQueue.hpp"
+#include "PreparationQueue.hpp" // Para desenfileirar pedidos (RF05)
+#include "PickupStack.hpp"      // Para empilhar pedidos prontos (RF06)
 
-// desenfileirado da fila PreparationQueue;
 class Kitchen
 {
 private:
-   Order *data;
-   
-public:
-    Kitchen(/* args */);
+    Order *data; // Guarda o pedido que está sendo preparado no momento
 
-    void callOrder();
-    void startPreration();
-    void finishPreparation();
+public:
+    Kitchen();
+
+    void callOrder(PreparationQueue &preparationQueue);
+    void startPreparation();
+    void finishPreparation(PickupStack &pickupStack);
 
     ~Kitchen();
 };

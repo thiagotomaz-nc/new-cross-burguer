@@ -3,6 +3,8 @@
 #include "models/Item.hpp"
 #include "models/OrderHistoryList.hpp"
 #include "models/PreparationQueue.hpp"
+#include "models/Kitchen.hpp"
+#include "models/PickupStack.hpp"
 
 #include "enuns/enumStatusOrder.h"
 
@@ -39,8 +41,7 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
 
 // Cozinha
-void menuKitchen(PreparationQueue * preparationQueue);
-
+void menuKitchen(PreparationQueue &preparationQueue, Kitchen &kitchen, PickupStack &pickupStack);
 
 // configurações
 void deleteTerminal();
@@ -61,6 +62,10 @@ int main()
     vector<Order> orders;
     OrderHistoryList orderHistoryList;
     PreparationQueue preparationQueue;
+    Kitchen kitchen;
+    PickupStack pickupStack;
+
+
     
 
     previousRegistrations(orders, menu_products,orderHistoryList);
@@ -98,7 +103,7 @@ int main()
             menuManagerHistory(&orderHistoryList);
             break;
         case 5:
-            menuKitchen(&preparationQueue);
+            menuKitchen(preparationQueue, kitchen, pickupStack);
         break;
         case 10:
             /* code */
@@ -1170,7 +1175,7 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 // =======================================================
 // COZINHA
 // =======================================================
-void menuKitchen(PreparationQueue * preparationQueue){
+void menuKitchen(PreparationQueue &preparationQueue, Kitchen &kitchen, PickupStack &pickupStack) {
     int responseMenu = 0;
 
     menuDividers();
@@ -1180,7 +1185,7 @@ void menuKitchen(PreparationQueue * preparationQueue){
     cout << "1 - Exibir fila de preparo" << endl;
     cout << "2 - Iniciar preparo" << endl;
     cout << "3 - Finalizar Preparo" << endl;
-    cout << "4 - Enviar para fila de retirada" << endl;
+    cout << "4 - Sair" << endl;
     cout << "\nDigite a opção desejada: ";
     cin >> responseMenu;
 
@@ -1190,16 +1195,17 @@ void menuKitchen(PreparationQueue * preparationQueue){
         preparationQueue.showQueuePreparation();
         break;
     case 2:
-
+        // Pega o próximo da fila e inicia o preparo
+        kitchen.callOrder(preparationQueue);
+        kitchen.startPreparation();
         break;
     case 3:
-        
-        break;
-    case 4:
-        
+        // Finaliza o pedido atual e envia para a pilha de retirada
+        kitchen.finishPreparation(pickupStack);
         break;
     default:
         break;
+    }
 }
 
 // =======================================================
