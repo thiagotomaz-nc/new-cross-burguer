@@ -10,6 +10,7 @@ class PreparationQueue
 {
 private:
     PreparationQueueNode* head;
+    PreparationQueueNode* peek;
     int n_elements;
 
 public:
@@ -24,7 +25,9 @@ public:
     Order getPeek();
     // utilizar a copia do primeiro elemento da pilha,para não permitir exclusão;
 
+    void showQueuePreparation();
+
     ~PreparationQueue();
 };
-
+ 
 #endif

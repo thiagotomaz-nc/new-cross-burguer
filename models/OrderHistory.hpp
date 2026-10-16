@@ -13,7 +13,6 @@ private:
 
 public:
     OrderHistory();
-
     // const após o método: impede alterações diretas nos atributos do objeto atual.
     // const antes do tipo retornado: impede alterações no objeto apontado pelo retorno.
     OrderHistory *getNext();

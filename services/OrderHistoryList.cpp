@@ -8,7 +8,7 @@ OrderHistoryList::OrderHistoryList()
 
 void OrderHistoryList::insertBegin(Order newOrder)
 {
-    OrderHistory *orderHistory = new OrderHistory();
+    this->orderHistory = new OrderHistory();
     orderHistory->setOrder(newOrder);
 
     // Adiciona o primeiro elemento na lista de historico;
@@ -132,7 +132,7 @@ void OrderHistoryList::showReportAll()
     cout << "--------------------------------------------" << endl;
 }
 
-pair<bool, OrderHistory> OrderHistoryList::searchOrderNumber(int number)
+pair<bool, Order> OrderHistoryList::searchOrderIndexNumber(int number)
 {
 
     OrderHistory *aux = this->head;
@@ -142,16 +142,16 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderNumber(int number)
 
         if (aux->getOrder().getNumberOrder() == number)
         {
-            return {true, *aux};
+            return {true, aux->getOrder()};
             break;
         }
         aux = aux->getNext();
     }
 
-    return {false, OrderHistory{}};
+    return {false, Order{}};
 }
 
-pair<bool, OrderHistory> OrderHistoryList::searchOrderEnd(int number)
+pair<bool, Order> OrderHistoryList::searchOrderEndNumber(int number)
 {
 
     OrderHistory *aux = this->tail;
@@ -161,16 +161,17 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderEnd(int number)
 
         if (aux->getOrder().getNumberOrder() == number)
         {
-            return {true, *aux};
+            return {true, aux->getOrder()};
             break;
         }
         aux = aux->getPrevious();
     }
 
-    return {false, OrderHistory{}};
+    return {false, Order{}};
 }
 
-pair<bool, OrderHistory> OrderHistoryList::searchOrderClient(string nameClient)
+
+pair<bool, Order> OrderHistoryList::searchOrderClient(string nameClient)
 {
     OrderHistory *aux = this->head;
 
@@ -179,30 +180,20 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderClient(string nameClient)
 
         if (aux->getOrder().getNameClient() == nameClient)
         {
-            return {true, *aux};
+            return {true, aux->getOrder()};
             break;
         }
         aux = aux->getNext();
     }
 
-    return {false, OrderHistory{}};
+    return {false, Order{}};
 }
 
 OrderHistoryList::~OrderHistoryList()
 {
 }
 
-OrderHistory *OrderHistoryList::gethead() const
-{
-    return this->head;
-}
-
-OrderHistory *OrderHistoryList::getTail() const
-{
-    return this->tail;
-}
-
-int OrderHistoryList::removeOrder(int number)
+void OrderHistoryList::removeOrder(int number)
 {
 
     OrderHistory *orderRemove = this->head;

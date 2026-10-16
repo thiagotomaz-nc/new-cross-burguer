@@ -39,8 +39,7 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
 
 // Cozinha
-void menuKitchen(PreparationQueue * preparationQueue);
-
+void menuKitchen(PreparationQueue *preparationQueue);
 
 // configurações
 void deleteTerminal();
@@ -61,9 +60,8 @@ int main()
     vector<Order> orders;
     OrderHistoryList orderHistoryList;
     PreparationQueue preparationQueue;
-    
 
-    previousRegistrations(orders, menu_products,orderHistoryList);
+    previousRegistrations(orders, menu_products, orderHistoryList);
 
     cout << endl;
 
@@ -99,7 +97,7 @@ int main()
             break;
         case 5:
             menuKitchen(&preparationQueue);
-        break;
+            break;
         case 10:
             /* code */
             cout << endl;
@@ -171,7 +169,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
 
             if (order->getStatusOrder() == static_cast<int>(StatusOrder::FECHADO))
             {
-                messagesErrorsWarning("Atencao o pedido" +to_string(order->getNumberOrder()) +" ja esta fechado!");
+                messagesErrorsWarning("Atencao o pedido" + to_string(order->getNumberOrder()) + " ja esta fechado!");
                 return;
             }
 
@@ -184,7 +182,9 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
                 if (order->getStatusOrder() != static_cast<int>(StatusOrder::CANCELADO) && order->getStatusOrder() != static_cast<int>(StatusOrder::PRONTO))
                 {
                     order->setStatusOrder(StatusOrder::FECHADO);
-                    orderHistoryList->insertBegin(*order);
+                    orderHistoryList->insertEnd(*order);
+                    preparationQueue.enqueue(&orderHistoryList->getTail()->getOrder());
+
 
                     messagesSucess("Pedido fechado com sucesso!");
                 }
@@ -436,14 +436,15 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
     if (isClosedNow && history != nullptr)
     {
         history->insertEnd(currentOrder);
-        preparationQueue.enqueue(&orders.back());
+        preparationQueue.enqueue(&history->getTail()->getOrder());
     }
 
     cout << "\n========================================" << endl;
     cout << " Pedido N. " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
     cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
     cout << " Status: " << (isClosedNow ? "FECHADO" : "EM CONSTRUÇÃO") << endl;
-    cout << "========================================\n" << endl;
+    cout << "========================================\n"
+         << endl;
 }
 
 // função cancelar Pedido
@@ -1107,7 +1108,7 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
 
 void resumeHistory(OrderHistoryList *orderHistoryList)
 {
-   int responseMenu = 0;
+    int responseMenu = 0;
     int count = 1;
     int size = orderHistoryList->getSize();
     bool continuar = true;
@@ -1170,7 +1171,8 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 // =======================================================
 // COZINHA
 // =======================================================
-void menuKitchen(PreparationQueue * preparationQueue){
+void menuKitchen(PreparationQueue *preparationQueue)
+{
     int responseMenu = 0;
 
     menuDividers();
@@ -1187,19 +1189,20 @@ void menuKitchen(PreparationQueue * preparationQueue){
     switch (responseMenu)
     {
     case 1:
-        preparationQueue.showQueuePreparation();
+        preparationQueue->showQueuePreparation();
         break;
     case 2:
 
         break;
     case 3:
-        
+
         break;
     case 4:
-        
+
         break;
     default:
         break;
+    }
 }
 
 // =======================================================
@@ -1233,7 +1236,7 @@ void messagesErrorsWarning(string messsage)
 // =======================================================
 // CADASTROS PRÉVIOS
 // =======================================================
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu,OrderHistoryList &orderHistory)
+void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory)
 {
 
     Product product;
@@ -1324,6 +1327,5 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu,OrderHis
 
     orders.push_back(order_temp);
 
-    orderHistory.insertEnd(orders[0]);
-
-} 
+    orderHistory.insertEnd(orders[1]);
+}
