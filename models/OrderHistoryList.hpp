@@ -13,7 +13,9 @@ private:
 public:
     OrderHistoryList();
     int removeOrder(int number);
-    void showReport();
+    OrderHistory* gethead() const;
+    OrderHistory* getTail() const;
+    void showReportAll();
     int getSize();
     void insertBegin(Order newOrder);
     void insertEnd(Order newOrder);

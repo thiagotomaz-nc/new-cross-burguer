@@ -54,7 +54,6 @@ int main()
     Product product;
     vector<Product> menu_products;
     vector<Order> orders;
-    int numberOrder = 0;
     OrderHistoryList orderHistoryList;
 
     previousRegistrations(orders, menu_products);
@@ -158,9 +157,9 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
             order = &orders.at(orderIndex - 1);
             cout << "\n pedido: " << order->getNumberOrder() << " selecionado!" << endl;
 
-            if (order->getStatusOrder() != static_cast<int>(StatusOrder::FECHADO))
+            if (order->getStatusOrder() == static_cast<int>(StatusOrder::FECHADO))
             {
-                messagesSucess("O pedido ja esta fechado!");
+                messagesErrorsWarning("Atencao o pedido" +to_string(order->getNumberOrder()) +" ja esta fechado!");
                 return;
             }
 
@@ -174,6 +173,8 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
                 {
                     order->setStatusOrder(StatusOrder::FECHADO);
                     orderHistoryList->insertBegin(*order);
+
+                    messagesSucess("Pedido fechado com sucesso!");
                 }
             }
         }
@@ -192,7 +193,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
         break;
     case 6:
         menuDividers();
-        cout << "Relatorio de pedidos" << endl;
+        cout << "RELATORIO DOS PEDIDOS" << endl;
         cout << "**********************************************************" << endl;
         if (orders.size() > 0)
         {
@@ -1037,7 +1038,7 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
 
     menuDividers();
 
-    cout << "Menu - Historico de pedidos" << endl;
+    cout << "MENU - HISTORICO DE PEDIDOS" << endl;
     cout << "**********************************************************" << endl;
     cout << "1 - Exibir historico de pedidos completo" << endl;
     cout << "2 - Exibir historico de pedidos resumido" << endl;
@@ -1051,8 +1052,11 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
     {
     case 1:
     {
+        deleteTerminal();
+        cout << "HISTORICO COMPLETO DOS PEDIDOS" << endl;
+        cout << "**********************************************************" << endl;
         char tecla;
-        orderHistoryList->showReport();
+        orderHistoryList->showReportAll();
         cout << "aperte qualquer tecla para sair" << endl;
         cin >> tecla;
     }
@@ -1067,9 +1071,6 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
     case 4:
 
         break;
-    case 5:
-
-        break;
     default:
         break;
     }
@@ -1079,33 +1080,54 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 {
     int responseMenu = 0;
 
-    menuDividers();
-
-    cout << "Menu - Historico de pedidos" << endl;
-    cout << "**********************************************************" << endl;
-    cout << "1 - Proximo" << endl;
-    cout << "2 - Anterior" << endl;
-    cout << "0 - Voltar menu principal" << endl;
-    cout << "\nDigite a opção desejada: ";
-    cin >> responseMenu;
-
-    menuDividers();
-    switch (responseMenu)
+    int size = orderHistoryList->getSize();
+    
+    cout << "Total de Pedidos " << size << endl;
+    if (size > 0)
     {
-    case 1:
-    {
-        char tecla;
-        orderHistoryList->showReport();
-        cout << "aperte qualquer tecla para sair" << endl;
-        cin >> tecla;
+        OrderHistory* aux = orderHistoryList->gethead();
+
+        menuDividers();
+
+        cout << "Menu - Resumo Historico de pedidos" << endl;
+        cout << "**********************************************************" << endl;
+        cout << "1 - Proximo  | 2 - Anterior | 0 - Voltar menu principal"   << endl;
+        cout << "\nDigite a opção desejada: ";
+        cin >> responseMenu;
+        
+        deleteTerminal();
+
+        menuDividers();
+
+        switch (responseMenu)
+        {
+        case 1:
+
+            aux->getOrder().showResumeOrder();
+            aux = aux->getNext();
+
+            if (aux == nullptr){
+                orderHistoryList->gethead();
+            }
+
+            break;
+        case 2:
+            aux = aux->getPrevious();
+
+            if (aux == nullptr){
+                aux = orderHistoryList->getTail();
+            }
+           
+            aux->getOrder().showResumeOrder();
+            
+            break;
+        default:
+            break;
+        }
     }
-
-    break;
-    case 2:
-        resumeHistory(orderHistoryList);
-        break;
-    default:
-        break;
+    else
+    {
+        messagesErrorsWarning("Nenhum pedido no historico!");
     }
 }
 
@@ -1230,4 +1252,5 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu)
     order_temp.setStatusOrder(StatusOrder::FECHADO);
 
     orders.push_back(order_temp);
-}
+
+} 

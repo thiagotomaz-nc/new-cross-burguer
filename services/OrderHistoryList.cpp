@@ -16,8 +16,8 @@ void OrderHistoryList::insertBegin(Order newOrder)
     {
         this->head = orderHistory;
         this->tail = this->head;
-        orderHistory->setNext(this->head);
-        orderHistory->setPrevious(this->head);
+        orderHistory->setNext(nullptr);
+        orderHistory->setPrevious(nullptr);
         return;
     }
     else
@@ -25,17 +25,18 @@ void OrderHistoryList::insertBegin(Order newOrder)
 
         // alterar o proximo e o anterior do OrderHistory
         orderHistory->setNext(this->head);
-        orderHistory->setPrevious(this->head->getNext());
+        orderHistory->setPrevious(nullptr);
 
         this->head->setPrevious(orderHistory);
+
         OrderHistory *aux = this->head;
 
-        while (aux->getNext() != this->head)
+        while (aux->getNext() != nullptr)
         {
             aux = aux->getNext();
         }
 
-        aux->setNext(orderHistory);
+        aux->setNext(nullptr);
         this->tail = aux;
         this->head = orderHistory;
 
@@ -52,19 +53,19 @@ void OrderHistoryList::insertEnd(Order newOrder)
     {
         this->head = orderHistory;
         this->tail = this->head;
-        orderHistory->setNext(this->head);
-        orderHistory->setPrevious(this->head);
+        orderHistory->setNext(nullptr);
+        orderHistory->setPrevious(nullptr);
         return;
     }
     else
     {
 
         // apontar o ultimo ponteiro para o inicio;
-        orderHistory->setNext(this->head);
+        orderHistory->setNext(nullptr);
 
         OrderHistory *aux = this->head;
 
-        while (aux->getNext() != this->head)
+        while (aux->getNext() != nullptr)
         {
             aux = aux->getNext();
         }
@@ -72,7 +73,7 @@ void OrderHistoryList::insertEnd(Order newOrder)
         // apontar o primeiro para o ultimo elemento;
         orderHistory->setPrevious(aux);
         aux->setNext(orderHistory);
-        this->tail = aux;
+        this->tail = orderHistory;
 
         return;
     }
@@ -81,9 +82,10 @@ void OrderHistoryList::insertEnd(Order newOrder)
 int OrderHistoryList::getSize()
 {
     OrderHistory *aux = this->head;
+
     int count = 0;
 
-    while (aux != this->head)
+    while (aux != nullptr)
     {
         count++;
         aux = aux->getNext();
@@ -92,8 +94,33 @@ int OrderHistoryList::getSize()
     return count;
 }
 
-void OrderHistoryList::showReport()
+void OrderHistoryList::showReportAll()
 {
+    OrderHistory *aux = this->head;
+    double totalVendido = 0.0;
+
+    if (aux != nullptr)
+    {
+        while (aux != nullptr)
+        {
+            aux->getOrder().showResumeOrder();
+            totalVendido += aux->getOrder().getTotalPriceToOrder();
+            aux = aux->getNext();
+        }
+    }
+    else
+    {
+        cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
+        cout << "Historico vazio!" << "\n";
+        cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
+        return;
+    }
+
+    cout << "--------------------------------------------"<<endl;
+    cout << "Valor total vendido : R$ "<< totalVendido<< endl;
+    cout << "Quantidade de pedidos: " <<  getSize() << endl;
+    cout << "--------------------------------------------"<<endl;
+
 }
 
 pair<bool, OrderHistory> OrderHistoryList::searchOrderNumber(int number)
@@ -103,7 +130,6 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderNumber(int number)
 
     while (aux != this->head)
     {
-
 
         if (aux->getOrder().getNumberOrder() == number)
         {
@@ -123,7 +149,6 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderEnd(int number)
 
     while (aux != this->tail)
     {
-      
 
         if (aux->getOrder().getNumberOrder() == number)
         {
@@ -139,7 +164,7 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderEnd(int number)
 pair<bool, OrderHistory> OrderHistoryList::searchOrderClient(string nameClient)
 {
     OrderHistory *aux = this->head;
-   
+
     while (aux != this->head)
     {
 
@@ -154,15 +179,24 @@ pair<bool, OrderHistory> OrderHistoryList::searchOrderClient(string nameClient)
     return {false, OrderHistory{}};
 }
 
-OrderHistoryList::~OrderHistoryList(){
-
+OrderHistoryList::~OrderHistoryList()
+{
 }
 
+OrderHistory *OrderHistoryList::gethead() const
+{
+    return this->head;
+}
 
- int OrderHistoryList::removeOrder(int number){
+OrderHistory *OrderHistoryList::getTail() const
+{
+    return this->tail;
+}
 
-   OrderHistory* orderRemove =  this->head;
+int OrderHistoryList::removeOrder(int number)
+{
 
+    OrderHistory *orderRemove = this->head;
 
     while (orderRemove != this->head)
     {
@@ -173,7 +207,8 @@ OrderHistoryList::~OrderHistoryList(){
         orderRemove = orderRemove->getNext();
     }
 
-    if (orderRemove != this->head){
+    if (orderRemove != this->head)
+    {
         // utilizar um ponteiro;
         // atualizar o proximo e o antecessor
         orderRemove->getNext()->getPrevious()->setPrevious(orderRemove->getPrevious());
@@ -181,8 +216,9 @@ OrderHistoryList::~OrderHistoryList(){
 
         // deletar o objeto
         delete orderRemove;
-    }else{
-        cout<<"Pedido não esta no histórico";
     }
-
- }
+    else
+    {
+        cout << "Pedido não esta no histórico";
+    }
+}

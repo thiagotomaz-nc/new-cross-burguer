@@ -13,13 +13,17 @@ private:
 
 public:
     OrderHistory();
-    OrderHistory* getNext();
-    OrderHistory* getPrevious();
-    void setNext(OrderHistory* next);
-    void setPrevious(OrderHistory* previous);
+
+    // const após o método: impede alterações diretas nos atributos do objeto atual.
+    // const antes do tipo retornado: impede alterações no objeto apontado pelo retorno.
+    OrderHistory *getNext();
+    OrderHistory *getPrevious();
+
+    void setNext(OrderHistory *next);
+    void setPrevious(OrderHistory *previous);
     void setOrder(Order newOrder);
+
     Order getOrder();
-   
 };
 
 #endif
