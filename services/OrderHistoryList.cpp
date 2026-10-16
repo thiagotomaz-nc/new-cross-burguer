@@ -105,7 +105,7 @@ void OrderHistoryList::showReportAll()
     }
 
     OrderHistory *aux = this->head;
-    double totalVendido = 0.0;
+    double totalSold = 0.0;
 
     do
     {
@@ -119,7 +119,7 @@ void OrderHistoryList::showReportAll()
         tempOrder.sumTotalPriceToOrder();
         tempOrder.showResumeOrder();
 
-        totalVendido += tempOrder.getTotalPriceToOrder();
+        totalSold += tempOrder.getTotalPriceToOrder();
             
         // Avança para o próximo nó
         aux = aux->getNext();
@@ -127,7 +127,7 @@ void OrderHistoryList::showReportAll()
     } while (aux != nullptr && aux != this->head); // Proteção contra ponteiros nulos
 
     cout << "--------------------------------------------" << endl;
-    cout << "Valor total vendido : R$ " << totalVendido << endl;
+    cout << "Valor total vendido : R$ " << totalSold << endl;
     cout << "Quantidade de pedidos: " << getSize() << endl;
     cout << "--------------------------------------------" << endl;
 }

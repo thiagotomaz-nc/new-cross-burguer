@@ -2,6 +2,7 @@
 #include "models/Order.hpp"
 #include "models/Item.hpp"
 #include "models/OrderHistoryList.hpp"
+#include "models/PreparationQueue.hpp"
 
 #include "enuns/enumStatusOrder.h"
 
@@ -20,10 +21,10 @@ int getProductIndex(const vector<Product> &menu, int barCode);
 bool productExists(const vector<Product> &menu, int barCode);
 bool productExistsName(vector<Product> &menu, const string &name);
 void showProducts(vector<Product> &menu);
+void menuProducts(vector<Product> &menu);
 
 // Menus historicos
-void menuProducts(vector<Product> &menu);
-void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList);
+void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, PreparationQueue &preparationQueue);
 void menuCancelOrder(vector<Order> &menu);
 void menuManagerHistory(OrderHistoryList *orderHistoryList);
 void resumeHistory(OrderHistoryList *orderHistoryList);
@@ -31,11 +32,15 @@ void resumeHistory(OrderHistoryList *orderHistoryList);
 // orders
 void showOrders(vector<Order> &order);
 int searchOrderNumber(vector<Order> &order);
-void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *historyList);
+void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, PreparationQueue &preparationQueue);
 void menuCancelOrder(vector<Order> &orders);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
+
+// Cozinha
+void menuKitchen(PreparationQueue * preparationQueue);
+
 
 // configurações
 void deleteTerminal();
@@ -44,7 +49,7 @@ void messagesSucess(string messsage);
 void messagesErrorsWarning(string messsage);
 
 // CADASTROS PRÉVIOS
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu);
+void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory);
 
 int main()
 {
@@ -55,8 +60,10 @@ int main()
     vector<Product> menu_products;
     vector<Order> orders;
     OrderHistoryList orderHistoryList;
+    PreparationQueue preparationQueue;
+    
 
-    previousRegistrations(orders, menu_products);
+    previousRegistrations(orders, menu_products,orderHistoryList);
 
     cout << endl;
 
@@ -69,6 +76,8 @@ int main()
         cout << "2 - Cancelar pedido" << endl;
         cout << "3 - Produtos da Hamburgueria" << endl;
         cout << "4 - Historico" << endl;
+        cout << "5 - Cozinha" << endl;
+        cout << "6 - Fila de retirada" << endl;
         cout << "10 - Sair do sistema" << endl;
         cout << "----------------------------------------------" << endl;
         cout << "\nDigite a opcao desejada: ";
@@ -77,7 +86,7 @@ int main()
         switch (response)
         {
         case 1:
-            menuManageOrder(orders, menu_products, &orderHistoryList);
+            menuManageOrder(orders, menu_products, &orderHistoryList, preparationQueue);
             break;
         case 2:
             menuCancelOrder(orders);
@@ -88,6 +97,9 @@ int main()
         case 4:
             menuManagerHistory(&orderHistoryList);
             break;
+        case 5:
+            menuKitchen(&preparationQueue);
+        break;
         case 10:
             /* code */
             cout << endl;
@@ -110,7 +122,7 @@ int main()
 // MENU gerenciar PEDIDOS - Editar pedido
 // =======================================================
 // Menu de gerenciamento dos pedidos
-void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList)
+void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, PreparationQueue &preparationQueue)
 {
 
     int responseMenuOrder = 0;
@@ -134,7 +146,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
     switch (responseMenuOrder)
     {
     case 1:
-        menuAddOrder(orders, menu, orderHistoryList);
+        menuAddOrder(orders, menu, orderHistoryList, preparationQueue);
         break;
     case 2:
         menuCancelOrder(orders);
@@ -324,7 +336,7 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
     }
 }
 // Menu de cadastro de pedidos
-void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *historyList)
+void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *history, PreparationQueue &preparationQueue)
 {
     int barCode;
     char confirm;
@@ -421,9 +433,10 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
     orders.push_back(currentOrder);
 
     // Insere no histórico apenas se estiver FECHADO
-    if (isClosedNow && historyList != nullptr)
+    if (isClosedNow && history != nullptr)
     {
-        historyList->insertEnd(currentOrder);
+        history->insertEnd(currentOrder);
+        preparationQueue.enqueue(&orders.back());
     }
 
     cout << "\n========================================" << endl;
@@ -1094,57 +1107,99 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
 
 void resumeHistory(OrderHistoryList *orderHistoryList)
 {
-    int responseMenu = 0;
-
+   int responseMenu = 0;
+    int count = 1;
     int size = orderHistoryList->getSize();
-    
-    cout << "Total de Pedidos " << size << endl;
+    bool continuar = true;
+
     if (size > 0)
     {
-        OrderHistory* aux = orderHistoryList->gethead();
+        OrderHistory *aux = orderHistoryList->gethead();
 
-        menuDividers();
-
-        cout << "Menu - Resumo Historico de pedidos" << endl;
-        cout << "**********************************************************" << endl;
-        cout << "1 - Proximo  | 2 - Anterior | 0 - Voltar menu principal"   << endl;
-        cout << "\nDigite a opção desejada: ";
-        cin >> responseMenu;
-        
-        deleteTerminal();
-
-        menuDividers();
-
-        switch (responseMenu)
+        do
         {
-        case 1:
+
+            cout << "\n\nTotal de Pedidos " << count << "/" << size << endl;
+
+            menuDividers();
+
+            cout << "MENU - RESUMO HISTORICO DE PEDIDOS" << endl;
+            cout << "**********************************************************" << endl;
 
             aux->getOrder().showResumeOrder();
-            aux = aux->getNext();
 
-            if (aux == nullptr){
-                orderHistoryList->gethead();
+            cout << ((aux->getNext() != nullptr) ? "1 - Proximo  | " : "") << ((aux->getPrevious() != nullptr) ? "2 - Anterior | " : "") << "0 - Voltar menu principal" << endl;
+            cout << "\nDigite a opção desejada: ";
+            cin >> responseMenu;
+
+            deleteTerminal();
+
+            menuDividers();
+
+            switch (responseMenu)
+            {
+            case 1:
+
+                if (aux->getNext() != nullptr)
+                {
+                    aux = aux->getNext();
+                    count++;
+                }
+
+                break;
+            case 2:
+
+                if (aux->getPrevious() != nullptr)
+                {
+                    aux = aux->getPrevious();
+                    count--;
+                }
+
+                break;
+            default:
+                continuar = false;
+                break;
             }
-
-            break;
-        case 2:
-            aux = aux->getPrevious();
-
-            if (aux == nullptr){
-                aux = orderHistoryList->getTail();
-            }
-           
-            aux->getOrder().showResumeOrder();
-            
-            break;
-        default:
-            break;
-        }
+        } while (continuar);
     }
     else
     {
         messagesErrorsWarning("Nenhum pedido no historico!");
     }
+}
+// =======================================================
+// COZINHA
+// =======================================================
+void menuKitchen(PreparationQueue * preparationQueue){
+    int responseMenu = 0;
+
+    menuDividers();
+
+    cout << "MENU - COZINHA" << endl;
+    cout << "**********************************************************" << endl;
+    cout << "1 - Exibir fila de preparo" << endl;
+    cout << "2 - Iniciar preparo" << endl;
+    cout << "3 - Finalizar Preparo" << endl;
+    cout << "4 - Enviar para fila de retirada" << endl;
+    cout << "\nDigite a opção desejada: ";
+    cin >> responseMenu;
+
+    switch (responseMenu)
+    {
+    case 1:
+        preparationQueue.showQueuePreparation();
+        break;
+    case 2:
+
+        break;
+    case 3:
+        
+        break;
+    case 4:
+        
+        break;
+    default:
+        break;
 }
 
 // =======================================================
@@ -1178,7 +1233,7 @@ void messagesErrorsWarning(string messsage)
 // =======================================================
 // CADASTROS PRÉVIOS
 // =======================================================
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu)
+void previousRegistrations(vector<Order> &orders, vector<Product> &menu,OrderHistoryList &orderHistory)
 {
 
     Product product;
@@ -1245,8 +1300,8 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu)
     // pre-cadastro de pedidos
     Order order_temp;
 
-    order_temp.setNameClient("Thiago");
-    order_temp.setNumberOrder(0);
+    order_temp.setNameClient("jackson");
+    order_temp.setNumberOrder(1);
     order_temp.setNumberTable(1);
     item.setProductItem(menu[0]);
     item.setQuantityItem(3);
@@ -1256,7 +1311,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu)
     orders.push_back(order_temp);
 
     order_temp.setNameClient("Thiago");
-    order_temp.setNumberOrder(1);
+    order_temp.setNumberOrder(0);
     order_temp.setNumberTable(2);
     item.setProductItem(menu[9]);
     item.setQuantityItem(10);
@@ -1268,5 +1323,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu)
     order_temp.setStatusOrder(StatusOrder::FECHADO);
 
     orders.push_back(order_temp);
+
+    orderHistory.insertEnd(orders[0]);
 
 } 
