@@ -28,16 +28,19 @@ void menuProducts(vector<Product> &menu);
 void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
 void menuManagerHistory(OrderHistoryList *orderHistoryList);
 void resumeHistory(OrderHistoryList *orderHistoryList);
+void menuCancelOrderHistory(OrderHistoryList *orderHistoryList);
+void searchOrderByNumber(OrderHistoryList *orderHistoryList);
+void searchOrderByName(OrderHistoryList *orderHistoryList);
 
 // orders
 void showOrders(vector<Order> &order);
-int searchOrderNumber(vector<Order> &order);
 void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
 void menuCancelOrder(vector<Order> &orders);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
 void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistoryList *OrderHistoryList, OrderPreparationQueue &orderPreparationQueue);
+int searchOrderIndex(vector<Order> &orders);
 
 // Cozinha
 void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &kitchen, OrderPickupStack &orderPickupStack);
@@ -76,11 +79,10 @@ int main()
         cout << "\nNew Cross Burguer - HOME" << endl;
         cout << "**********************************************************" << endl;
         cout << "1 - Pedidos" << endl;
-        cout << "2 - Cancelar pedido" << endl;
-        cout << "3 - Produtos da Hamburgueria" << endl;
-        cout << "4 - Historico" << endl;
-        cout << "5 - Cozinha" << endl;
-        cout << "6 - Fila de retirada" << endl;
+        cout << "2 - Produtos da Hamburgueria" << endl;
+        cout << "3 - Historico" << endl;
+        cout << "4 - Cozinha" << endl;
+        cout << "5 - Fila de retirada" << endl;
         cout << "10 - Sair do sistema" << endl;
         cout << "----------------------------------------------" << endl;
         cout << "\nDigite a opcao desejada: ";
@@ -92,28 +94,23 @@ int main()
             menuManageOrder(orders, menu_products, &orderHistoryList, orderPreparationQueue, &numberOrder);
             break;
         case 2:
-            menuCancelOrder(orders);
-            break;
-        case 3:
             menuProducts(menu_products);
             break;
-        case 4:
-            menuManagerHistory(&orderHistoryList);
+        case 3:
+            menuManagerHistory(&orderHistoryList);            
             break;
-        case 5:
+        case 4:
             menuKitchen(&orderPreparationQueue, kitchen, orderPickupStack);
             break;
-        case 6:
+        case 5:
             menuPickupStack(orderPickupStack);
             break;
         case 10:
-            /* code */
             cout << endl;
             cout << "Saindo do sistema!!!\nAte mais!!" << endl;
             cout << endl;
             continuar = false;
             break;
-
         default:
             messagesErrorsWarning("Opcao invalida! Tente novamente.");
             continue;
@@ -138,13 +135,12 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
     cout << "Menu - Gerenciar Pedidos" << endl;
     cout << "**********************************************************" << endl;
     cout << "1 - Adicionar um pedido" << endl;
-    cout << "2 - Cancelar um pedido" << endl;
+    cout << "2 - Cancelar pedido" << endl;
     cout << "3 - Editar pedido" << endl;
     cout << "4 - Fechar um pedido " << endl;
     cout << "5 - Consultar lista de produtos cadastrados" << endl;
     cout << "6 - Exibir pedidos em construcao" << endl;
-    cout << "7 - Exibir todos os pedidos" << endl;
-    cout << "8 - Voltar ao menu principal" << endl;
+    cout << "7 - Voltar ao menu principal" << endl;
     cout << "---------------------------------------------------------" << endl;
     cout << "\nDigite a opcao desejada: ";
     cin >> responseMenuOrder;
@@ -163,36 +159,27 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
         break;
     case 4:
     {
-        int orderIndex;
+        // Procura o pedido pelo NUMERO e retorna o índice correto no vetor 'orders'
+        int index = searchOrderIndex(orders);
 
-        cout << "\n Informe o numero do pedido que deseja fechar : " << endl;
-        cin >> orderIndex;
-        Order *order;
-
-        try
+        if (index >= 0)
         {
-            // .at() lança std::out_of_range se o índice for inválido
-            order = &orders.at(orderIndex - 1);
-            cout << "\n pedido: " << order->getNumberOrder() << " selecionado!" << endl;
+            Order *order = &orders[index];
+            cout << "\nPedido N. " << order->getNumberOrder() << " selecionado!" << endl;
 
+            // Se já estiver fechado por algum motivo
             if (order->getStatusOrder() == StatusOrder::FECHADO)
             {
-                messagesErrorsWarning("Atencao o pedido" + to_string(order->getNumberOrder()) + " ja esta fechado!");
-                return;
+                messagesErrorsWarning("Atencao: o pedido N. " + to_string(order->getNumberOrder()) + " ja esta fechado!");
             }
-
-            closeOrder(orders, orderIndex, order, orderHistoryList, orderPreparationQueue);
+            else
+            {
+                // Fecha o pedido, move para o histórico e remove do vetor central
+                closeOrder(orders, index, order, orderHistoryList, orderPreparationQueue);
+            }
         }
-        catch (const std::out_of_range &e)
-        {
-            // Captura o erro out_of_range especificamente
-            messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
-            return;
-        }
-
-        // salvar na lista de pedidos
+        break;
     }
-    break;
     case 5:
         showProducts(menu);
         break;
@@ -216,28 +203,6 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
         }
 
         break;
-    case 7:
-        menuDividers();
-        cout << "RELATORIO GERAL DOS PEDIDOS " << endl;
-        cout << "**********************************************************" << endl;
-        if (orders.size() > 0)
-        {
-
-            for (size_t i = 0; i < orders.size(); i++)
-            { // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
-                orders[i].showResumeOrder();
-                cout << "\n"; // Em C++ usa-se order[i] em vez de order.get(i)
-            }
-            cout << "**********************************************************" << endl;
-        }
-        cout << "\n";
-
-        if (!orderHistoryList->isEmpty())
-        {
-            orderHistoryList->showReportAll();
-        }
-
-        break;
     default:
         break;
     }
@@ -252,10 +217,9 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
     cout << "**********************************************************" << endl;
     cout << "1 - Adicionar um item" << endl;
     cout << "2 - Remover um item" << endl;
-    cout << "3 - Desfazer a ultima ação do um item" << endl;
-    cout << "4 - Editar o nome do cliente: " << endl;
-    cout << "5 - Editar a mesa: " << endl;
-    cout << "6 - Sair" << endl;
+    cout << "3 - Editar o nome do cliente " << endl;    
+    cout << "4 - Editar a mesa " << endl;
+    cout << "5 - Sair" << endl;
     cout << "\nDigite a opção desejada: ";
     cin >> responseMenuEditOrder;
 
@@ -268,88 +232,60 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
         menuRemoveOrderItem(orders, menu);
         //  ao remover o item deve colocar ele na pilha de ação e caso o cliente mude ele é recolocado no pedido
         break;
-    /*case 3:
-        // pilha de ações
-        break;*/
-    case 4:
+    case 3: // Editar Nome do Cliente
     {
-        int orderIndex;
-        string newName = "";
+        int orderIndex = searchOrderIndex(orders);
+        if (orderIndex < 0) break;
 
-        cout << "\n Informe o numero do pedido que deseja editar o cliente : " << endl;
-        cin >> orderIndex;
-        Order *order;
+        Order *order = &orders[orderIndex];
+        messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
 
-        try
-        {
-            // .at() lança std::out_of_range se o índice for inválido
-            order = &orders.at(orderIndex - 1);
-            cout << "\n pedido: " << order->getNumberOrder() << " selecionado!" << endl;
-        }
-        catch (const std::out_of_range &e)
-        {
-            // Captura o erro out_of_range especificamente
-            messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
-            return;
-        }
         cin.ignore();
-        cout << "\n informe o novo nome do cliente ou tecle [ENTER] para manter o mesmo nome: ";
+        string newName = "";
+        cout << "\nInforme o novo nome do cliente: ";
         getline(cin, newName);
-        if (!newName.empty() || !newName.find_first_not_of(" \t\n\r") == string::npos)
+
+        if (!newName.empty())
         {
             order->setNameClient(newName);
             messagesSucess("Nome do cliente atualizado com sucesso!");
         }
         else
         {
-            messagesErrorsWarning("[Erro] O nome do cliente deve ser diferente de vazio! Tente novamente.");
-            return;
+            messagesErrorsWarning("[Erro] O nome nao pode ser vazio!");
         }
-        // salvar na lista de pedidos
     }
     break;
-    case 5:
+
+    case 4: // Editar Mesa
     {
-        int orderIndex;
+        int orderIndex = searchOrderIndex(orders);
+        if (orderIndex < 0) break;
+
+        Order *order = &orders[orderIndex];
+        messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
+
         int numBerTable = 0;
-
-        cout << "\n Informe o numero do pedido que deseja editar a mesa : " << endl;
-        cin >> orderIndex;
-        Order *order;
-
-        try
-        {
-            // .at() lança std::out_of_range se o índice for inválido
-            order = &orders.at(orderIndex - 1);
-            messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
-        }
-        catch (const std::out_of_range &e)
-        {
-            // Captura o erro out_of_range especificamente
-            messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
-            return;
-        }
-        cin.ignore();
-        cout << "\n informe o novo numero da mesa do pedido ou tecle [ENTER] para manter o mesmo numero: ";
+        cout << "\nInforme o novo numero da mesa: ";
         cin >> numBerTable;
+
         if (numBerTable > 0)
         {
             order->setNumberTable(numBerTable);
-            messagesSucess("Nome do cliente atualizado com sucesso!");
+            messagesSucess("Mesa atualizada com sucesso!");
         }
         else
         {
-            messagesErrorsWarning("[Erro] O nome do cliente deve ser diferente de vazio! Tente novamente.");
-            return;
+            messagesErrorsWarning("[Erro] Numero de mesa invalido!");
         }
-        // salvar na lista de pedidos
-    }
-
-    break;
+    }   
+        break;
+    
     default:
         break;
     }
 }
+
 
 // Menu de cadastro de pedidos
 void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *history, OrderPreparationQueue &orderPreparationQueue, int *orderNumber)
@@ -429,9 +365,10 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
     currentOrder.setNumberTable(clientSeat);
     currentOrder.sumTotalPriceToOrder();
 
+    // Chama a função de fechamento do pedido recém-criado
     closeOrder(orders, -1, &currentOrder, history, orderPreparationQueue);
 
-    // Salva no vetor ativo
+    // Se o usuário optou por NÃO fechar (continua EM_CONSTRUCAO), salva no vetor central
     if (currentOrder.getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
     {
         orders.push_back(currentOrder);
@@ -446,30 +383,42 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
 }
 
 // função cancelar Pedido
+// Função para cancelar apenas Pedidos em Construção
 void menuCancelOrder(vector<Order> &orders)
 {
     char continueClear;
 
-    // Chama a busca por código, que já pede o código do produto e retorna a posição
-    int OrderIndex = searchOrderNumber(orders);
-
-    cout << "Menu - Cancelar produto " << endl;
+    cout << "Menu - Cancelar Pedido Em Construcao" << endl;
     cout << "**********************************************************" << endl;
 
-    // Se o índice for 0 ou maior, o produto existe na lista
-    if (OrderIndex >= 0)
+    if (orders.empty()) {
+        messagesErrorsWarning("Nenhum pedido em aberto no momento.");
+        return;
+    }
+
+    // Busca o índice do pedido no vetor central
+    int orderIndex = searchOrderIndex(orders);
+
+    if (orderIndex >= 0)
     {
-        cout << "\nTem certeza que deseja apagar o produto: "
-             << orders[OrderIndex].getNumberOrder() << "? (s/n): ";
+        // Valida se o pedido realmente está em construção
+        if (orders[orderIndex].getStatusOrder() != StatusOrder::EM_CONSTRUCAO)
+        {
+            messagesErrorsWarning("Apenas pedidos EM CONSTRUCAO podem ser cancelados por este menu!");
+            return;
+        }
+
+        cout << "\nTem certeza que deseja cancelar o Pedido N. "
+             << orders[orderIndex].getNumberOrder() << " (Em Construcao)? (s/n): ";
 
         char confirm;
         cin >> confirm;
 
         if (confirm == 's' || confirm == 'S')
         {
-            // Apaga o produto do vetor usando o iterador
-            orders.erase(orders.begin() + OrderIndex);
-            messagesSucess("Produto removido com sucesso!");
+            // Remove permanentemente o pedido do vetor de montagem
+            orders.erase(orders.begin() + orderIndex);
+            messagesSucess("Pedido em construcao cancelado e removido com sucesso!");
         }
         else
         {
@@ -508,28 +457,20 @@ void showOrders(vector<Order> &order)
 // Adicionar itens ao pedido
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
 {
-    int orderIndex;
-    int barCode;
-    int quantity;
-    char confirm;
+    // Declaração das variáveis auxiliares utilizadas no loop
+    int barCode = 0;
+    int quantity = 0;
+    char confirm = 'n';
 
-    cout << "\n Informe o numero do pedido que deseja adicionar itens : " << endl;
-    cin >> orderIndex;
-    Order *order;
+    // Usa a busca pelo número do pedido em vez do índice fixo
+    int orderIndex = searchOrderIndex(orders);
 
-    try
-    {
-        // .at() lança std::out_of_range se o índice for inválido
-        order = &orders.at(orderIndex - 1);
-        messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
+    if (orderIndex < 0) {
+        return; // Pedido não encontrado (a searchOrderIndex já exibe a mensagem de erro)
     }
-    catch (const std::out_of_range &e)
-    {
-        // Captura o erro out_of_range especificamente
-        messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
-        return;
-    }
-    cin.ignore();
+    
+    Order *order = &orders[orderIndex];
+    messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
 
     if (order->getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
     {
@@ -575,7 +516,7 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
                 return;
             }
             cout << "-------------------------------------------" << endl;
-            cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): " << endl;
+            cout << "\nDeseja adicionar mais um produto ao pedido?(s/n): ";
             cin >> confirm;
         } while (confirm == 's' || confirm == 'S');
     }
@@ -596,26 +537,18 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
 // Remover item de pedido
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
 {
-    int orderIndex;
-    char confirm;
-    char confirmRm;
+    char confirm = 'n';
+    char confirmRm = 'n';
 
-    cout << "\n Informe o numero do pedido que deseja remover itens : " << endl;
-    cin >> orderIndex;
-    Order *order;
+    // Busca pelo número do pedido em vez de usar o índice posicional direto
+    int orderIndex = searchOrderIndex(orders);
 
-    try
-    {
-        // .at() lança std::out_of_range se o índice for inválido
-        order = &orders.at(orderIndex - 1);
-        messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
+    if (orderIndex < 0) {
+        return; // Pedido não encontrado (a searchOrderIndex já exibe a mensagem)
     }
-    catch (const std::out_of_range &e)
-    {
-        messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
-        return;
-    }
-    cin.ignore();
+
+    Order *order = &orders[orderIndex];
+    messagesSucess("pedido: " + to_string(order->getNumberOrder()) + " selecionado!");
 
     if (order->getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
     {
@@ -658,7 +591,7 @@ void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
             }
 
             cout << "-------------------------------------------" << endl;
-            cout << "\nDeseja remover mais um produto do pedido?(s/n): " << endl;
+            cout << "\nDeseja remover mais um produto do pedido?(s/n): ";
             cin >> confirm;
         } while (confirm == 's' || confirm == 'S');
     }
@@ -683,32 +616,70 @@ void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
     }
 }
 
+//fechar pedido
 void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue)
 {
-    char optionCloseOrder;
+    if (order == nullptr) return;
 
-    cout << "Confirmar o fechamento do pedido? (s/n)" << endl;
+    char optionCloseOrder;
+    cout << "Confirmar o fechamento do pedido N. " << order->getNumberOrder() << "? (s/n): ";
     cin >> optionCloseOrder;
 
-    bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
-
-    if (isClosedNow)
+    if (optionCloseOrder == 's' || optionCloseOrder == 'S')
     {
         if (order->getStatusOrder() != StatusOrder::CANCELADO && order->getStatusOrder() != StatusOrder::PRONTO)
         {
+            // Altera o status
             order->setStatusOrder(StatusOrder::FECHADO);
-            orderHistoryList->insertEnd(*order);
-            orderPreparationQueue.enqueue(orderHistoryList->getTail()->getOrderPointer());
 
-            if (indexOrder > 0)
+            // Copia para o Histórico
+            orderHistoryList->insertEnd(*order);
+
+            // Enfileira na Cozinha
+            if (orderHistoryList->getTail() != nullptr) {
+                orderPreparationQueue.enqueue(orderHistoryList->getTail()->getOrderPointer());
+            }
+
+            // Remove do vetor 'orders' se ele já estiver lá dentro
+            if (indexOrder >= 0 && indexOrder < static_cast<int>(orders.size()))
             {
                 orders.erase(orders.begin() + indexOrder);
             }
 
             messagesSucess("Pedido fechado com sucesso!");
         }
+    } else {
+        messagesErrorsWarning("Operacao cancelada.");
     }
 }
+
+// Busca um pedido pelo número e retorna o índice no vetor de pedidos
+int searchOrderIndex(vector<Order> &orders)
+{
+    int orderNumber;
+    int foundIndex = -1;
+
+    menuDividers();
+    cout << "Informe o NUMERO do pedido: ";
+    cin >> orderNumber;
+
+    for (size_t i = 0; i < orders.size(); i++)
+    {
+        if (orders[i].getNumberOrder() == orderNumber)
+        {
+            foundIndex = static_cast<int>(i); // Salva o índice do pedido
+            break;                            // Encontrou, para o loop
+        }
+    }
+
+    if (foundIndex == -1)
+    {
+        messagesErrorsWarning("Pedido com o numero " + to_string(orderNumber) + " nao encontrado!");
+    }
+
+    return foundIndex; // Retorna o índice do pedido encontrado ou -1
+}
+
 // =======================================================
 // MENU PRODUTOS
 // =======================================================
@@ -1016,11 +987,6 @@ int searchProductBarCode(vector<Product> &menu)
     return foundIndex; // Retorna o índice do produto encontrado ou -1 se não encontrado
 }
 
-int searchOrderNumber(vector<Order> &order)
-{
-    (void)order;
-    return 1;
-}
 // Listar todos os produtos cadastrados no sistema
 void showProducts(vector<Product> &menu)
 {
@@ -1095,8 +1061,11 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
     cout << "**********************************************************" << endl;
     cout << "1 - Exibir historico de pedidos completo" << endl;
     cout << "2 - Exibir historico de pedidos resumido" << endl;
-    cout << "3 - Remover um pedido do historico" << endl;
-    cout << "4 - Voltar ao order principal" << endl;
+    cout << "3 - Buscar um pedido pelo nome do cliente" << endl;
+    cout << "4 - Buscar um pedido pelo numero" << endl;
+    cout << "5 - Cancelar um pedido do historico" << endl;
+    cout << "6 - Remover um pedido do historico" << endl;
+    cout << "10 - Voltar ao order principal" << endl;
     cout << "\nDigite a opção desejada: ";
     cin >> responseMenu;
 
@@ -1119,9 +1088,15 @@ void menuManagerHistory(OrderHistoryList *orderHistoryList)
         resumeHistory(orderHistoryList);
         break;
     case 3:
-
+        searchOrderByName(orderHistoryList);
         break;
     case 4:
+        searchOrderByNumber(orderHistoryList);
+        break;
+    case 5:
+        
+        break;
+    case 6:
 
         break;
     default:
@@ -1189,6 +1164,102 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
     else
     {
         messagesErrorsWarning("Nenhum pedido no historico!");
+    }
+}
+
+void searchOrderByName(OrderHistoryList *orderHistoryList)
+{
+    char continueClear;
+
+    cout << "Menu - Buscar Pedido por Nome do Cliente" << endl;
+    cout << "**********************************************************" << endl;
+
+    if (orderHistoryList == nullptr || orderHistoryList->isEmpty())
+    {
+        messagesErrorsWarning("O historico de pedidos esta vazio.");
+        return;
+    }
+
+    string clientName;
+    cout << "Informe o nome do cliente: ";
+    cin.ignore();
+    getline(cin, clientName);
+
+    OrderHistory *aux = orderHistoryList->gethead();
+    bool found = false;
+
+    cout << "\n--- RESULTADO DA BUSCA ---" << endl;
+
+    while (aux != nullptr)
+    {
+        // Usando getNameClient() em vez de getClientName()
+        if (aux->getOrder().getNameClient() == clientName)
+        {
+            found = true;
+            aux->getOrder().showResumeOrder();
+            cout << "----------------------------------------------------------" << endl;
+        }
+        aux = aux->getNext();
+    }
+
+    if (!found)
+    {
+        messagesErrorsWarning("Nenhum pedido encontrado para o cliente: " + clientName);
+    }
+
+    cout << "\nPressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
+    cin >> continueClear;
+
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
+    }
+}
+
+void searchOrderByNumber(OrderHistoryList *orderHistoryList)
+{
+    char continueClear;
+
+    cout << "Menu - Buscar Pedido por Numero" << endl;
+    cout << "**********************************************************" << endl;
+
+    if (orderHistoryList == nullptr || orderHistoryList->isEmpty())
+    {
+        messagesErrorsWarning("O historico de pedidos esta vazio.");
+        return;
+    }
+
+    int orderNumber;
+    cout << "Informe o NUMERO do pedido: ";
+    cin >> orderNumber;
+
+    OrderHistory *aux = orderHistoryList->gethead();
+    bool found = false;
+
+    while (aux != nullptr)
+    {
+        if (aux->getOrder().getNumberOrder() == orderNumber)
+        {
+            found = true;
+            cout << "\n--- PEDIDO ENCONTRADO ---" << endl;
+            aux->getOrder().showResumeOrder();
+            cout << "----------------------------------------------------------" << endl;
+            break; // Como o número é único, pode encerrar o loop
+        }
+        aux = aux->getNext();
+    }
+
+    if (!found)
+    {
+        messagesErrorsWarning("Pedido N. " + to_string(orderNumber) + " nao foi encontrado no historico.");
+    }
+
+    cout << "\nPressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
+    cin >> continueClear;
+
+    if (continueClear == 's' || continueClear == 'S')
+    {
+        deleteTerminal();
     }
 }
 
@@ -1382,7 +1453,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
     menu.push_back(product);
 
     product.setBarCode(3);
-    product.setName("bauru artersal");
+    product.setName("bauru artesanal");
     product.setUnitPrice(14);
 
     menu.push_back(product);
@@ -1427,7 +1498,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
     product.setUnitPrice(3);
     menu.push_back(product);
 
-    // pre-cadastro de pedidos
+    /*// pre-cadastro de pedidos
     Order order_temp;
 
     order_temp.setNameClient("jackson");
@@ -1454,5 +1525,5 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
 
     orderHistory.insertEnd(order_temp);
 
-    orderPreparationQueue.enqueue(orderHistory.getTail()->getOrderPointer());
+    orderPreparationQueue.enqueue(orderHistory.getTail()->getOrderPointer());*/
 }
