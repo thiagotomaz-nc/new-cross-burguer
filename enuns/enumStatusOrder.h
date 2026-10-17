@@ -5,8 +5,11 @@
 #pragma once //impede que o mesmo arquivo .h seja incluído mais de uma vez durante a compilação.
 
 enum class StatusOrder{
-    CANCELADO = 0,
-    EM_CONSTRUCAO = 1,
-    FECHADO = 2,
-    PRONTO = 3
+    CANCELADO,
+    EM_CONSTRUCAO,
+    FECHADO,
+    PREPARO,
+    COZINHA,
+    PRONTO,
+    FINALIZADO, 
 };

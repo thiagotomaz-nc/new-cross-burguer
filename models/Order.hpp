@@ -23,7 +23,7 @@ private:
     string nameClient;
     vector<Item> items; // marca qual o inicio do cabeça dos items; 
     double priceTotalToOrder = 0;
-    int statusOrder; // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
+    StatusOrder statusOrder; // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
 
 public:
     Order();
@@ -45,13 +45,13 @@ public:
     void setNameClient(string newNameClient);
     string getNameClient();
     void setStatusOrder(StatusOrder newStatusOrder);
-    int getStatusOrder();
+    StatusOrder getStatusOrder();
 
     int findItemIndexByBarCode(int barCode); // Retorna o índice do item no vetor do pedido ou -1 se não existir
 
     void showResumeOrder();
 
-    string statusToString(int status);
+    string statusToString(StatusOrder status);
   
     ~Order();
 };

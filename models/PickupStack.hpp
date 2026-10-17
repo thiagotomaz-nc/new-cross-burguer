@@ -2,24 +2,25 @@
 #define _PICKUP_STACK_HPP
 
 #include "Order.hpp"
-#include "PickupStackNode.hpp"
 
+#define SIZE_DEFAULT 10
+// Pilha encadeada simples
 class PickupStack
 {
 private:
-    PickupStackNode *top;   // Aponta para o nó no topo da pilha
-    int length;             // Quantidade atual de elementos
+    Order * orderPickupStack;
+    PickupStack *next;
 
 public:
+
     PickupStack();
-    
-    void push(Order *order);
-    Order* pop();
-    Order* peek();
-    
-    int isEmpty();
-    int getLength();
-    
+
+    void orderInPickupStack(Order * order);
+    void setNext(PickupStack *newNext);
+    PickupStack* getNext();
+
+    Order* getOrder();  
+
     ~PickupStack();
 };
 
