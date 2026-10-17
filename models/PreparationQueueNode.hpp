@@ -11,6 +11,7 @@ class PreparationQueueNode
 private:
     PreparationQueueNode* next;
     Order * orderPreparation;
+    
 
 public:
     PreparationQueueNode();

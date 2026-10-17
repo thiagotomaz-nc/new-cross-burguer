@@ -46,7 +46,9 @@ Order *OrderHistory::getOrderPointer()
 
 OrderHistory::~OrderHistory()
 {
+   /*
     cout << "\n---------------------------------------------------------\n";
     cout << "Pedido [ " << this->getOrder().getNumberOrder() << " ] removido do historico com sucesso!" << "\n";
     cout << "---------------------------------------------------------\n\n";
+    */
 }

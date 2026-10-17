@@ -7,7 +7,7 @@
 class Kitchen
 {
 private:
-   Order *data;
+   Order *orderkitchen;
    
 public:
     Kitchen(/* args */);

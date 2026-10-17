@@ -7,9 +7,11 @@ PreparationQueueNode::PreparationQueueNode(){
 }
 void PreparationQueueNode::setOrder(Order *order){
     this->orderPreparation = order;
+    
 }
+
 Order *PreparationQueueNode::getOrder(){
-    return this->getOrder();
+    return this->orderPreparation;
 }
 PreparationQueueNode *PreparationQueueNode::getNext() const{
     return this->next;

@@ -3,15 +3,14 @@
 PreparationQueue::PreparationQueue()
 {
     this->head = nullptr;
-    this->peek = nullptr;
     this->n_elements = 0;
 }
 
-void PreparationQueue::enqueue(Order *orderHistoryTemp)
+void PreparationQueue::enqueue(Order *orderInHistory)
 {
 
     this->preparationQueueNode = new PreparationQueueNode();
-    this->preparationQueueNode->setOrder(orderHistoryTemp);
+    this->preparationQueueNode->setOrder(orderInHistory);
     this->preparationQueueNode->setNext(nullptr);
 
     this->n_elements++;
@@ -20,7 +19,6 @@ void PreparationQueue::enqueue(Order *orderHistoryTemp)
     if (this->head == nullptr)
     {
         this->head = this->preparationQueueNode;
-        this->peek = this->preparationQueueNode;
         return;
     }
 
@@ -34,35 +32,30 @@ void PreparationQueue::enqueue(Order *orderHistoryTemp)
 
     // Conecta o novo nó ao final
     current->setNext(this->preparationQueueNode);
-
-    // Atualiza o ponteiro do último nó da fila
-    this->peek = this->preparationQueueNode;
 }
 
 // ponteiro ou não
 void PreparationQueue::dequeue()
 {
     // Se a fila está vazia (cabeça sem pedido), não faz nada
-    if (this->head == nullptr)
+    if (isEmpty())
     {
+        displayMessage("Fila de preparo esta vazia!");
         return;
     }
 
     // Se há apenas 1 elemento na fila
     if (this->n_elements == 1)
     {
-        delete this->head;
         this->head = nullptr;
         return;
     }
 
     // Se há 2 ou mais elementos na fila
-    PreparationQueueNode *temp = this->head; // Guarda o ponteiro do segundo nó
+    PreparationQueueNode *temp = this->head; // Pega o ponteiro do primeiro nó 
 
-    this->head = temp->getNext(); // Promove o pedido do segundo nó para a cabeça
-    delete temp;                  // Aponta para o terceiro nó (preservando o resto da fila)
-                                  // Desconecta o nó antigo antes de deletar
-                                  // Libera a memória apenas do nó promovido
+    this->head = temp->getNext(); // atualaliza a cabeça apontando ela para o proximo  nó
+
 }
 
 bool PreparationQueue::isEmpty()
@@ -94,22 +87,32 @@ Order *PreparationQueue::getOrderPreparation()
 void PreparationQueue::showQueuePreparation()
 {
     // Caso contrário, navega até o último nó da fila
+    // Sempre vou exibir toda a minha fila de preparo
+    cout << "\nFILA DE PREPARO" << "[ total de pedidos: " << this->n_elements << " ]" << endl;
+    cout << "**************************************************************" << endl;
+    int sequencia = 1;
 
     if (!isEmpty())
     {
         PreparationQueueNode *aux = this->head;
-        
+
         do
         {
-            aux-> getOrder()->showResumeOrder();
+            cout << "Ordem preparo: " << sequencia << endl;
+            aux->getOrder()->showResumeOrder();
             aux = aux->getNext();
 
         } while (aux != nullptr);
     }
     else
     {
-        cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
-        cout << "Fila de preparo esta vazia!" << "\n";
-        cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
+        displayMessage("Fila de preparo esta vazia!");
     }
+}
+
+void PreparationQueue::displayMessage(string displayMessage)
+{
+    cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
+    cout << displayMessage << "\n";
+    cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
 }

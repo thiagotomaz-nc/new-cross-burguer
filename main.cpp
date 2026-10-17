@@ -1174,7 +1174,8 @@ void menuKitchen(PreparationQueue *preparationQueue)
     cout << "1 - Exibir fila de preparo" << endl;
     cout << "2 - Iniciar preparo" << endl;
     cout << "3 - Finalizar Preparo" << endl;
-    cout << "4 - Enviar para fila de retirada" << endl;
+    cout << "4 - Pedidos na cozinha " << endl;
+    cout << "5 - Enviar para fila de retirada" << endl;
     cout << "\nDigite a opção desejada: ";
     cin >> responseMenu;
 
@@ -1320,7 +1321,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
     orders.push_back(order_temp);
 
     orderHistory.insertEnd(orders[1]);
-
+    
     preparationQueue.enqueue(orderHistory.getTail()->getOrderPointer());
 
 }
