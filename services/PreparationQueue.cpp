@@ -10,17 +10,17 @@ PreparationQueue::PreparationQueue()
 void PreparationQueue::enqueue(Order *orderHistoryTemp)
 {
 
-    PreparationQueueNode *preparetionQueueNode = new PreparationQueueNode();
-    preparetionQueueNode->setOrder(orderHistoryTemp);
-    preparetionQueueNode->setNext(nullptr);
+    this->preparationQueueNode = new PreparationQueueNode();
+    this->preparationQueueNode->setOrder(orderHistoryTemp);
+    this->preparationQueueNode->setNext(nullptr);
 
     this->n_elements++;
 
     // Se o elemento principal (head) não tiver dados ainda, preenche direto
     if (this->head == nullptr)
     {
-        this->head = preparetionQueueNode;
-        this->peek = preparetionQueueNode;
+        this->head = this->preparationQueueNode;
+        this->peek = this->preparationQueueNode;
         return;
     }
 
@@ -33,10 +33,10 @@ void PreparationQueue::enqueue(Order *orderHistoryTemp)
     }
 
     // Conecta o novo nó ao final
-    current->setNext(preparetionQueueNode);
+    current->setNext(this->preparationQueueNode);
 
     // Atualiza o ponteiro do último nó da fila
-    this->peek = preparetionQueueNode;
+    this->peek = this->preparationQueueNode;
 }
 
 // ponteiro ou não
@@ -65,9 +65,9 @@ void PreparationQueue::dequeue()
                                   // Libera a memória apenas do nó promovido
 }
 
-int PreparationQueue::isEmpty()
+bool PreparationQueue::isEmpty()
 {
-    return (this->head == nullptr) ? 0 : this->n_elements;
+    return this->head == nullptr;
 }
 
 // retorno o objeto OrderStory;
@@ -82,6 +82,8 @@ Order PreparationQueue::getPeek()
 PreparationQueue::~PreparationQueue()
 {
     // não posso apagar o orderhistory, pois ele esta salvo no historico;
+    delete this->preparationQueueNode;
+    this->preparationQueueNode = nullptr;
 }
 
 Order *PreparationQueue::getOrderPreparation()
@@ -92,11 +94,22 @@ Order *PreparationQueue::getOrderPreparation()
 void PreparationQueue::showQueuePreparation()
 {
     // Caso contrário, navega até o último nó da fila
-    PreparationQueueNode *aux = this->head;
 
-    while (aux != nullptr)
-    {   
-        aux->getOrder()->showResumeOrder();
-        aux = aux->getNext();
+    if (!isEmpty())
+    {
+        PreparationQueueNode *aux = this->head;
+        
+        do
+        {
+            aux-> getOrder()->showResumeOrder();
+            aux = aux->getNext();
+
+        } while (aux != nullptr);
+    }
+    else
+    {
+        cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
+        cout << "Fila de preparo esta vazia!" << "\n";
+        cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
     }
 }

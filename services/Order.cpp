@@ -2,7 +2,8 @@
 
 Order::Order()
 {
-    this->statusOrder = static_cast<int>(StatusOrder::EM_CONSTRUCAO);
+    this->statusOrder = StatusOrder::EM_CONSTRUCAO;
+    this->numberOrder = 0;
 }
 
 Order::Order(const Order & other){
@@ -93,41 +94,29 @@ string Order::getNameClient()
 
 void Order::setStatusOrder(StatusOrder newStatusOrder)
 {
-    int status = static_cast<int>(newStatusOrder);
-    if (status > 0)
-    {
-        this->statusOrder = status;
-    }
-    else
-    {
-        this->statusOrder = 1;
-    }
+    this->statusOrder = newStatusOrder;
+   
 }
 
-int Order::getStatusOrder()
+StatusOrder Order::getStatusOrder()
 {
     return this->statusOrder;
 }
 
-string Order::statusToString(int status)
+string Order::statusToString(StatusOrder status)
 {
     switch (status)
     {
-    case 0:
-        return "CANCELADO";
-        break;
-    case 1:
-        return "EM_CONSTRUCAO";
-        break;
-    case 2:
-        return "FECHADO";
-        break;
-    case 3:
-        return "PRONTO";
-        break;
+    case StatusOrder::CANCELADO:
+        return "CANCELADO";  
+    case StatusOrder::EM_CONSTRUCAO:
+        return "EM_CONSTRUCAO";   
+    case StatusOrder::FECHADO:
+        return "FECHADO"; 
+    case StatusOrder::PRONTO:
+        return "PRONTO";  
     default:
         return "status não encontrado";
-        break;
     }
 }
 

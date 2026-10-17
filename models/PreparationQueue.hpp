@@ -9,6 +9,7 @@
 class PreparationQueue
 {
 private:
+    PreparationQueueNode * preparationQueueNode;
     PreparationQueueNode* head;
     PreparationQueueNode* peek;
     int n_elements;
@@ -18,7 +19,7 @@ public:
 
     void enqueue(Order* PreparationQueue); // ponteiro
     void dequeue();
-    int isEmpty();
+    bool isEmpty();
 
     Order* getOrderPreparation();
     

@@ -1,10 +1,12 @@
 #include "../models/OrderHistory.hpp"
 
-OrderHistory::OrderHistory()
+OrderHistory::OrderHistory(const Order &st):order(st)
 {
+    
     this->previous = nullptr;
     this->next = nullptr;
 }
+
 
 void OrderHistory::setOrder(Order newOrder)
 {
@@ -22,7 +24,7 @@ void OrderHistory::setPrevious(OrderHistory *previous)
 }
 
 // possivelmente não presice desses metodos
-OrderHistory *OrderHistory::getNext() 
+OrderHistory *OrderHistory::getNext()
 {
     return this->next;
 }
@@ -35,4 +37,16 @@ OrderHistory *OrderHistory::getPrevious()
 Order OrderHistory::getOrder()
 {
     return this->order;
+}
+
+Order *OrderHistory::getOrderPointer()
+{
+    return &this->order;
+}
+
+OrderHistory::~OrderHistory()
+{
+    cout << "\n---------------------------------------------------------\n";
+    cout << "Pedido [ " << this->getOrder().getNumberOrder() << " ] removido do historico com sucesso!" << "\n";
+    cout << "---------------------------------------------------------\n\n";
 }

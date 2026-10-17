@@ -25,7 +25,6 @@ void menuProducts(vector<Product> &menu);
 
 // Menus historicos
 void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, PreparationQueue &preparationQueue);
-void menuCancelOrder(vector<Order> &menu);
 void menuManagerHistory(OrderHistoryList *orderHistoryList);
 void resumeHistory(OrderHistoryList *orderHistoryList);
 
@@ -37,6 +36,7 @@ void menuCancelOrder(vector<Order> &orders);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
+void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistoryList *OrderHistoryList, PreparationQueue &PreparationQueue);
 
 // Cozinha
 void menuKitchen(PreparationQueue *preparationQueue);
@@ -48,7 +48,7 @@ void messagesSucess(string messsage);
 void messagesErrorsWarning(string messsage);
 
 // CADASTROS PRÉVIOS
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory);
+void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory, PreparationQueue & preparationQueue);
 
 int main()
 {
@@ -61,7 +61,7 @@ int main()
     OrderHistoryList orderHistoryList;
     PreparationQueue preparationQueue;
 
-    previousRegistrations(orders, menu_products, orderHistoryList);
+    previousRegistrations(orders, menu_products, orderHistoryList, preparationQueue);
 
     cout << endl;
 
@@ -159,7 +159,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
 
         cout << "\n Informe o numero do pedido que deseja fechar : " << endl;
         cin >> orderIndex;
-        Order *order;
+        Order * order;
 
         try
         {
@@ -167,28 +167,13 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
             order = &orders.at(orderIndex - 1);
             cout << "\n pedido: " << order->getNumberOrder() << " selecionado!" << endl;
 
-            if (order->getStatusOrder() == static_cast<int>(StatusOrder::FECHADO))
+            if (order->getStatusOrder() == StatusOrder::FECHADO)
             {
                 messagesErrorsWarning("Atencao o pedido" + to_string(order->getNumberOrder()) + " ja esta fechado!");
                 return;
             }
 
-            cout << "Confirmar o fechamento do pedido? 1 - [Sim] | 0 - [Nao]" << endl;
-
-            cin >> optionCloseOrder;
-
-            if (optionCloseOrder == 1)
-            {
-                if (order->getStatusOrder() != static_cast<int>(StatusOrder::CANCELADO) && order->getStatusOrder() != static_cast<int>(StatusOrder::PRONTO))
-                {
-                    order->setStatusOrder(StatusOrder::FECHADO);
-                    orderHistoryList->insertEnd(*order);
-                    preparationQueue.enqueue(&orderHistoryList->getTail()->getOrder());
-
-
-                    messagesSucess("Pedido fechado com sucesso!");
-                }
-            }
+            closeOrder(orders, orderIndex, order, orderHistoryList, preparationQueue);
         }
         catch (const std::out_of_range &e)
         {
@@ -335,6 +320,7 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
         break;
     }
 }
+
 // Menu de cadastro de pedidos
 void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *history, PreparationQueue &preparationQueue)
 {
@@ -395,21 +381,7 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
 
     menuDividers();
 
-    // Pergunta sobre o fechamento do pedido
-    char closeOrder;
-    cout << "-------------------------------------------" << endl;
-    cout << "\nDeseja fechar o pedido agora? (s/n): ";
-    cin >> closeOrder;
 
-    bool isClosedNow = (closeOrder == 's' || closeOrder == 'S');
-    if (isClosedNow)
-    {
-        currentOrder.setStatusOrder(StatusOrder::FECHADO);
-    }
-    else
-    {
-        currentOrder.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
-    }
 
     // Lê os dados cadastrais
     string clientName;
@@ -429,20 +401,18 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
     currentOrder.setNumberTable(clientSeat);
     currentOrder.sumTotalPriceToOrder();
 
-    // Salva no vetor ativo
-    orders.push_back(currentOrder);
+    closeOrder(orders, -1, &currentOrder, history, preparationQueue);
 
-    // Insere no histórico apenas se estiver FECHADO
-    if (isClosedNow && history != nullptr)
-    {
-        history->insertEnd(currentOrder);
-        preparationQueue.enqueue(&history->getTail()->getOrder());
+    // Salva no vetor ativo
+    if (currentOrder.getStatusOrder() == StatusOrder::EM_CONSTRUCAO){
+         orders.push_back(currentOrder);
     }
+   
 
     cout << "\n========================================" << endl;
     cout << " Pedido N. " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
     cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
-    cout << " Status: " << (isClosedNow ? "FECHADO" : "EM CONSTRUÇÃO") << endl;
+    cout << " Status: " << currentOrder.statusToString(currentOrder.getStatusOrder()) << endl;
     cout << "========================================\n"
          << endl;
 }
@@ -486,12 +456,6 @@ void menuCancelOrder(vector<Order> &orders)
     {
         deleteTerminal();
     }
-}
-
-int searchOrderNumber(vector<Order> &order)
-{
-    (void)order;
-    return 1;
 }
 
 // Listar todos os produtos cadastrados no sistema
@@ -539,7 +503,7 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
     }
     cin.ignore();
 
-    if (order->getStatusOrder() == static_cast<int>(StatusOrder::EM_CONSTRUCAO))
+    if (order->getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
     {
         cout << "Adicionar Itens" << endl;
         cout << "**********************************************************" << endl;
@@ -589,7 +553,7 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
     }
     else
     {
-        messagesErrorsWarning("Pedido em estado " + to_string(order->getStatusOrder()) + " não permite adicionar itens!");
+        messagesErrorsWarning("Pedido em estado " + order->statusToString(order->getStatusOrder()) + " não permite adicionar itens!");
     }
 
     order->sumTotalPriceToOrder();
@@ -625,7 +589,7 @@ void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
     }
     cin.ignore();
 
-    if (order->getStatusOrder() == static_cast<int>(StatusOrder::EM_CONSTRUCAO))
+    if (order->getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
     {
         cout << "Remover Itens" << endl;
         cout << "**********************************************************" << endl;
@@ -672,7 +636,7 @@ void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
     }
     else
     {
-        messagesErrorsWarning("Pedido em estado " + to_string(order->getStatusOrder()) + " não permite remover itens!");
+        messagesErrorsWarning("Pedido em estado " + order->statusToString(order->getStatusOrder()) + " não permite remover itens!");
     }
 
     order->sumTotalPriceToOrder();
@@ -691,6 +655,27 @@ void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
     }
 }
 
+void closeOrder(vector<Order> &orders, int indexOrder, Order * order, OrderHistoryList *orderHistoryList, PreparationQueue &preparationQueue)
+{
+    char optionCloseOrder;
+
+    cout << "Confirmar o fechamento do pedido? (s/n)" << endl;
+    cin >> optionCloseOrder;
+
+    bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
+
+    if (isClosedNow)
+    {
+        if (order->getStatusOrder() != StatusOrder::CANCELADO && order->getStatusOrder() != StatusOrder::PRONTO)
+        {
+            order->setStatusOrder(StatusOrder::FECHADO);
+            orderHistoryList->insertEnd(*order);
+            preparationQueue.enqueue(orderHistoryList->getTail()->getOrderPointer());
+
+            messagesSucess("Pedido fechado com sucesso!");
+        }
+    }
+}
 // =======================================================
 // MENU PRODUTOS
 // =======================================================
@@ -998,6 +983,11 @@ int searchProductBarCode(vector<Product> &menu)
     return foundIndex; // Retorna o índice do produto encontrado ou -1 se não encontrado
 }
 
+int searchOrderNumber(vector<Order> &order)
+{
+    (void)order;
+    return 1;
+}
 // Listar todos os produtos cadastrados no sistema
 void showProducts(vector<Product> &menu)
 {
@@ -1168,6 +1158,8 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
         messagesErrorsWarning("Nenhum pedido no historico!");
     }
 }
+
+
 // =======================================================
 // COZINHA
 // =======================================================
@@ -1236,7 +1228,7 @@ void messagesErrorsWarning(string messsage)
 // =======================================================
 // CADASTROS PRÉVIOS
 // =======================================================
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory)
+void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory, PreparationQueue & preparationQueue)
 {
 
     Product product;
@@ -1314,7 +1306,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
     orders.push_back(order_temp);
 
     order_temp.setNameClient("Thiago");
-    order_temp.setNumberOrder(0);
+    order_temp.setNumberOrder(2);
     order_temp.setNumberTable(2);
     item.setProductItem(menu[9]);
     item.setQuantityItem(10);
@@ -1328,4 +1320,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
     orders.push_back(order_temp);
 
     orderHistory.insertEnd(orders[1]);
+
+    preparationQueue.enqueue(orderHistory.getTail()->getOrderPointer());
+
 }

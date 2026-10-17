@@ -12,7 +12,9 @@ private:
     OrderHistory *next;
 
 public:
-    OrderHistory();
+    //copia os dados do pedido para o atributo order do novo nó
+    OrderHistory(const Order &st);
+
     // const após o método: impede alterações diretas nos atributos do objeto atual.
     // const antes do tipo retornado: impede alterações no objeto apontado pelo retorno.
     OrderHistory *getNext();
@@ -23,6 +25,9 @@ public:
     void setOrder(Order newOrder);
 
     Order getOrder();
+    Order* getOrderPointer();
+
+    ~OrderHistory();
 };
 
 #endif
