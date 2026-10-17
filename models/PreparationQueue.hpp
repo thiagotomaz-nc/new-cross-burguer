@@ -1,7 +1,7 @@
 #ifndef _PREPARATION_QUEUE_HPP_
 #define _PREPARATION_QUEUE_HPP_
 
-#include "PreparationQueueNode.hpp"
+#include "Order.hpp"
 
 #define SIZE_DEFAULT 10
 
@@ -9,27 +9,19 @@
 class PreparationQueue
 {
 private:
-    PreparationQueueNode * preparationQueueNode;
-    PreparationQueueNode* head;
-    int n_elements;
+    PreparationQueue * next;
+    Order * orderPreparation;  
 
 public:
     PreparationQueue();
-
-    void enqueue(Order* PreparationQueue); // ponteiro
-    void dequeue();
-    bool isEmpty();
-
-    void displayMessage(string displayMessage);
-
-    Order* getOrderPreparation();
+    void setOrder(Order * order);
     
-    Order getPeek();
-    // utilizar a copia do primeiro elemento da pilha,para não permitir exclusão;
+    Order* getOrder();
 
-    void showQueuePreparation();
+    PreparationQueue* getNext() const;
 
-    ~PreparationQueue();
+    void setNext(PreparationQueue* next);
+    
 };
- 
+
 #endif

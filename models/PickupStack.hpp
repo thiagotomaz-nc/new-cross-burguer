@@ -4,27 +4,24 @@
 #include "Order.hpp"
 
 #define SIZE_DEFAULT 10
-//Pilha encadeada simples
+// Pilha encadeada simples
 class PickupStack
 {
 private:
-    PickupStack * top;
-    int size;
-    int length;
+    Order * orderPickupStack;
+    PickupStack *next;
 
 public:
-    PickupStack(int size = SIZE_DEFAULT);
-    void push(Order *Order);
-    void pop(Order *order);
-    void peek(Order *order);
-    int isEmpty();
-    int getSize();
-    int setSize(int newSize);
-    int setLength(int newLength);
-    int getLength();
+
+    PickupStack();
+
+    void orderInPickupStack(Order * order);
+    void setNext(PickupStack *newNext);
+    PickupStack* getNext();
+
+    Order* getOrder();  
+
     ~PickupStack();
 };
-
-
 
 #endif

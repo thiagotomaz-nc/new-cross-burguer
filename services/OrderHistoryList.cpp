@@ -106,6 +106,8 @@ void OrderHistoryList::showReportAll()
     OrderHistory *aux = this->head;
     double totalSold = 0.0;
 
+    
+
     do
     {
         // Garante que o nó atual é válido antes de acessar os dados
@@ -131,10 +133,10 @@ void OrderHistoryList::showReportAll()
     cout << "--------------------------------------------" << endl;
 }
 
- bool OrderHistoryList::isEmpty(){
+bool OrderHistoryList::isEmpty()
+{
     return this->head == nullptr;
- }
-
+}
 
 pair<bool, Order> OrderHistoryList::searchOrderIndexNumber(int number)
 {
@@ -194,8 +196,6 @@ pair<bool, Order> OrderHistoryList::searchOrderClient(string nameClient)
 
 OrderHistoryList::~OrderHistoryList()
 {
-    delete this->orderHistory;
-    this->orderHistory = nullptr;
 }
 
 void OrderHistoryList::removeOrder(int number)
@@ -240,10 +240,12 @@ void OrderHistoryList::removeOrder(int number)
     }
 }
 
- OrderHistory* OrderHistoryList::getTail() const{
+OrderHistory *OrderHistoryList::getTail() const
+{
     return this->tail;
- }
+}
 
- OrderHistory* OrderHistoryList::gethead() const{
+OrderHistory *OrderHistoryList::gethead() const
+{
     return this->head;
- }
+}

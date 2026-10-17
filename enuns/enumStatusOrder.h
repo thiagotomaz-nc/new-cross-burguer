@@ -10,5 +10,6 @@ enum class StatusOrder{
     FECHADO,
     PREPARO,
     COZINHA,
-    PRONTO 
+    PRONTO,
+    FINALIZADO, 
 };

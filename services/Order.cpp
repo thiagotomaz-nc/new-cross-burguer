@@ -6,7 +6,8 @@ Order::Order()
     this->numberOrder = 0;
 }
 
-Order::Order(const Order & other){
+Order::Order(const Order &other)
+{
     this->numberOrder = other.numberOrder;
     this->numberTable = other.numberTable;
     this->nameClient = other.nameClient;
@@ -95,7 +96,6 @@ string Order::getNameClient()
 void Order::setStatusOrder(StatusOrder newStatusOrder)
 {
     this->statusOrder = newStatusOrder;
-   
 }
 
 StatusOrder Order::getStatusOrder()
@@ -108,13 +108,19 @@ string Order::statusToString(StatusOrder status)
     switch (status)
     {
     case StatusOrder::CANCELADO:
-        return "CANCELADO";  
+        return "CANCELADO";
     case StatusOrder::EM_CONSTRUCAO:
-        return "EM_CONSTRUCAO";   
+        return "EM_CONSTRUCAO";
     case StatusOrder::FECHADO:
-        return "FECHADO"; 
+        return "FECHADO";
     case StatusOrder::PRONTO:
-        return "PRONTO";  
+        return "PRONTO";
+    case StatusOrder::COZINHA:
+        return "COZINHA";
+    case StatusOrder::PREPARO:
+        return "EM PREPARO";
+    case StatusOrder::FINALIZADO:
+        return "FINALIZADO";
     default:
         return "status não encontrado";
     }
@@ -124,7 +130,7 @@ void Order::showResumeOrder()
 {
     cout << "Numero do pedido | Numero da mesa | Cliente | status do pedido" << endl;
     cout << "----------------------------------------------------------------" << endl;
-    cout << setfill('0')<< setw(DECIMAL_PLACES_ORDER) << this->numberOrder << " | " <<  this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
+    cout << setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << " | " << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
     cout << "==========================================================" << endl;
     cout << "\nitens do pedido: " << endl;
     cout << "Numero | Descricao | Preco unit. x quant.  =  total R$" << endl;
@@ -135,11 +141,12 @@ void Order::showResumeOrder()
 
         for (size_t i = 0; i < this->items.size(); i++)
         {
-            this->items[i].showItems(i);          
+            this->items[i].showItems(i);
         }
 
         cout << "\nTotal do pedido:  R$ " << getTotalPriceToOrder() << endl;
-        cout << "==========================================================\n" << endl;
+        cout << "==========================================================\n"
+             << endl;
     }
     else
     {
@@ -156,21 +163,21 @@ int Order::findItemIndexByBarCode(int barCode)
     for (size_t i = 0; i < this->items.size(); ++i)
     {
         // Auto: Desestrutura o pair<bool, Product> retornado por getProductItem()
-        //extrai automaticamente os elementos de dentro do pair:
-        //hasProduct vira uma variável do tipo bool (recebe o first)
-        //product vira uma variável do tipo Product (recebe o second)
+        // extrai automaticamente os elementos de dentro do pair:
+        // hasProduct vira uma variável do tipo bool (recebe o first)
+        // product vira uma variável do tipo Product (recebe o second)
 
         // hasProduct: indica se existe um produto válido no item
         // product: objeto do produto
         auto [hasProduct, product] = this->items[i].getProductItem();
 
-        //Garante que você só vai ler o código de barras (getBarCode()) se o produto realmente existir dentro daquele item do pedido.
+        // Garante que você só vai ler o código de barras (getBarCode()) se o produto realmente existir dentro daquele item do pedido.
         if (hasProduct && product.getBarCode() == barCode)
         {
             return static_cast<int>(i); // Retorna a posição do item no pedido
         }
     }
-    
+
     // Retorna -1 se o produto não for encontrado na lista de itens deste pedido
     return -1;
 }
