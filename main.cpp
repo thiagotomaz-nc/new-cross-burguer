@@ -55,7 +55,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
 int main()
 {
     // inicio variaveis
-    int response = 0, numberOrder = 0;
+    int response = 0, numberOrder = 2;
     bool continuar = true;
     Product product;
     vector<Product> menu_products;
@@ -295,7 +295,7 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
         cin.ignore();
         cout << "\n informe o novo nome do cliente ou tecle [ENTER] para manter o mesmo nome: ";
         getline(cin, newName);
-        if (!newName.empty() || !newName.find_first_not_of(" \t\n\r") == string::npos)
+        if (!newName.empty() || newName.find_first_not_of(" \t\n\r") != string::npos)
         {
             order->setNameClient(newName);
             messagesSucess("Nome do cliente atualizado com sucesso!");

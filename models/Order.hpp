@@ -21,24 +21,32 @@ private:
     int numberOrder = 0;
     int numberTable;
     string nameClient;
-    vector<Item> items; // marca qual o inicio do cabeça dos items; 
+    vector<Item> items; // marca qual o inicio do cabeça dos items;
     double priceTotalToOrder = 0;
     StatusOrder statusOrder; // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
 
 public:
     Order();
-    Order(const Order & other);
+
+    // Construtor de cópia, para quando se cria o objeto e passa o novo objeto na criação
+    // ex: Order pedido1;
+    //  Order pedido2 = pedido1;
+    Order(const Order &other);
+
+    // Operador de atribuição por cópia
+    // Order pedido3;
+    // pedido3 = pedido1;
+    Order &operator=(const Order &) = default;
 
     void addItemToOrder(Item item);
     void removeItemFromOrder(int index);
 
     pair<bool, Item> getItemToIndex(int index);
- 
+
     void sumTotalPriceToOrder();
     double getTotalPriceToOrder();
     int setNumberOrder(int newNumberOrder);
 
-    
     void setNumberTable(int newNumberTable);
     int getNumberOrder();
     int getNumberTable();
@@ -52,7 +60,7 @@ public:
     void showResumeOrder();
 
     string statusToString(StatusOrder status);
-  
+
     ~Order();
 };
 

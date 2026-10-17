@@ -23,7 +23,7 @@ void Order::addItemToOrder(Item item)
 
 void Order::removeItemFromOrder(int index)
 {
-    if (index >= 0 && index < this->items.size())
+    if (index >= 0 &&  static_cast<size_t>(index) < this->items.size())
     {
         // Apaga o produto do vetor usando o iterador
         this->items.erase(items.begin() + index);
@@ -34,7 +34,7 @@ void Order::removeItemFromOrder(int index)
 // optional armazena o objeto diretamente quando existe
 pair<bool, Item> Order::getItemToIndex(int index)
 {
-    if (index >= 0 && index < this->items.size())
+    if (index >= 0 && static_cast<size_t>(index) < this->items.size())
     {
         return {true, this->items[index]};
     }
