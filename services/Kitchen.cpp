@@ -47,3 +47,9 @@ void Kitchen::finishPreparation(PickupStack &pickupStack) {
     // Libera a bancada de preparo da cozinha
     this->data = nullptr;
 }
+
+Kitchen::~Kitchen() {
+    // Apontamos para nullptr para garantir que o ponteiro local da bancada é desvinculado,
+    // preservando a instância do pedido no histórico.
+    this->data = nullptr;
+}
