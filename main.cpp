@@ -34,7 +34,7 @@ int searchOrderNumber(vector<Order> &order);
 void menuInitialOrder(vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
 void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategories, Order *currentOrder, int *orderNumber);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
-void menuSelectItemOrder(Order *order, vector<Product> &menu, OrderHistoryList *history, int *orderNumber);
+void menuSelectItemOrder(Order *order, vector<Product> &menu, int *orderNumber);
 bool closeOrder(Order *order, OrderHistoryList *OrderHistoryList, OrderPreparationQueue &orderPreparationQueue);
 
 // Cozinha
@@ -477,7 +477,7 @@ void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategorie
     } while (repeat);
 }
 
-void menuSelectItemOrder(Order *order, vector<Product> &menu, OrderHistoryList *history, int *orderNumber)
+void menuSelectItemOrder(Order *order, vector<Product> &menu,  int *orderNumber)
 {
     bool repeat = true;
     int categoriesSelect;
@@ -591,7 +591,7 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
         {
         case 1:
             deleteTerminal();
-            menuSelectItemOrder(&currentOrder, menu, history, orderNumber);
+            menuSelectItemOrder(&currentOrder, menu, orderNumber);
             break;
         case 2:
             if (currentOrder.getItemsCount() > 0)
