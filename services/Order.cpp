@@ -21,9 +21,14 @@ void Order::addItemToOrder(Item item)
     this->items.push_back(item);
 }
 
+int Order::getItemsCount()
+{
+    return this->items.size();
+}
+
 void Order::removeItemFromOrder(int index)
 {
-    if (index >= 0 &&  static_cast<size_t>(index) < this->items.size())
+    if (index >= 0 && static_cast<size_t>(index) < this->items.size())
     {
         // Apaga o produto do vetor usando o iterador
         this->items.erase(items.begin() + index);

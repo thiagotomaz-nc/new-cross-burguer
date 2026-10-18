@@ -3,6 +3,7 @@
 
 enum class StatusProductCategories
 {
+    NONE,
     DRINKS,
     BURGERS,
     SIDE_DISHES, // ACOMPANHAMENTO

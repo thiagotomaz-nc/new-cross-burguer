@@ -18,8 +18,7 @@ void menuEditProduct(vector<Product> &menu);
 void menuDeleteProduct(vector<Product> &menu);
 void searchProductName(vector<Product> &menu);
 int searchProductBarCode(vector<Product> &menu);
-int getProductIndex(const vector<Product> &menu, int barCode);
-bool productExists(const vector<Product> &menu, int barCode);
+int getProductIndex(const vector<Product> &menu, int barCode, StatusProductCategories statusCategories);
 bool productExistsName(vector<Product> &menu, const string &name);
 void showProducts(vector<Product> &menu);
 void menuProducts(vector<Product> &menu);
@@ -33,7 +32,7 @@ void resumeHistory(OrderHistoryList *orderHistoryList);
 void showOrders(vector<Order> &order);
 int searchOrderNumber(vector<Order> &order);
 void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
-void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber, StatusProductCategories selectCategories);
+void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategories, Order *currentOrder, int *orderNumber);
 void menuCancelOrder(vector<Order> &orders);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
@@ -56,7 +55,7 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
 int main()
 {
     // inicio variaveis
-    int response = 0, numberOrder = 2;
+    int response = 0, numberOrder = 3;
     bool repeat = true;
     Product product;
     vector<Product> menu_products;
@@ -143,100 +142,154 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
         cout << "**********************************************************" << endl;
         cout << "1 - Adicionar um pedido" << endl;
         cout << "2 - Cancelar um pedido" << endl;
-        cout << "3 - Editar pedido" << endl;
-        cout << "4 - Fechar um pedido " << endl;
-        cout << "5 - Consultar lista de produtos cadastrados" << endl;
-        cout << "6 - Exibir pedidos em construcao" << endl;
-        cout << "7 - Exibir todos os pedidos" << endl;
-        cout << "8 - Voltar  menu anterior" << endl;
+        cout << "3 - Remover um pedido" << endl;
+        cout << "4 - Consultar um pedido [ NOME ] " << endl;
+        cout << "5 - Consultar um pedido [ NUMERO DO PEDIDO ] " << endl;
+        cout << "6 - Exibir todos os pedidos" << endl;
+        cout << "7 - Voltar  menu anterior" << endl;
         cout << "---------------------------------------------------------" << endl;
         cout << "\nDigite a opcao desejada: ";
         cin >> responseMenuOrder;
         cout << "---------------------------------------------------------" << endl;
 
-        deleteTerminal();
-
         switch (responseMenuOrder)
         {
         case 1:
+            deleteTerminal();
             menuSelectItemOrder(orders, menu, orderHistoryList, orderPreparationQueue, orderNumber);
             break;
         case 2:
             menuCancelOrder(orders);
             break;
         case 3:
-            menuEditOrder(orders, menu);
+            // remover pedido
             break;
         case 4:
-        {
-            int orderIndex;
-
-            cout << "\n Informe o numero do pedido que deseja fechar : " << endl;
-            cin >> orderIndex;
-            Order *order;
-
-            try
+            // consultar pedido por nome
+            deleteTerminal();
+            if (!orderHistoryList->isEmpty())
             {
-                // .at() lança std::out_of_range se o índice for inválido
-                order = &orders.at(orderIndex - 1);
-                cout << "\n pedido: " << order->getNumberOrder() << " selecionado!" << endl;
+                bool searchOtherNameClient = true;
+                char confirm;
+                string nameClient;
 
-                if (order->getStatusOrder() == StatusOrder::FECHADO)
+                do
                 {
-                    messagesErrorsWarning("Atencao o pedido" + to_string(order->getNumberOrder()) + " ja esta fechado!");
-                    return;
-                }
 
-                closeOrder(orders, orderIndex, order, orderHistoryList, orderPreparationQueue);
-            }
-            catch (const std::out_of_range &e)
-            {
-                // Captura o erro out_of_range especificamente
-                messagesErrorsWarning("[ERRO] Posição fora do limite do vetor!");
-                return;
-            }
+                    cin.ignore();
+                    cout << "Consultar um pedido [ NOME ] " << endl;
+                    cout << "---------------------------------------------------------" << endl;
+                    cout << "\n Digite o nome do cliente: ";
+                    getline(cin, nameClient);
 
-            // salvar na lista de pedidos
-        }
-        break;
-        case 5:
-            showProducts(menu);
-            break;
-        case 6:
-            menuDividers();
-            cout << "RELATORIO DOS PEDIDOS EM CONSTRUCAO" << endl;
-            cout << "**********************************************************" << endl;
-            if (orders.size() > 0)
-            {
+                    if (!nameClient.empty())
+                    {
+                        pair<bool, Order> clientfound = orderHistoryList->searchOrderClient(nameClient);
 
-                for (size_t i = 0; i < orders.size(); i++)
-                { // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
-                    orders[i].showResumeOrder();
-                    cout << "\n"; // Em C++ usa-se order[i] em vez de order.get(i)
-                }
-                cout << "**********************************************************" << endl;
+                        if (clientfound.first)
+                        {
+                            cout << "\nResultado da pesquisa para o nome do cliente [ " << nameClient << " ]" << endl;
+                            cout << "---------------------------------------------------------" << endl;
+                            clientfound.second.showResumeOrder();
+                        }
+                        else
+                        {
+                            messagesErrorsWarning("Nenhum cliente com o nome [ " + nameClient + "] encontrado.");
+                        }
+                    }
+                    else
+                    {
+                        messagesErrorsWarning("O nome nao pode ser vazio. Tente novamente!");
+                        continue;
+                    }
+                    cout << "\n---------------------------------------------------------" << endl;
+                    cout << "Digite [s] para continuar ou qualquer tecla para sair....:";
+                    cin >> confirm;
+
+                    if (confirm == 's' || confirm == 'S')
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        searchOtherNameClient = false;
+                    }
+
+                    deleteTerminal();
+                } while (searchOtherNameClient);
             }
             else
             {
-                messagesSucess("Nenhum produto em construção cadastrado.");
+                messagesErrorsWarning("Nenhum pedido no historico");
             }
 
             break;
-        case 7:
+        case 5:
+            // consultar pedido por numero de pedido
+            deleteTerminal();
+            if (!orderHistoryList->isEmpty())
+            {
+                bool searchOtherNameClient = true;
+                char confirm;
+                int orderNumberSearch;
+
+                do
+                {
+
+                    cin.ignore();
+                    cout << "Consultar um pedido [ NUMERO DO PEDIDO ] " << endl;
+                    cout << "---------------------------------------------------------" << endl;
+                    cout << "\n Digite o numero do pedido : ";
+                    cin >> orderNumberSearch;
+                    cout << "\n---------------------------------------------------------" << endl;
+
+                    if (orderNumberSearch > 0)
+                    {
+                        pair<bool, Order> clientfound = orderHistoryList->searchOrderIndexNumber(orderNumberSearch);
+
+                        if (clientfound.first)
+                        {
+                            cout << "\nResultado da pesquisa para o numero de pedido [ " << orderNumberSearch << " ]" << endl;
+                            cout << "---------------------------------------------------------" << endl;
+                            clientfound.second.showResumeOrder();
+                        }
+                        else
+                        {
+                            messagesErrorsWarning("Nenhum cliente com o nome [ " + to_string(orderNumberSearch) + " ] encontrado.");
+                        }
+                    }
+                    else
+                    {
+                        messagesErrorsWarning("O numero deve ser maior que zero. Tente novamente!");
+                        continue;
+                    }
+                    cout << "\n---------------------------------------------------------" << endl;
+                    cout << "Digite [s] para continuar ou qualquer tecla para sair....: ";
+                    cin >> confirm;
+
+                    if (confirm == 's' || confirm == 'S')
+                    {
+
+                        continue;
+                    }
+                    else
+                    {
+                        searchOtherNameClient = false;
+                    }
+                    deleteTerminal();
+
+                } while (searchOtherNameClient);
+            }
+            else
+            {
+                messagesErrorsWarning("Nenhum pedido no historico");
+            }
+            break;
+        case 6:
+            deleteTerminal();
             menuDividers();
             cout << "RELATORIO GERAL DOS PEDIDOS " << endl;
             cout << "**********************************************************" << endl;
-            if (orders.size() > 0)
-            {
-
-                for (size_t i = 0; i < orders.size(); i++)
-                { // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
-                    orders[i].showResumeOrder();
-                    cout << "\n"; // Em C++ usa-se order[i] em vez de order.get(i)
-                }
-                cout << "**********************************************************" << endl;
-            }
-            cout << "\n";
 
             if (!orderHistoryList->isEmpty())
             {
@@ -244,7 +297,8 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
             }
 
             break;
-        case 8:
+        case 7:
+            deleteTerminal();
             repeat = false;
             break;
         default:
@@ -258,7 +312,6 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
 {
 
     int responseMenuEditOrder = 0;
-    
 
     cout << "\nMenu - Editar pedido" << endl;
     cout << "**********************************************************" << endl;
@@ -363,33 +416,65 @@ void menuEditOrder(vector<Order> &orders, vector<Product> &menu)
     }
 }
 
-void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *history, OrderPreparationQueue &orderPreparationQueue, int *orderNumber, StatusProductCategories selectCategories)
+void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategories, Order *currentOrder, int *orderNumber)
 {
-
     bool repeat = true;
-
-    int selectProduct;
-
-    Order currentOrder;
+    int selectProductBarCode, quantity = 0;
 
     // Loop para adicionar todos os itens do pedido
     do
     {
-        menuDividers();
-        cout << "Menu - Adicionar produto ao pedido(s)" << endl;
+        cout << "Adicionar produto ao pedido " << *orderNumber << endl;
         cout << "**********************************************************" << endl;
-        cout << "informe o numero do item para adicionar ao pedido ou [0] para menu anterior: ";
+        cout << "informe o numero do item para adicionar ao pedido ou [0] para nao: ";
 
-        cin >> selectProduct;
+        cin >> selectProductBarCode;
 
-        if (selectProduct != 0 && selectProduct > 0)
+        if (selectProductBarCode > 0)
+        {
+            int index = getProductIndex(menu, selectProductBarCode, selectCategories);
+
+            if (index == -1)
+            {
+                messagesErrorsWarning("Produto inexistente. Tente novamente!");
+                continue;
+            }
+
+            cout << "\n-------------------------------------------" << endl;
+            cout << "PRODUTO SELECIONADO: " << menu[index].getName() << endl;
+            cout << "-------------------------------------------" << endl;
+            do
+            {
+                cout << "\nDigite a quantidade desejada: ";
+                cin >> quantity;
+
+                if (quantity > 0)
+                {
+                    Item newItem;
+                    newItem.setProductItem(menu[index]);
+                    newItem.setQuantityItem(quantity);
+                    cout << "\n-------------------------------------------" << endl;
+                    cout << "-> Subtotal do Item: R$ " << newItem.getPriceTotalItem() << endl;
+
+                    currentOrder->addItemToOrder(newItem);
+                }
+                else
+                {
+                    messagesErrorsWarning("[ERRO] A quantidade deve ser maior que zero!");
+                }
+            } while (quantity < 1);
+
+            repeat = false;
+        }
+        else if (selectProductBarCode == 0)
         {
             repeat = false;
-            deleteTerminal();
+            break;
         }
         else
         {
             messagesErrorsWarning("opção invalida, tente novamente!");
+            continue;
         }
 
     } while (repeat);
@@ -399,9 +484,8 @@ void menuAddOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList
 void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *history, OrderPreparationQueue &orderPreparationQueue, int *orderNumber)
 {
     bool repeat = true;
-
+    char confirm;
     int categoriesSelect;
-
     Order currentOrder;
 
     // Loop para adicionar todos os itens do pedido
@@ -424,7 +508,7 @@ void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHist
         switch (categoriesSelect)
         {
         case 1:
-            cout << "Relatorio de bebidas: " << endl;
+            cout << "Relatorio de produtos: BEBIDAS " << endl;
             cout << "------------------------------------------------" << endl;
             for (size_t i = 0; i < menu.size(); i++)
             {
@@ -436,27 +520,115 @@ void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHist
             cout << "\n\n"
                  << endl;
 
-            menuAddOrder(orders, menu, history, orderPreparationQueue, orderNumber, StatusProductCategories::DRINKS);
+            menuAddOrder(menu, StatusProductCategories::DRINKS, &currentOrder, orderNumber);
             break;
         case 2:
-            /* code */
+            cout << "Relatorio de produtos: HAMBURGUERS " << endl;
+            cout << "------------------------------------------------" << endl;
+            for (size_t i = 0; i < menu.size(); i++)
+            {
+                if (menu[i].getStatusProductCategories() == StatusProductCategories::BURGERS)
+                {
+                    menu[i].printProduct();
+                }
+            }
+            cout << "\n\n"
+                 << endl;
+
+            menuAddOrder(menu, StatusProductCategories::BURGERS, &currentOrder, orderNumber);
             break;
         case 3:
-            /* code */
+            cout << "Relatorio de produtos: BEBIDAS " << endl;
+            cout << "------------------------------------------------" << endl;
+            for (size_t i = 0; i < menu.size(); i++)
+            {
+                if (menu[i].getStatusProductCategories() == StatusProductCategories::SIDE_DISHES)
+                {
+                    menu[i].printProduct();
+                }
+            }
+            cout << "\n\n"
+                 << endl;
+
+            menuAddOrder(menu, StatusProductCategories::SIDE_DISHES, &currentOrder, orderNumber);
             break;
         case 4:
-            /* code */
+            messagesErrorsWarning("[Aviso] NENHUM pedido cadastrado!");
+            repeat = false;
             break;
 
         default:
-            messagesErrorsWarning("opção invalida, tente novamente!");
+            messagesErrorsWarning("Opcao invalida. Tente novamente!");
             break;
+        }
+
+        if (currentOrder.getItemsCount() > 0)
+        {
+
+            cout << "-------------------------------------------" << endl;
+            cout << "\nDeseja adicionar um produto ao pedido de numero [ " << *orderNumber << " ] ? (s/n): ";
+            cin >> confirm;
+
+            if (confirm == 's' || confirm == 'S')
+            {
+                deleteTerminal();
+                continue;
+            }
+            else
+            {
+                repeat = false;
+            }
+
+            // Lê os dados cadastrais
+            string clientName;
+            int clientSeat;
+
+            cout << "\nDigite o nome do cliente: ";
+            cin >> clientName;
+
+            do
+            {
+                cout << "Digite o numero da mesa: ";
+                cin >> clientSeat;
+
+                if (clientSeat < 1)
+                {
+                    messagesErrorsWarning("[ERRO] O numero da mesa deve ser maior que zero!");
+                }
+
+            } while (clientSeat < 1);
+
+            currentOrder.setNumberOrder(*orderNumber);
+            currentOrder.setNameClient(clientName);
+            currentOrder.setNumberTable(clientSeat);
+            currentOrder.sumTotalPriceToOrder();
+
+            closeOrder(orders, -1, &currentOrder, history, orderPreparationQueue);
+
+            // Salva no vetor ativo
+            if (currentOrder.getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
+            {
+                orders.push_back(currentOrder);
+            }
+
+            cout << "\n========================================" << endl;
+            cout << " Pedido N. " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
+            cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
+            cout << " Status: " << currentOrder.statusToString(currentOrder.getStatusOrder()) << endl;
+            cout << "========================================\n"
+                 << endl;
+
+            (*orderNumber)++;
+        }
+        else
+        {
+            repeat = false;
         }
 
     } while (repeat);
 }
 
-// função cancelar Pedido
+// função cancelar Pedido | desde que não esteja na fila de retirada;
 void menuCancelOrder(vector<Order> &orders)
 {
     // Chama a busca por código, que já pede o código do produto e retorna a posição
@@ -489,7 +661,7 @@ void menuCancelOrder(vector<Order> &orders)
     deleteTerminal();
 }
 
-// Listar todos os produtos cadastrados no sistema
+// Listar todos os PEDIDOS cadastrados no sistema
 void showOrders(vector<Order> &order)
 {
     if (order.size() > 0)
@@ -538,20 +710,26 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
     {
         cout << "Adicionar Itens" << endl;
         cout << "**********************************************************" << endl;
+
         do
         {
             cout << "Informe o CODIGO do produto: ";
             cin >> barCode;
 
-            if (!productExists(menu, barCode))
+            int index = getProductIndex(menu, barCode, StatusProductCategories::NONE);
+
+            if (index == -1)
             {
                 messagesErrorsWarning("Nenhum produto cadastrado com esse codigo");
-                cout << "\nDeseja tentar outro codigo? (s/n): ";
+                cout << "\nDigite [s] para continuar ou qualquer tecla para sair....: ";
                 cin >> confirm;
-                continue;
-            }
 
-            int index = getProductIndex(menu, barCode);
+                if (confirm == 's' || confirm == 'S')
+                {
+                    continue;
+                }
+                confirm = 'n';
+            }
 
             cout << "\nProduto selecionado: " << endl;
             cout << "\nCodigo | Nome | Valor" << endl;
@@ -684,10 +862,12 @@ void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistor
 {
     char optionCloseOrder;
 
-    cout << "Confirmar o fechamento do pedido? (s/n)" << endl;
+    cout << "Confirmar o fechamento do pedido? (s/n): ";
     cin >> optionCloseOrder;
 
     bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
+
+    deleteTerminal();
 
     if (isClosedNow)
     {
@@ -702,8 +882,13 @@ void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistor
                 orders.erase(orders.begin() + indexOrder);
             }
 
-            messagesSucess("Pedido fechado com sucesso!");
+            messagesSucess("Pedido de numero [ " + to_string(order->getNumberOrder()) + " ]  fechado com sucesso!");
         }
+    }
+    else
+    {
+
+        messagesErrorsWarning("status do pedido de numero [ " + to_string(order->getNumberOrder()) + " ] nao alterado!");
     }
 }
 // =======================================================
@@ -781,8 +966,10 @@ void menuAddProduct(vector<Product> &menu)
         cout << "**********************************************************" << endl;
 
         // Loop para garantir a inserção de um código válido e único
+        bool productExist = true;
         do
         {
+
             cout << "Informe o CODIGO do produto: ";
             cin >> barCode;
 
@@ -790,12 +977,16 @@ void menuAddProduct(vector<Product> &menu)
             {
                 messagesErrorsWarning("[Erro] O codigo de barras deve ser maior que zero! Tente novamente.");
             }
-            else if (productExists(menu, barCode))
+            else if (getProductIndex(menu, barCode, StatusProductCategories::NONE) > -1)
             {
-
-                messagesErrorsWarning("[Erro] Ja existe um produto cadastrado com o codigo " + to_string(barCode) + "! Tente novamente.");
+                messagesErrorsWarning("[Erro] Ja existe um produto cadastrado com o codigo [ " + to_string(barCode) + " ]! Tente novamente.");
             }
-        } while (barCode < 0 || productExists(menu, barCode));
+            else
+            {
+                productExist = false;
+            }
+        } while (barCode < 0 || productExist);
+
         cout << "---------------------------------------------------------------------" << endl;
 
         // Limpa o \n deixado pelo cin >> barCode antes de entrar no getline
@@ -957,7 +1148,7 @@ void menuEditProduct(vector<Product> &menu)
             menu[productIndex].setUnitPrice(newPrice);
             menu[productIndex].setStatusProductCategoriesNumber(newCategoriesProduct);
 
-            messagesSucess("Produto [ " + to_string( menu[productIndex].getBarCode()) + " ] atualizado com sucesso!");
+            messagesSucess("Produto [ " + to_string(menu[productIndex].getBarCode()) + " ] atualizado com sucesso!");
 
             cout << "\nCodigo | Nome | Valor | Categoria" << endl;
             cout << "-------------------" << endl;
@@ -975,12 +1166,9 @@ void menuEditProduct(vector<Product> &menu)
             cout << "\nPressione a tecla [s] para tentar novamente ou qualquer outra para continuar..." << endl;
             cin >> continueClear;
             deleteTerminal();
-            
         }
 
     } while (continueClear == 's' || continueClear == 'S');
-
-    
 }
 
 // Deletar um produto do menu
@@ -1060,8 +1248,7 @@ void searchProductName(vector<Product> &menu)
     {
         messagesErrorsWarning("Nenhum produto encontrado com o termo: " + partName);
     }
-    cout <<"\n";
-
+    cout << "\n";
 }
 
 // Listar todos os produtos que contenham esse código de barras
@@ -1073,14 +1260,7 @@ int searchProductBarCode(vector<Product> &menu)
     cout << "Informe o CODIGO do produto: ";
     cin >> barCode;
 
-    for (size_t i = 0; i < menu.size(); i++)
-    {
-        if (menu[i].getBarCode() == barCode)
-        {
-            foundIndex = i; // Salva o índice onde o produto está
-            break;          // Encontrou, para o loop
-        }
-    }
+    foundIndex = getProductIndex(menu, barCode, StatusProductCategories::NONE);
 
     if (foundIndex == -1)
     {
@@ -1102,7 +1282,7 @@ void showProducts(vector<Product> &menu)
     if (menu.size() > 0)
     {
         cout << "\nCodigo | Nome | Valor | Categoria" << endl;
-        cout << "-------------------" << endl;
+        cout << "---------------------------------------------" << endl;
         for (size_t i = 0; i < menu.size(); i++)
         { // size_t é um inteiro positivo (unsigned) usado pelo C++ para tamanhos e índices de vetores
             menu[i].printProduct();
@@ -1116,33 +1296,31 @@ void showProducts(vector<Product> &menu)
 }
 
 // Retorna a posição do produto no vetor
-int getProductIndex(const vector<Product> &menu, int barCode)
+int getProductIndex(const vector<Product> &menu, int barCode, StatusProductCategories statusCategories)
 {
-    for (size_t i = 0; i < menu.size(); i++)
+    if (statusCategories != StatusProductCategories::NONE)
     {
-        if (menu[i].getBarCode() == barCode)
+        for (size_t i = 0; i < menu.size(); i++)
         {
-            return i; // Retorna a posição (0, 1, 2...) onde o produto está no vetor
+            if (menu[i].getBarCode() == barCode && menu[i].getStatusProductCategories() == statusCategories)
+            {
+                return i; // Retorna a posição (0, 1, 2...) onde o produto está no vetor
+            }
         }
-    }
-    return -1; // Retorna -1 se não encontrar
-}
-
-// Verifica se o produto existe no order pelo código de barras, mas sem retornar texto
-bool productExists(const vector<Product> &menu, int barCode)
-{
-
-    int posicaoEncontrada = getProductIndex(menu, barCode); // Procura em que posição o produto está no vetor
-
-    // Testa se a posição é válida
-    if (posicaoEncontrada != -1)
-    {
-        return true; // Se a posição for diferente de -1, o produto existe na lista!
+        return -1;
     }
     else
     {
-        return false; // Se for igual a -1, o produto não existe na lista!
+        for (size_t i = 0; i < menu.size(); i++)
+        {
+            if (menu[i].getBarCode() == barCode)
+            {
+                return i; // Retorna a posição (0, 1, 2...) onde o produto está no vetor
+            }
+        }
+        return -1;
     }
+    // Retorna -1 se não encontrar
 }
 
 // Nova versão do productExists, mas para NOME (mesmo nome de função, parâmetros diferentes)
@@ -1165,44 +1343,45 @@ bool productExistsName(vector<Product> &menu, const string &name)
 void menuManagerHistory(OrderHistoryList *orderHistoryList)
 {
     int responseMenu = 0;
+    bool repeat = true;
 
-    menuDividers();
-
-    cout << "MENU - HISTORICO DE PEDIDOS" << endl;
-    cout << "**********************************************************" << endl;
-    cout << "1 - Exibir historico de pedidos completo" << endl;
-    cout << "2 - Exibir historico de pedidos resumido" << endl;
-    cout << "3 - Remover um pedido do historico" << endl;
-    cout << "4 - Voltar ao order principal" << endl;
-    cout << "\nDigite a opção desejada: ";
-    cin >> responseMenu;
-
-    menuDividers();
-    switch (responseMenu)
+    do
     {
-    case 1:
-    {
-        cout << "HISTORICO COMPLETO DOS PEDIDOS" << endl;
+        cout << "MENU - HISTORICO DE PEDIDOS" << endl;
         cout << "**********************************************************" << endl;
-        char tecla;
-        orderHistoryList->showReportAll();
-        cout << "aperte qualquer tecla para sair" << endl;
-        cin >> tecla;
-    }
+        cout << "1 - Exibir historico completo dos pedidos" << endl;
+        cout << "2 - Exibir historico resumido de pedidos" << endl;
+        cout << "3 - Voltar ao order principal" << endl;
+        cout << "---------------------------------------------" << endl;
+        cout << "\nDigite a opção desejada: ";
+        cin >> responseMenu;
 
-    break;
-    case 2:
-        resumeHistory(orderHistoryList);
-        break;
-    case 3:
+        deleteTerminal();
+        switch (responseMenu)
+        {
+        case 1:
+        {
+            cout << "HISTORICO COMPLETO DOS PEDIDOS" << endl;
+            cout << "**********************************************************" << endl;
+            char tecla;
+            orderHistoryList->showReportAll();
+            cout << "aperte qualquer tecla para sair: ";
+            cin >> tecla;
+            deleteTerminal();
+        }
 
         break;
-    case 4:
-
-        break;
-    default:
-        break;
-    }
+        case 2:
+            resumeHistory(orderHistoryList);
+            break;
+        case 3:
+            repeat = false;
+            break;
+        default:
+            messagesErrorsWarning("Opcao invalida. Tente novamente!");
+            break;
+        }
+    } while (repeat);
 }
 
 void resumeHistory(OrderHistoryList *orderHistoryList)
@@ -1210,7 +1389,7 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
     int responseMenu = 0;
     int count = 1;
     int size = orderHistoryList->getSize();
-    bool continuar = true;
+    bool repeat = true;
 
     if (size > 0)
     {
@@ -1233,9 +1412,13 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
             cin >> responseMenu;
 
             menuDividers();
+            deleteTerminal();
 
             switch (responseMenu)
             {
+            case 0:
+                repeat = false;
+                break;
             case 1:
 
                 if (aux->getNext() != nullptr)
@@ -1255,15 +1438,17 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 
                 break;
             default:
-                continuar = false;
+                messagesErrorsWarning("Opcao invaldia. Tente novamente!");
                 break;
             }
-        } while (continuar);
+        } while (repeat);
     }
     else
     {
         messagesErrorsWarning("Nenhum pedido no historico!");
     }
+
+    deleteTerminal();
 }
 
 // =======================================================
@@ -1272,111 +1457,121 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &kitchen, OrderPickupStack &orderPickupStack)
 {
     int responseMenu = 0;
+    bool repeat = true;
 
     menuDividers();
-
-    cout << "MENU - COZINHA" << endl;
-    cout << "**********************************************************" << endl;
-    cout << "1 - Exibir fila de preparo" << endl;
-    cout << "2 - Iniciar preparo" << endl;
-    cout << "3 - Finalizar Preparo" << endl;
-    cout << "4 - Pedidos na cozinha " << endl;
-    cout << "\nDigite a opção desejada: ";
-    cin >> responseMenu;
-
-    switch (responseMenu)
+    do
     {
-    case 1:
-        orderPreparationQueue->showQueuePreparation();
-        break;
-    case 2:
-        if (!orderPreparationQueue->isEmpty())
-        {
-            Order *orderPreparo = orderPreparationQueue->getOrderPreparation();
-            orderPreparo->setStatusOrder(StatusOrder::COZINHA);
-            kitchen.push_back(orderPreparo);
-            orderPreparationQueue->dequeue();
+        cout << "MENU - COZINHA" << endl;
+        cout << "**********************************************************" << endl;
+        cout << "1 - Exibir fila de preparo" << endl;
+        cout << "2 - Iniciar preparo" << endl;
+        cout << "3 - Finalizar Preparo" << endl;
+        cout << "4 - Pedidos na cozinha " << endl;
+        cout << "5 - Voltar ao menu anterior " << endl;
+        cout << "\nDigite a opção desejada: ";
+        cin >> responseMenu;
 
-            messagesSucess("Iniciando o preparo do Pedido N. " + to_string(kitchen.back()->getNumberOrder()));
-        }
-        else
-        {
-            messagesErrorsWarning("Nenhum pedido na Fila de preparo");
-        }
-        break;
-    case 3:
-    {
-        int pedidoIndex;
-        cout << "\nDigite o numero do pedido que deseja finalizar: ";
-        cin >> pedidoIndex;
+        deleteTerminal();
 
-        if (pedidoIndex > 0)
+        switch (responseMenu)
         {
+        case 1:
+            orderPreparationQueue->showQueuePreparation();
+            break;
+        case 2:
+            if (!orderPreparationQueue->isEmpty())
+            {
+                Order *orderPreparo = orderPreparationQueue->getOrderPreparation();
+                orderPreparo->setStatusOrder(StatusOrder::COZINHA);
+                kitchen.push_back(orderPreparo);
+                orderPreparationQueue->dequeue();
+
+                messagesSucess("Iniciando o preparo do Pedido N. " + to_string(kitchen.back()->getNumberOrder()));
+            }
+            else
+            {
+                messagesErrorsWarning("Nenhum pedido na Fila de preparo");
+            }
+            break;
+        case 3:
+        {
+            int pedidoIndex;
+            cout << "\nDigite o numero do pedido que deseja finalizar: ";
+            cin >> pedidoIndex;
+
+            if (pedidoIndex > 0)
+            {
+                if (kitchen.size() > 0)
+                {
+                    for (size_t i = 0; i < kitchen.size(); i++)
+                    {
+                        if (kitchen[i]->getNumberOrder() == pedidoIndex)
+                        {
+
+                            char optionCloseOrder;
+
+                            cout << "Confirmar o fechamento do pedido [ " << kitchen[i]->getNumberOrder() << " ] ? (s/n): ";
+                            cin >> optionCloseOrder;
+
+                            bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
+                            if (isClosedNow)
+                            {
+
+                                messagesSucess("Pedido " + to_string(kitchen[i]->getNumberOrder()) + " esta PRONTO e disponivel para a retirada!!");
+                                kitchen[i]->setStatusOrder(StatusOrder::PRONTO);
+                                kitchen.erase(kitchen.begin() + i);
+                                orderPickupStack.push(kitchen[i]);
+                            }
+                            else
+                            {
+                                messagesErrorsWarning("Pedido " + to_string(kitchen[i]->getNumberOrder()) + " nao finalizado!");
+                            }
+
+                            return;
+                        }
+                    }
+
+                    messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] é inexistente. Tente novamente!");
+                }
+                else
+                {
+                    messagesErrorsWarning("Nenhum pedido na cozinha!");
+                }
+            }
+            else
+            {
+                messagesErrorsWarning("Digite um valor positivo!");
+            }
+        }
+
+        break;
+        case 4:
+
             if (kitchen.size() > 0)
             {
+                cout << "\n\nRELATORIO DE PEDIDOS NA COZINHA " << endl;
+                cout << "**********************************************************" << endl;
+
                 for (size_t i = 0; i < kitchen.size(); i++)
                 {
-                    if (kitchen[i]->getNumberOrder() == pedidoIndex)
-                    {
-
-                        char optionCloseOrder;
-
-                        cout << "Confirmar o fechamento do pedido [ " << kitchen[i]->getNumberOrder() << " ] ? (s/n): ";
-                        cin >> optionCloseOrder;
-
-                        bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
-                        if (isClosedNow)
-                        {
-
-                            messagesSucess("Pedido " + to_string(kitchen[i]->getNumberOrder()) + " esta PRONTO e disponivel para a retirada!!");
-                            kitchen[i]->setStatusOrder(StatusOrder::PRONTO);
-                            kitchen.erase(kitchen.begin() + i);
-                            orderPickupStack.push(kitchen[i]);
-                        }
-                        else
-                        {
-                            messagesErrorsWarning("Pedido " + to_string(kitchen[i]->getNumberOrder()) + " nao finalizado!");
-                        }
-
-                        return;
-                    }
+                    kitchen[i]->showResumeOrder();
                 }
-
-                messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] é inexistente. Tente novamente!");
             }
             else
             {
                 messagesErrorsWarning("Nenhum pedido na cozinha!");
             }
-        }
-        else
-        {
-            messagesErrorsWarning("Digite um valor positivo!");
-        }
-    }
 
-    break;
-    case 4:
-
-        if (kitchen.size() > 0)
-        {
-            cout << "\n\nRELATORIO DE PEDIDOS NA COZINHA " << endl;
-            cout << "**********************************************************" << endl;
-
-            for (size_t i = 0; i < kitchen.size(); i++)
-            {
-                kitchen[i]->showResumeOrder();
-            }
+            break;
+        case 5:
+            repeat = false;
+            break;
+        default:
+            messagesErrorsWarning("Opcao invaalida. Tente novamente!");
+            break;
         }
-        else
-        {
-            messagesErrorsWarning("Nenhum pedido na cozinha!");
-        }
-
-        break;
-    default:
-        break;
-    }
+    } while (repeat);
 }
 
 void menuPickupStack(OrderPickupStack &orderPickupStack)

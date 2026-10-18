@@ -143,13 +143,12 @@ pair<bool, Order> OrderHistoryList::searchOrderIndexNumber(int number)
 
     OrderHistory *aux = this->head;
 
-    while (aux != this->head)
+    while (aux != nullptr)
     {
-
         if (aux->getOrder().getNumberOrder() == number)
         {
+            
             return {true, aux->getOrder()};
-            break;
         }
         aux = aux->getNext();
     }
@@ -162,7 +161,7 @@ pair<bool, Order> OrderHistoryList::searchOrderEndNumber(int number)
 
     OrderHistory *aux = this->tail;
 
-    while (aux != this->tail)
+    while (aux != nullptr)
     {
 
         if (aux->getOrder().getNumberOrder() == number)
@@ -180,7 +179,7 @@ pair<bool, Order> OrderHistoryList::searchOrderClient(string nameClient)
 {
     OrderHistory *aux = this->head;
 
-    while (aux != this->head)
+    while (aux != nullptr)
     {
 
         if (aux->getOrder().getNameClient() == nameClient)

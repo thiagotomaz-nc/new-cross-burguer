@@ -21,10 +21,10 @@ private:
     int numberOrder = 0;
     int numberTable;
     string nameClient;
-    vector<Item> items; // marca qual o inicio do cabeça dos items;
+    vector<Item> items; 
     double priceTotalToOrder = 0;
     StatusOrder statusOrder; // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
-    
+
 public:
     Order();
 
@@ -51,6 +51,7 @@ public:
     int getNumberOrder();
     int getNumberTable();
     void setNameClient(string newNameClient);
+    int getItemsCount();
     string getNameClient();
     void setStatusOrder(StatusOrder newStatusOrder);
     StatusOrder getStatusOrder();

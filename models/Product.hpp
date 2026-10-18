@@ -24,7 +24,7 @@ public:
     int getBarCode() const;
     string getName() const;
     float getUnitPrice() const;
-    StatusProductCategories getStatusProductCategories();
+    StatusProductCategories getStatusProductCategories() const;
 
     void setStatusProductCategories(StatusProductCategories newStatusProductCategories);
     void setStatusProductCategoriesNumber(int newStatusProductCategories);

@@ -32,7 +32,7 @@ void Product::setUnitPrice(float newUnitPrice)
     this->unitPrice = newUnitPrice;
 }
 
-StatusProductCategories Product::getStatusProductCategories()
+StatusProductCategories Product::getStatusProductCategories() const
 {
     return this->statusProductCategories;
 }
