@@ -55,8 +55,12 @@ void OrderPickupStack::pop()
     // Marca o status do pedido do topo como finalizado
     this->top->getOrder()->setStatusOrder(StatusOrder::FINALIZADO);
 
-    // Caso 1: Apenas 1 elemento na pilha
-    if (this->head == this->top)
+    cout << "\n---------------------------------------------------------" << endl;
+    cout << "Pedido [ " << this->top->getOrder()->getNumberOrder()<< " ] entregue." << endl;
+    cout << "---------------------------------------------------------\n\n";
+
+        // Caso 1: Apenas 1 elemento na pilha
+        if (this->head == this->top)
     {
         delete this->head;
 

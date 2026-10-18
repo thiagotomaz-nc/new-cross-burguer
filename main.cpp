@@ -597,22 +597,26 @@ void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *history, Order
     do
     {
         menuDividers();
-        cout << "Menu - Selecionar categoria do produto" << endl;
+        cout << "Menu - Adicionar produtos ao pedido" << endl;
         cout << "**********************************************************" << endl;
+        cout << " Categorias de produtos " << endl;
+        cout << "------------------------------------------------" << endl;
         cout << "1 - Bebidas " << endl;
-        cout << "2 - Hamburguer: " << endl;
-        cout << "3 - Acompanhamentos: " << endl;
-        cout << "4 - voltar ao menu anterior " << endl;
+        cout << "2 - Hamburguer " << endl;
+        cout << "3 - Acompanhamentos " << endl;
+        cout << "------------------------------------------------" << endl;
+        cout << "4 - Remover um produto do pedido" << endl;
+        cout << "5 - vizualizar pedido em construcao: " << endl;
+        cout << "6 - voltar ao menu anterior " << endl;
         cout << "------------------------------------------------" << endl;
 
         cout << "Informe a categoria do produto: ";
         cin >> categoriesSelect;
 
-        deleteTerminal();
-
         switch (categoriesSelect)
         {
         case 1:
+            deleteTerminal();
             cout << "Relatorio de produtos: BEBIDAS " << endl;
             cout << "------------------------------------------------" << endl;
             for (size_t i = 0; i < menu.size(); i++)
@@ -628,6 +632,7 @@ void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *history, Order
             menuAddOrder(menu, StatusProductCategories::DRINKS, &currentOrder, orderNumber);
             break;
         case 2:
+            deleteTerminal();
             cout << "Relatorio de produtos: HAMBURGUERS " << endl;
             cout << "------------------------------------------------" << endl;
             for (size_t i = 0; i < menu.size(); i++)
@@ -643,6 +648,7 @@ void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *history, Order
             menuAddOrder(menu, StatusProductCategories::BURGERS, &currentOrder, orderNumber);
             break;
         case 3:
+            deleteTerminal();
             cout << "Relatorio de produtos: BEBIDAS " << endl;
             cout << "------------------------------------------------" << endl;
             for (size_t i = 0; i < menu.size(); i++)
@@ -658,6 +664,55 @@ void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *history, Order
             menuAddOrder(menu, StatusProductCategories::SIDE_DISHES, &currentOrder, orderNumber);
             break;
         case 4:
+
+            if (currentOrder.getItemsCount() > 0)
+            {
+                int confirmRemoveItemOrder;
+                bool isItemRemove = false;
+                do
+                {
+                    cout << "-------------------------------------------" << endl;
+                    cout << "\nInforme o numero do item que deseja remover? ";
+                    cin >> confirmRemoveItemOrder;
+
+                    if (confirmRemoveItemOrder > 0)
+                    {
+                        isItemRemove = currentOrder.removeItemFromOrder(confirmRemoveItemOrder);
+
+                        if (isItemRemove)
+                        {
+                            messagesSucess("Item removido com sucesso!");
+                        }
+                    }
+                    else
+                    {
+                        messagesErrorsWarning("digite um valor maior que zero!");
+                        continue;
+                    }
+
+                } while (confirmRemoveItemOrder < 0);
+
+                continue;
+            }
+            else
+            {
+                messagesErrorsWarning("Pedido sem nenhum item cadastrado!");
+                continue;
+            }
+
+        case 5:
+            if (currentOrder.getItemsCount() > 0)
+            {
+                currentOrder.showResumeOrder();
+                cout << "\n";
+            }
+            else
+            {
+                messagesErrorsWarning("Nenhum item cadastrado no pedido!");
+            }
+            continue;
+
+        case 6:
             messagesErrorsWarning("[Aviso] NENHUM pedido cadastrado!");
             repeat = false;
             break;
@@ -671,7 +726,7 @@ void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *history, Order
         {
 
             cout << "-------------------------------------------" << endl;
-            cout << "\nDeseja adicionar um produto ao pedido de numero [ " << *orderNumber << " ] ? (s/n): ";
+            cout << "\nDeseja adicionar mais um produto ao pedido de numero [ " << *orderNumber << " ] ? (s/n): ";
             cin >> confirm;
 
             if (confirm == 's' || confirm == 'S')
@@ -1595,7 +1650,6 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
                             }
 
                             break;
-                            
                         }
                     }
 

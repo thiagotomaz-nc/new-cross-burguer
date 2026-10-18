@@ -39,7 +39,7 @@ public:
     Order &operator=(const Order &) = default;
 
     void addItemToOrder(Item item);
-    void removeItemFromOrder(int index);
+    bool removeItemFromOrder(int index);
 
     pair<bool, Item> getItemToIndex(int index);
 

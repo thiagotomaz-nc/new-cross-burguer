@@ -26,17 +26,22 @@ int Order::getItemsCount()
     return this->items.size();
 }
 
-void Order::removeItemFromOrder(int index)
+bool Order::removeItemFromOrder(int index)
 {
     if (index >= 0 && static_cast<size_t>(index) < this->items.size())
     {
-        // Apaga o produto do vetor usando o iterador
-        this->items.erase(items.begin() + index);
-        // adicionar a pilha de ações;
+        for (size_t i = 0; i < this->items.size(); i++)
+        {
+            if (this->items[i].getProductItem().second.getBarCode() == index)
+            {
+                this->items.erase(this->items.begin() + i);
+                return true;
+            }
+        }
     }
+    return false;
 }
 
-// optional armazena o objeto diretamente quando existe
 pair<bool, Item> Order::getItemToIndex(int index)
 {
     if (index >= 0 && static_cast<size_t>(index) < this->items.size())
@@ -133,11 +138,11 @@ string Order::statusToString(StatusOrder status)
 
 void Order::showResumeOrder()
 {
-    cout <<"\nPEDIDO: " <<setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << endl ;    
-    cout <<"Numero da mesa | Cliente | status do pedido" << endl;
+    cout << "\nPEDIDO: " << setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << endl;
+    cout << "Numero da mesa | Cliente | status do pedido" << endl;
     cout << "----------------------------------------------------------------" << endl;
     cout << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
-    cout << "----------------------------------------------------------------"<< endl;
+    cout << "----------------------------------------------------------------" << endl;
     cout << "\nitens do pedido: " << endl;
     cout << "Numero | Descricao | Preco unit. x quant.  =  total R$" << endl;
     cout << "----------------------------------------------------------------" << endl;
