@@ -42,6 +42,24 @@ void Product::setStatusProductCategories(StatusProductCategories newStatusProduc
     this->statusProductCategories = newStatusProductCategories;
 }
 
+void Product::setStatusProductCategoriesNumber(int newStatusProductCategories)
+{
+    switch (newStatusProductCategories)
+    {
+    case 1:
+        this->statusProductCategories = StatusProductCategories::DRINKS;
+        break;
+    case 2:
+        this->statusProductCategories = StatusProductCategories::BURGERS;
+        break;
+    case 3:
+        this->statusProductCategories = StatusProductCategories::SIDE_DISHES;
+        break;
+    default:
+        break;
+    }
+}
+
 string Product::statusProductToString(StatusProductCategories status) const
 {
     switch (status)

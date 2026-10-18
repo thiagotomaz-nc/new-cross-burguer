@@ -27,6 +27,7 @@ public:
     StatusProductCategories getStatusProductCategories();
 
     void setStatusProductCategories(StatusProductCategories newStatusProductCategories);
+    void setStatusProductCategoriesNumber(int newStatusProductCategories);
     void setBarCode(int newBarCode);
     void setName(string newName);
     void setUnitPrice(float newUnitPrice);
