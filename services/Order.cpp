@@ -133,10 +133,11 @@ string Order::statusToString(StatusOrder status)
 
 void Order::showResumeOrder()
 {
-    cout << "Numero do pedido | Numero da mesa | Cliente | status do pedido" << endl;
+    cout <<"\nPEDIDO: " <<setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << endl ;    
+    cout <<"Numero da mesa | Cliente | status do pedido" << endl;
     cout << "----------------------------------------------------------------" << endl;
-    cout << setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << " | " << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
-    cout << "==========================================================" << endl;
+    cout << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
+    cout << "----------------------------------------------------------------"<< endl;
     cout << "\nitens do pedido: " << endl;
     cout << "Numero | Descricao | Preco unit. x quant.  =  total R$" << endl;
     cout << "----------------------------------------------------------------" << endl;
@@ -150,7 +151,7 @@ void Order::showResumeOrder()
         }
 
         cout << "\nTotal do pedido:  R$ " << getTotalPriceToOrder() << endl;
-        cout << "==========================================================\n"
+        cout << "##############################################################################"
              << endl;
     }
     else

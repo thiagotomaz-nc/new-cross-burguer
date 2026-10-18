@@ -50,7 +50,7 @@ void messagesSucess(string messsage);
 void messagesErrorsWarning(string messsage);
 
 // CADASTROS PRÉVIOS
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory, OrderPreparationQueue &orderPreparationQueue);
+void previousRegistrations(vector<Product> &menu, OrderHistoryList &orderHistory, OrderPreparationQueue &orderPreparationQueue);
 
 int main()
 {
@@ -66,7 +66,7 @@ int main()
     OrderPreparationQueue orderPreparationQueue;
     OrderPickupStack orderPickupStack;
 
-    previousRegistrations(orders, menu_products, orderHistoryList, orderPreparationQueue);
+    previousRegistrations(menu_products, orderHistoryList, orderPreparationQueue);
 
     cout << endl;
 
@@ -162,8 +162,38 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
             menuCancelOrder(orders);
             break;
         case 3:
-            // remover pedido
-            break;
+        {
+            bool deleteOrderNumber= true;
+            int orderNumberDeleteSearch;
+
+            do
+            {
+                cin.ignore();
+                cout << "\nRemover um pedido " << endl;
+                cout << "---------------------------------------------------------" << endl;
+                cout << "\n Digite o numero do pedido que deseja cancelar: ";
+                cin >> orderNumberDeleteSearch;
+                cout << "\n---------------------------------------------------------" << endl;
+
+                if (orderNumberDeleteSearch > 0)
+                {
+                    // Apaga o produto do vetor usando o iterador
+                    deleteOrderNumber = !orderHistoryList->removeOrder(orderNumberDeleteSearch);
+
+                    if (deleteOrderNumber){
+                        messagesErrorsWarning("Numero de pedido [ "+to_string(deleteOrderNumber)+" ] inexistente. Tente novamente!");
+                    }
+                }
+                else
+                {
+                    messagesErrorsWarning("O numero deve ser maior que zero. Tente novamente!");
+                    continue;
+                }
+
+
+            } while (deleteOrderNumber);
+        }
+        break;
         case 4:
             // consultar pedido por nome
             deleteTerminal();
@@ -294,6 +324,8 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
             if (!orderHistoryList->isEmpty())
             {
                 orderHistoryList->showReportAll();
+            }else{
+                messagesErrorsWarning("Historico vazio!");
             }
 
             break;
@@ -1407,7 +1439,7 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 
             aux->getOrder().showResumeOrder();
 
-            cout << ((aux->getNext() != nullptr) ? "1 - Proximo  | " : "") << ((aux->getPrevious() != nullptr) ? "2 - Anterior | " : "") << "0 - Voltar menu principal" << endl;
+            cout <<"\n"<< ((aux->getNext() != nullptr) ? "1 - Proximo  | " : "") << ((aux->getPrevious() != nullptr) ? "2 - Anterior | " : "") << "0 - Voltar menu principal" << endl;
             cout << "\nDigite a opção desejada: ";
             cin >> responseMenu;
 
@@ -1643,7 +1675,7 @@ void messagesErrorsWarning(string messsage)
 // =======================================================
 // CADASTROS PRÉVIOS
 // =======================================================
-void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHistoryList &orderHistory, OrderPreparationQueue &orderPreparationQueue)
+void previousRegistrations(vector<Product> &menu, OrderHistoryList &orderHistory, OrderPreparationQueue &orderPreparationQueue)
 {
 
     Product product;
@@ -1728,8 +1760,10 @@ void previousRegistrations(vector<Order> &orders, vector<Product> &menu, OrderHi
     item.setQuantityItem(3);
     order_temp.addItemToOrder(item);
     order_temp.sumTotalPriceToOrder();
-    order_temp.setStatusOrder(StatusOrder::EM_CONSTRUCAO);
-    orders.push_back(order_temp);
+    order_temp.setStatusOrder(StatusOrder::FECHADO);
+
+    orderHistory.insertEnd(order_temp);
+    orderPreparationQueue.enqueue(orderHistory.getTail()->getOrderPointer());
 
     order_temp.setNameClient("Thiago");
     order_temp.setNumberOrder(2);

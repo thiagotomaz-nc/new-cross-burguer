@@ -13,7 +13,9 @@ private:
 public:
     OrderHistoryList();
 
-    void removeOrder(int number);
+    bool removeOrder(int number);
+    bool cancelOrder(int orderNumber);
+
     OrderHistory* gethead() const;
     OrderHistory* getTail() const;
     void showReportAll();

@@ -106,8 +106,6 @@ void OrderHistoryList::showReportAll()
     OrderHistory *aux = this->head;
     double totalSold = 0.0;
 
-    
-
     do
     {
         // Garante que o nó atual é válido antes de acessar os dados
@@ -117,7 +115,12 @@ void OrderHistoryList::showReportAll()
         }
 
         Order tempOrder = aux->getOrder();
-        tempOrder.sumTotalPriceToOrder();
+
+        if (tempOrder.getStatusOrder() != StatusOrder::CANCELADO)
+        {
+            tempOrder.sumTotalPriceToOrder();
+        }
+
         tempOrder.showResumeOrder();
 
         totalSold += tempOrder.getTotalPriceToOrder();
@@ -147,7 +150,7 @@ pair<bool, Order> OrderHistoryList::searchOrderIndexNumber(int number)
     {
         if (aux->getOrder().getNumberOrder() == number)
         {
-            
+
             return {true, aux->getOrder()};
         }
         aux = aux->getNext();
@@ -197,46 +200,83 @@ OrderHistoryList::~OrderHistoryList()
 {
 }
 
-void OrderHistoryList::removeOrder(int number)
+bool OrderHistoryList::cancelOrder(int orderNumber)
 {
+    return true;
+}
+
+bool OrderHistoryList::removeOrder(int number)
+{
+
+    if (isEmpty())
+    {
+        cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
+        cout << "[aviso] O historico esta vazio.\n";
+        cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
+        return false;
+    }
 
     OrderHistory *auxOrderRemove = this->head;
 
-    if (auxOrderRemove != nullptr)
+    while (auxOrderRemove != nullptr)
     {
-        while (auxOrderRemove->getNext() != nullptr)
+
+        if (auxOrderRemove->getOrder().getNumberOrder() == number)
         {
-            if (auxOrderRemove->getOrder().getNumberOrder() == number)
+            char confirm;
+            cin.ignore();
+
+            cout << "\nTem certeza que deseja apagar o produto de numero [ "
+                 << auxOrderRemove->getOrder().getNumberOrder() << " ] ? (s/n): ";
+
+            cin >> confirm;
+
+            if (confirm == 's' || confirm == 'S')
             {
-                break;
+                // INICIO - previous e next apontam para nullptr
+                if (auxOrderRemove->getPrevious() == nullptr && auxOrderRemove->getNext() == nullptr)
+                {
+                    this->tail = nullptr;
+                    this->head = nullptr;
+                }
+                // MEIO - significa que o historico tem um antecessor e um sucessor, NÃO MEXO NEM EM HEAD E NEM EM TAIL
+                else if (auxOrderRemove->getNext() != nullptr && auxOrderRemove->getPrevious() != nullptr)
+                {
+                    auxOrderRemove->getPrevious()->setNext(auxOrderRemove->getNext());
+                    auxOrderRemove->getNext()->setPrevious(auxOrderRemove->getPrevious());
+                }
+                else if (auxOrderRemove == this->head)
+                {
+                    this->head = auxOrderRemove->getNext();
+                    auxOrderRemove->getNext()->setPrevious(nullptr);
+                }
+                else
+                {
+                    this->tail = auxOrderRemove->getPrevious();
+                    auxOrderRemove->getPrevious()->setNext(nullptr);
+                }
+
+                delete auxOrderRemove;
+
+                cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
+                cout << "pedido de numero [ " << number << "] deletado com sucesso.\n";
+                cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
+
+                return true;
             }
-
-            auxOrderRemove = auxOrderRemove->getNext();
+            else
+            {
+                cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
+                cout << "Operacao cancelada.\n";
+                cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
+                return false;
+            }
         }
 
-        if (auxOrderRemove != this->head)
-        {
-            // utilizar um ponteiro;
-            // atualizar o proximo e o antecessor
-            auxOrderRemove->getNext()->getPrevious()->setPrevious(auxOrderRemove->getPrevious());
-            auxOrderRemove->getPrevious()->getNext()->setNext(auxOrderRemove->getNext());
-
-            // deletar o objeto
-            delete auxOrderRemove;
-        }
-        else
-        {
-            cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
-            cout << "Pedido não esta no histórico" << "\n";
-            cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
-        }
+        auxOrderRemove = auxOrderRemove->getNext();
     }
-    else
-    {
-        cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
-        cout << "Pedido não esta no histórico" << "\n";
-        cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
-    }
+
+    return false;
 }
 
 OrderHistory *OrderHistoryList::getTail() const
