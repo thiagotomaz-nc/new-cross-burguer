@@ -36,6 +36,17 @@ void Order::removeItemFromOrder(int index)
     }
 }
 
+int Order::getOdeItemIndex(int numberItemOrder){
+    for (size_t i = 0; i < this->items.size(); i++){
+        if (this->items[i].getProductItem().second.getBarCode() == numberItemOrder){
+            return i;
+        }
+
+    }
+
+    return -1;
+}
+
 // optional armazena o objeto diretamente quando existe
 pair<bool, Item> Order::getItemToIndex(int index)
 {
@@ -138,8 +149,8 @@ void Order::showResumeOrder()
     cout << "----------------------------------------------------------------" << endl;
     cout << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
     cout << "----------------------------------------------------------------"<< endl;
-    cout << "\nitens do pedido: " << endl;
-    cout << "Numero | Descricao | Preco unit. x quant.  =  total R$" << endl;
+    cout << "\nITENS " << endl;
+    cout << "Numero | cod. produto | Descricao | Preco unit. x quant.  =  total R$" << endl;
     cout << "----------------------------------------------------------------" << endl;
 
     if (this->items.size() > 0)
@@ -151,7 +162,8 @@ void Order::showResumeOrder()
         }
 
         cout << "\nTotal do pedido:  R$ " << getTotalPriceToOrder() << endl;
-        cout << "##############################################################################"
+        cout << "----------------------------------";
+        cout << "\n##############################################################################"
              << endl;
     }
     else

@@ -42,6 +42,7 @@ public:
     void removeItemFromOrder(int index);
 
     pair<bool, Item> getItemToIndex(int index);
+    int getOdeItemIndex(int numberItemOrder);
 
     void sumTotalPriceToOrder();
     double getTotalPriceToOrder();

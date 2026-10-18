@@ -55,7 +55,7 @@ void Item::setProductItem(Product newProduct) {
 void Item::showItems(int numberItem) {
     cout << setfill('0') << setw(DECIMAL_PLACES) << numberItem + 1;
     // Reseta o setfill para espaço em branco para não afundar a formatação da linha
-    cout << setfill(' ') << "  " << this->product.getName() << "  "
+    cout << "     " << setfill('0') << setw(DECIMAL_PLACES) << this->product.getBarCode()  << "           " << this->product.getName() << "  "
          << "R$ " << this->product.getUnitPrice() << " x " << this->quantity << " = "
          << "R$ " << this->priceTotalItems << endl;
 }
