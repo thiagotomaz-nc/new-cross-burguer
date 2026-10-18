@@ -24,7 +24,7 @@ private:
     vector<Item> items; // marca qual o inicio do cabeça dos items;
     double priceTotalToOrder = 0;
     StatusOrder statusOrder; // 0 - CANCELADO, 1 - EM CONSTRUÇÃO, 2 - FECHADO, 3 - PRONTO
-
+    
 public:
     Order();
 

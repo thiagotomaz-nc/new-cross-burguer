@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <iomanip> 
+#include "../enuns/enumStatusProduct.h"
 
 #define DECIMAL_PLACES 4
 
@@ -14,6 +15,7 @@ private:
     int barCode;
     string name;
     float unitPrice;
+    StatusProductCategories statusProductCategories;
 
 public:
     Product();
@@ -22,12 +24,18 @@ public:
     int getBarCode() const;
     string getName() const;
     float getUnitPrice() const;
+    StatusProductCategories getStatusProductCategories();
 
+    void setStatusProductCategories(StatusProductCategories newStatusProductCategories);
     void setBarCode(int newBarCode);
     void setName(string newName);
     void setUnitPrice(float newUnitPrice);
 
-    void show() const;
+    string statusProductToString(StatusProductCategories status) const;
+    
+    // const depois da função - garante que não vai modificar nenhuma variável ou propriedade do objeto que a chamou, transformando a função em somente LEITURA;
+    // const antes da função - o valor que a função devolve não pode ser modificado;
+    void printProduct() const;
 };
 
 #endif
