@@ -21,20 +21,30 @@ void Order::addItemToOrder(Item item)
     this->items.push_back(item);
 }
 
-void Order::removeItemFromOrder(int index)
+int Order::getItemsCount()
 {
-    if (index >= 0 && index < this->items.size())
-    {
-        // Apaga o produto do vetor usando o iterador
-        this->items.erase(items.begin() + index);
-        // adicionar a pilha de ações;
-    }
+    return this->items.size();
 }
 
-// optional armazena o objeto diretamente quando existe
+bool Order::removeItemFromOrder(int index)
+{
+    if (index >= 0 && static_cast<size_t>(index) < this->items.size())
+    {
+        for (size_t i = 0; i < this->items.size(); i++)
+        {
+            if (this->items[i].getProductItem().second.getBarCode() == index)
+            {
+                this->items.erase(this->items.begin() + i);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 pair<bool, Item> Order::getItemToIndex(int index)
 {
-    if (index >= 0 && index < this->items.size())
+    if (index >= 0 && static_cast<size_t>(index) < this->items.size())
     {
         return {true, this->items[index]};
     }
@@ -128,10 +138,11 @@ string Order::statusToString(StatusOrder status)
 
 void Order::showResumeOrder()
 {
-    cout << "Numero do pedido | Numero da mesa | Cliente | status do pedido" << endl;
+    cout << "\nPEDIDO: " << setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << endl;
+    cout << "Numero da mesa | Cliente | status do pedido" << endl;
     cout << "----------------------------------------------------------------" << endl;
-    cout << setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << " | " << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
-    cout << "==========================================================" << endl;
+    cout << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
+    cout << "----------------------------------------------------------------" << endl;
     cout << "\nitens do pedido: " << endl;
     cout << "Numero | Descricao | Preco unit. x quant.  =  total R$" << endl;
     cout << "----------------------------------------------------------------" << endl;
@@ -145,7 +156,7 @@ void Order::showResumeOrder()
         }
 
         cout << "\nTotal do pedido:  R$ " << getTotalPriceToOrder() << endl;
-        cout << "==========================================================\n"
+        cout << "##############################################################################"
              << endl;
     }
     else

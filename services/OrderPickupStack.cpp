@@ -10,25 +10,22 @@ void OrderPickupStack::push(Order *order)
 {
     if (order == nullptr)
     {
-        cout << "O pedido nao pode ser vazio!";
+        cout << "O pedido nao pode ser vazio!" << endl;
         return;
     }
 
-    this->pickupStack = new PickupStack();
-    this->pickupStack->orderInPickupStack(order);
+    PickupStack *newPickupStack = new PickupStack();
+    newPickupStack->orderInPickupStack(order);
 
     this->size++;
 
-    if (this->top == nullptr)
+    if (this->head == nullptr)
     {
-        this->head = this->pickupStack;
-        this->top = this->head;
-        return;
+        this->head = newPickupStack;
+        this->top = newPickupStack;
     }
     else
     {
-        this->top = this->pickupStack;
-
         PickupStack *aux = this->head;
 
         while (aux->getNext() != nullptr)
@@ -36,57 +33,57 @@ void OrderPickupStack::push(Order *order)
             aux = aux->getNext();
         }
 
-        // O anterior aponta para o novo topo
-        aux->setNext(this->top);
-
-        cout << "Pedido: " << this->head->getOrder() << endl;
+        aux->setNext(newPickupStack);
+        this->top = newPickupStack;
     }
+
+    cout << "Pedido adicionado a fila: " << this->top->getOrder()->getNumberOrder() << endl;
 }
 
 void OrderPickupStack::pop()
 {
-    if (!isEmpty())
-    {
 
-        this->top->getOrder()->setStatusOrder(StatusOrder::FINALIZADO);
-
-        cout << "\n---------------------------------------------------------" << endl;
-        cout << "Pedido [ " << this->top->getOrder()->getNumberOrder() << " ] entregue!" << endl;
-        cout << "---------------------------------------------------------\n"
-             << endl;
-
-        if (this->size == 1)
-        {
-            this->size--;
-            delete this->head;
-
-            this->head = nullptr;
-            this->top = nullptr;
-
-            return;
-        }
-
-        PickupStack *aux = this->head;
-
-        while (aux->getNext() != this->top)
-        {
-            aux = aux->getNext();
-        }
-
-        delete this->top;
-
-        aux->setNext(nullptr);
-        this->top = aux;
-
-        this->size--;
-    }
-    else
+    if (isEmpty())
     {
         cout << "\n---------------------------------------------------------" << endl;
         cout << "Nenhum pedido disponivel para retirada." << endl;
         cout << "---------------------------------------------------------\n"
              << endl;
+        return;
     }
+
+    // Marca o status do pedido do topo como finalizado
+    this->top->getOrder()->setStatusOrder(StatusOrder::FINALIZADO);
+
+    cout << "\n---------------------------------------------------------" << endl;
+    cout << "Pedido [ " << this->top->getOrder()->getNumberOrder()<< " ] entregue." << endl;
+    cout << "---------------------------------------------------------\n\n";
+
+        // Caso 1: Apenas 1 elemento na pilha
+        if (this->head == this->top)
+    {
+        delete this->head;
+
+        // Zera TODOS os ponteiros para evitar acesso a memória libertada
+        this->head = nullptr;
+        this->top = nullptr;
+        this->pickupStack = nullptr;
+        this->size = 0;
+        return;
+    }
+
+    // Caso 2: Mais de 1 elemento (encontra o nó anterior ao top)
+    PickupStack *aux = this->head;
+    while (aux->getNext() != this->top)
+    {
+        aux = aux->getNext();
+    }
+
+    delete this->top; // Liberta a memória do topo atual
+
+    aux->setNext(nullptr);
+    this->top = aux; // O anterior passa a ser o novo topo
+    this->size--;
 }
 
 Order OrderPickupStack::peek()
@@ -107,6 +104,8 @@ void OrderPickupStack::printReadyOrders()
 {
     if (!isEmpty())
     {
+        int deliverySequence = this->size;
+
         cout << "\n\nFILA DE RETIRADA" << " [ total de pedidos prontos: " << this->size << " ]" << endl;
         cout << "**************************************************************" << endl;
 
@@ -114,10 +113,15 @@ void OrderPickupStack::printReadyOrders()
 
         do
         {
+            cout << "-------" << endl;
+            cout << "ORDERM PARA RETIRADA:  " << deliverySequence-- << endl;
+            cout << "-------" << endl;
             aux->getOrder()->showResumeOrder();
             aux = aux->getNext();
 
         } while (aux != nullptr);
+
+        cout << "\n";
     }
     else
     {
