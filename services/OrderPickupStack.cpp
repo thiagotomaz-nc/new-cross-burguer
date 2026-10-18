@@ -4,6 +4,8 @@ OrderPickupStack::OrderPickupStack(/* args */)
 {
     this->top = nullptr;
     this->pickupStack = nullptr;
+    this->size = 0;
+    this->head = nullptr;
 }
 
 void OrderPickupStack::push(Order *order)
@@ -14,15 +16,16 @@ void OrderPickupStack::push(Order *order)
         return;
     }
 
-    PickupStack *newPickupStack = new PickupStack();
-    newPickupStack->orderInPickupStack(order);
+    // Criamos um NOVO nó localmente para não reutilizar o mesmo ponteiro de membro
+    PickupStack *newNode = new PickupStack();
+    newNode->orderInPickupStack(order);
 
     this->size++;
 
     if (this->head == nullptr)
     {
-        this->head = newPickupStack;
-        this->top = newPickupStack;
+        this->head = newNode;
+        this->top = newNode;
     }
     else
     {
@@ -33,8 +36,8 @@ void OrderPickupStack::push(Order *order)
             aux = aux->getNext();
         }
 
-        aux->setNext(newPickupStack);
-        this->top = newPickupStack;
+        aux->setNext(newNode);
+        this->top = newNode;
     }
 
     cout << "Pedido adicionado a fila: " << this->top->getOrder()->getNumberOrder() << endl;
@@ -42,28 +45,30 @@ void OrderPickupStack::push(Order *order)
 
 void OrderPickupStack::pop()
 {
-
     if (isEmpty())
     {
         cout << "\n---------------------------------------------------------" << endl;
         cout << "Nenhum pedido disponivel para retirada." << endl;
-        cout << "---------------------------------------------------------\n"
-             << endl;
+        cout << "---------------------------------------------------------\n" << endl;
         return;
     }
 
     // Marca o status do pedido do topo como finalizado
     this->top->getOrder()->setStatusOrder(StatusOrder::FINALIZADO);
 
+    cout << "\n---------------------------------------------------------" << endl;
+    cout << "Pedido [ " << this->top->getOrder()->getNumberOrder() << " ] entregue!" << endl;
+    cout << "---------------------------------------------------------\n" << endl;
+
     // Caso 1: Apenas 1 elemento na pilha
     if (this->head == this->top)
     {
         delete this->head;
-
+        
         // Zera TODOS os ponteiros para evitar acesso a memória libertada
         this->head = nullptr;
         this->top = nullptr;
-        this->pickupStack = nullptr;
+        this->pickupStack = nullptr; 
         this->size = 0;
         return;
     }
@@ -110,7 +115,7 @@ void OrderPickupStack::printReadyOrders()
         do
         {
             cout << "-------" << endl;
-            cout << "ORDERM PARA RETIRADA:  " << deliverySequence-- << endl;
+            cout << "ORDEM PARA RETIRADA:  " << deliverySequence-- << endl;
             cout << "-------" << endl;
             aux->getOrder()->showResumeOrder();
             aux = aux->getNext();

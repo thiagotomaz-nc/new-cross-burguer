@@ -41,25 +41,26 @@ bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
         return false;
     }
 
-    // Se há 2 ou mais elementos na fila
     PreparationQueue *aux = this->head;
 
+    // Caso 1: O elemento a ser removido é o HEAD
     if (aux->getOrder()->getNumberOrder() == orderNumber)
     {
-
         this->head = aux->getNext();
         delete aux;
         this->n_elements--;
         return true;
     }
 
+    // Caso 2: O elemento está no meio ou fim da fila
     while (aux->getNext() != nullptr)
     {
         if (aux->getNext()->getOrder()->getNumberOrder() == orderNumber)
         {
-            aux->setNext(aux->getNext()->getNext());
-
-            delete aux->getNext();
+            PreparationQueue *nodeToDelete = aux->getNext(); // Guarda o nó que será apagado
+            aux->setNext(nodeToDelete->getNext());           // Desconecta o nó da fila
+            delete nodeToDelete;                             // Liberta APENAS o nó correto
+            
             this->n_elements--;
             return true;
         }
@@ -68,6 +69,7 @@ bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
 
     return false;
 }
+
 // ponteiro ou não
 void OrderPreparationQueue::dequeue()
 {
@@ -114,9 +116,12 @@ Order OrderPreparationQueue::getPeek()
 
 OrderPreparationQueue::~OrderPreparationQueue()
 {
-    // não posso apagar o orderhistory, pois ele esta salvo no historico;
-    delete this->preparationQueue;
-    this->preparationQueue = nullptr;
+    while (this->head != nullptr)
+    {
+        PreparationQueue *temp = this->head;
+        this->head = this->head->getNext();
+        delete temp;
+    }
 }
 
 Order *OrderPreparationQueue::getOrderPreparation()

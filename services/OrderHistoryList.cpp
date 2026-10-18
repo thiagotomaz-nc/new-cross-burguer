@@ -108,7 +108,6 @@ void OrderHistoryList::showReportAll()
 
     do
     {
-        // Garante que o nó atual é válido antes de acessar os dados
         if (aux == nullptr)
         {
             break;
@@ -116,19 +115,18 @@ void OrderHistoryList::showReportAll()
 
         Order tempOrder = aux->getOrder();
 
-        if (tempOrder.getStatusOrder() != StatusOrder::CANCELADO)
-        {
-            tempOrder.sumTotalPriceToOrder();
-        }
-
+        tempOrder.sumTotalPriceToOrder();
         tempOrder.showResumeOrder();
 
-        totalSold += tempOrder.getTotalPriceToOrder();
+        // Apenas adiciona ao valor total vendido se o pedido NAO foi cancelado
+        if (tempOrder.getStatusOrder() != StatusOrder::CANCELADO)
+        {
+            totalSold += tempOrder.getTotalPriceToOrder();
+        }
 
-        // Avança para o próximo nó
         aux = aux->getNext();
 
-    } while (aux != nullptr && aux != this->head); // Proteção contra ponteiros nulos
+    } while (aux != nullptr && aux != this->head);
 
     cout << "--------------------------------------------" << endl;
     cout << "Valor total vendido : R$ " << totalSold << endl;

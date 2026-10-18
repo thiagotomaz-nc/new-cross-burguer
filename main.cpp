@@ -1556,7 +1556,6 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             }
             break;
         case 3:
-
         {
             int pedidoIndex;
             cout << "\n--------------------------------------------------------------------" << endl;
@@ -1565,29 +1564,28 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
 
             if (pedidoIndex > 0)
             {
-                if (kitchen.size() > 0)
+                if (!kitchen.empty())
                 {
-                    bool isOrderFisinh = false;
+                    bool isOrderFinish = false; 
 
                     for (size_t i = 0; i < kitchen.size(); i++)
                     {
                         if (kitchen[i]->getNumberOrder() == pedidoIndex)
                         {
+                            isOrderFinish = true;
 
                             char optionCloseOrder;
-
                             cout << "Confirmar o fechamento do pedido [ " << kitchen[i]->getNumberOrder() << " ] ? (s/n): ";
                             cin >> optionCloseOrder;
 
                             bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
                             if (isClosedNow)
                             {
-
                                 messagesSucess("Pedido " + to_string(kitchen[i]->getNumberOrder()) + " esta PRONTO e disponivel para a retirada!!");
                                 kitchen[i]->setStatusOrder(StatusOrder::PRONTO);
-                                kitchen.erase(kitchen.begin() + i);
+                                
                                 orderPickupStack.push(kitchen[i]);
-                                isOrderFisinh = true;
+                                kitchen.erase(kitchen.begin() + i);
                             }
                             else
                             {
@@ -1595,13 +1593,12 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
                             }
 
                             break;
-                            
                         }
                     }
 
-                    if (!isOrderFisinh)
+                    if (!isOrderFinish)
                     {
-                        messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] é inexistente. Tente novamente!");
+                        messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] e inexistente. Tente novamente!");
                     }
                 }
                 else
