@@ -107,17 +107,24 @@ void OrderPickupStack::printReadyOrders()
 {
     if (!isEmpty())
     {
+        int deliverySequence = this->size ;
+
         cout << "\n\nFILA DE RETIRADA" << " [ total de pedidos prontos: " << this->size << " ]" << endl;
         cout << "**************************************************************" << endl;
 
         PickupStack *aux = this->head;
 
         do
-        {
+        {   
+            cout << "-------" << endl;
+            cout<<"ORDERM PARA RETIRADA:  "<< deliverySequence--<<endl;
+            cout << "-------" << endl;
             aux->getOrder()->showResumeOrder();
             aux = aux->getNext();
 
         } while (aux != nullptr);
+
+        cout<<"\n";
     }
     else
     {

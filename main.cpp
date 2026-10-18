@@ -24,20 +24,19 @@ void showProducts(vector<Product> &menu);
 void menuProducts(vector<Product> &menu);
 
 // Menus historicos
-void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
+void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
 void menuManagerHistory(OrderHistoryList *orderHistoryList);
 void resumeHistory(OrderHistoryList *orderHistoryList);
 
 // orders
 void showOrders(vector<Order> &order);
 int searchOrderNumber(vector<Order> &order);
-void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
+void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
 void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategories, Order *currentOrder, int *orderNumber);
-void menuCancelOrder(vector<Order> &orders);
 void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu);
 void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu);
-void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistoryList *OrderHistoryList, OrderPreparationQueue &orderPreparationQueue);
+void closeOrder(Order *order, OrderHistoryList *OrderHistoryList, OrderPreparationQueue &orderPreparationQueue);
 
 // Cozinha
 void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &kitchen, OrderPickupStack &orderPickupStack);
@@ -76,12 +75,11 @@ int main()
         cout << "\nNew Cross Burguer - HOME" << endl;
         cout << "**********************************************************" << endl;
         cout << "1 - Pedidos" << endl;
-        cout << "2 - Cancelar pedido" << endl;
-        cout << "3 - Produtos da Hamburgueria" << endl;
-        cout << "4 - Historico" << endl;
-        cout << "5 - Cozinha" << endl;
-        cout << "6 - Fila de retirada" << endl;
-        cout << "10 - Sair do sistema" << endl;
+        cout << "2 - Produtos da Hamburgueria" << endl;
+        cout << "3 - Historico" << endl;
+        cout << "4 - Cozinha" << endl;
+        cout << "5 - Fila de retirada" << endl;
+        cout << "6 - Sair do sistema" << endl;
         cout << "----------------------------------------------" << endl;
         cout << "\nDigite a opcao desejada: ";
         cin >> response;
@@ -91,24 +89,21 @@ int main()
         switch (response)
         {
         case 1:
-            menuManageOrder(orders, menu_products, &orderHistoryList, orderPreparationQueue, &numberOrder);
+            menuManageOrder(kitchen, menu_products, &orderHistoryList, orderPreparationQueue, &numberOrder);
             break;
         case 2:
-            menuCancelOrder(orders);
-            break;
-        case 3:
             menuProducts(menu_products);
             break;
-        case 4:
+        case 3:
             menuManagerHistory(&orderHistoryList);
             break;
-        case 5:
+        case 4:
             menuKitchen(&orderPreparationQueue, kitchen, orderPickupStack);
             break;
-        case 6:
+        case 5:
             menuPickupStack(orderPickupStack);
             break;
-        case 10:
+        case 6:
             /* code */
             cout << endl;
             cout << "Saindo do sistema!!!\nAte mais!!" << endl;
@@ -129,7 +124,7 @@ int main()
 // MENU gerenciar PEDIDOS - Editar pedido
 // =======================================================
 // Menu de gerenciamento dos pedidos
-void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber)
+void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber)
 {
 
     int responseMenuOrder = 0;
@@ -146,7 +141,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
         cout << "4 - Consultar um pedido [ NOME ] " << endl;
         cout << "5 - Consultar um pedido [ NUMERO DO PEDIDO ] " << endl;
         cout << "6 - Exibir todos os pedidos" << endl;
-        cout << "7 - Voltar  menu anterior" << endl;
+        cout << "7 - Voltar menu anterior" << endl;
         cout << "---------------------------------------------------------" << endl;
         cout << "\nDigite a opcao desejada: ";
         cin >> responseMenuOrder;
@@ -156,33 +151,110 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
         {
         case 1:
             deleteTerminal();
-            menuSelectItemOrder(orders, menu, orderHistoryList, orderPreparationQueue, orderNumber);
+            menuSelectItemOrder(menu, orderHistoryList, orderPreparationQueue, orderNumber);
             break;
         case 2:
-            menuCancelOrder(orders);
+            // cancelar um pedido, e remover ele da fila de preparo e da cozinha
+            {
+                // cancelar um pedido, e remover ele da fila de preparo e da cozinha
+                bool isCancelOrderNumber = true;
+                int orderNumberCancelSearch;
+                bool isKitchen;
+                do
+                {
+                    cin.ignore();
+                    cout << "\nCancelar um pedido " << endl;
+                    cout << "---------------------------------------------------------" << endl;
+                    cout << "\n Digite o numero do pedido que deseja cancelar ou [ 0 ] para sair: ";
+                    cin >> orderNumberCancelSearch;
+                    cout << "\n---------------------------------------------------------" << endl;
+
+                    if (orderNumberCancelSearch > 0)
+                    {
+                        // Altera o status do pedido para cancelado
+                        // retorna verdadeiro se cancelou e falso se não
+                        isCancelOrderNumber = !orderHistoryList->cancelOrder(orderNumberCancelSearch);
+
+                        if (!isCancelOrderNumber)
+                        {
+                            // remove da cozinha e da fila de preparo
+                            isKitchen = orderPreparationQueue.dequeueOrderNumber(orderNumberCancelSearch);
+
+                            if (!isKitchen)
+                            {
+
+                                if (kitchen.size() > 0)
+                                {
+
+                                    for (size_t i = 0; i < kitchen.size(); i++)
+                                    {
+
+                                        if (kitchen[i]->getNumberOrder() == orderNumberCancelSearch)
+                                        {
+
+                                            kitchen.erase(kitchen.begin() + i);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (orderNumberCancelSearch == 0)
+                    {
+                        isCancelOrderNumber = false;
+                        deleteTerminal();
+                    }
+                    else
+                    {
+                        messagesErrorsWarning("O numero deve ser maior que zero. Tente novamente!");
+                        continue;
+                    }
+
+                } while (isCancelOrderNumber);
+            }
             break;
         case 3:
         {
-            bool deleteOrderNumber= true;
+            // cancelar um pedido, e remover ele da fila de preparo e da cozinha
+            bool isDeleteOrderNumber = true;
             int orderNumberDeleteSearch;
-
+            bool isKitchen;
             do
             {
                 cin.ignore();
                 cout << "\nRemover um pedido " << endl;
                 cout << "---------------------------------------------------------" << endl;
-                cout << "\n Digite o numero do pedido que deseja cancelar: ";
+                cout << "\n Digite o numero do pedido que deseja Remover ou [ 0 ] para sair: ";
                 cin >> orderNumberDeleteSearch;
                 cout << "\n---------------------------------------------------------" << endl;
 
                 if (orderNumberDeleteSearch > 0)
                 {
-                    // Apaga o produto do vetor usando o iterador
-                    deleteOrderNumber = !orderHistoryList->removeOrder(orderNumberDeleteSearch);
 
-                    if (deleteOrderNumber){
-                        messagesErrorsWarning("Numero de pedido [ "+to_string(deleteOrderNumber)+" ] inexistente. Tente novamente!");
+                    // remove da cozinha e da fila de preparo
+                    isKitchen = orderPreparationQueue.dequeueOrderNumber(orderNumberDeleteSearch);
+
+                    if (!isKitchen)
+                    {
+                        if (kitchen.size() > 0)
+                        {
+                            for (size_t i = 0; i < kitchen.size(); i++)
+                            {
+                                if (kitchen[i]->getNumberOrder() == orderNumberDeleteSearch)
+                                {
+                                    kitchen.erase(kitchen.begin() + i);
+                                }
+                            }
+                        }
                     }
+
+                    // Apaga o pedido, em qualquer posição do lista duplamente encadeada
+                    isDeleteOrderNumber = !orderHistoryList->removeOrder(orderNumberDeleteSearch);
+                }
+                else if (orderNumberDeleteSearch == 0)
+                {
+                    isDeleteOrderNumber = false;
+                    deleteTerminal();
                 }
                 else
                 {
@@ -190,8 +262,7 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
                     continue;
                 }
 
-
-            } while (deleteOrderNumber);
+            } while (isDeleteOrderNumber);
         }
         break;
         case 4:
@@ -324,7 +395,9 @@ void menuManageOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryL
             if (!orderHistoryList->isEmpty())
             {
                 orderHistoryList->showReportAll();
-            }else{
+            }
+            else
+            {
                 messagesErrorsWarning("Historico vazio!");
             }
 
@@ -513,7 +586,7 @@ void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategorie
 }
 
 // Menu de seleção dos itens do pedido por categoria
-void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHistoryList *history, OrderPreparationQueue &orderPreparationQueue, int *orderNumber)
+void menuSelectItemOrder(vector<Product> &menu, OrderHistoryList *history, OrderPreparationQueue &orderPreparationQueue, int *orderNumber)
 {
     bool repeat = true;
     char confirm;
@@ -635,13 +708,7 @@ void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHist
             currentOrder.setNumberTable(clientSeat);
             currentOrder.sumTotalPriceToOrder();
 
-            closeOrder(orders, -1, &currentOrder, history, orderPreparationQueue);
-
-            // Salva no vetor ativo
-            if (currentOrder.getStatusOrder() == StatusOrder::EM_CONSTRUCAO)
-            {
-                orders.push_back(currentOrder);
-            }
+            closeOrder(&currentOrder, history, orderPreparationQueue);
 
             cout << "\n========================================" << endl;
             cout << " Pedido N. " << currentOrder.getNumberOrder() << " finalizado com sucesso!" << endl;
@@ -658,39 +725,6 @@ void menuSelectItemOrder(vector<Order> &orders, vector<Product> &menu, OrderHist
         }
 
     } while (repeat);
-}
-
-// função cancelar Pedido | desde que não esteja na fila de retirada;
-void menuCancelOrder(vector<Order> &orders)
-{
-    // Chama a busca por código, que já pede o código do produto e retorna a posição
-    int OrderIndex = searchOrderNumber(orders);
-
-    cout << "Menu - Cancelar produto " << endl;
-    cout << "**********************************************************" << endl;
-
-    // Se o índice for 0 ou maior, o produto existe na lista
-    if (OrderIndex >= 0)
-    {
-        cout << "\nTem certeza que deseja apagar o produto: "
-             << orders[OrderIndex].getNumberOrder() << "? (s/n): ";
-
-        char confirm;
-        cin >> confirm;
-
-        if (confirm == 's' || confirm == 'S')
-        {
-            // Apaga o produto do vetor usando o iterador
-            orders.erase(orders.begin() + OrderIndex);
-            messagesSucess("Produto removido com sucesso!");
-        }
-        else
-        {
-            messagesSucess("\nOperacao cancelada.");
-        }
-    }
-
-    deleteTerminal();
 }
 
 // Listar todos os PEDIDOS cadastrados no sistema
@@ -890,11 +924,11 @@ void menuRemoveOrderItem(vector<Order> &orders, vector<Product> &menu)
     deleteTerminal();
 }
 
-void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue)
+void closeOrder(Order *order, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue)
 {
     char optionCloseOrder;
 
-    cout << "Confirmar o fechamento do pedido? (s/n): ";
+    cout << "Digite [ s ]  para fechar o pedido ou qualquer tecla para dispensar?  ";
     cin >> optionCloseOrder;
 
     bool isClosedNow = (optionCloseOrder == 's' || optionCloseOrder == 'S');
@@ -909,18 +943,12 @@ void closeOrder(vector<Order> &orders, int indexOrder, Order *order, OrderHistor
             orderHistoryList->insertEnd(*order);
             orderPreparationQueue.enqueue(orderHistoryList->getTail()->getOrderPointer());
 
-            if (indexOrder > 0)
-            {
-                orders.erase(orders.begin() + indexOrder);
-            }
-
             messagesSucess("Pedido de numero [ " + to_string(order->getNumberOrder()) + " ]  fechado com sucesso!");
         }
     }
     else
     {
-
-        messagesErrorsWarning("status do pedido de numero [ " + to_string(order->getNumberOrder()) + " ] nao alterado!");
+        messagesErrorsWarning("Pedido desfeito.");
     }
 }
 // =======================================================
@@ -1439,7 +1467,8 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 
             aux->getOrder().showResumeOrder();
 
-            cout <<"\n"<< ((aux->getNext() != nullptr) ? "1 - Proximo  | " : "") << ((aux->getPrevious() != nullptr) ? "2 - Anterior | " : "") << "0 - Voltar menu principal" << endl;
+            cout << "\n"
+                 << ((aux->getNext() != nullptr) ? "1 - Proximo  | " : "") << ((aux->getPrevious() != nullptr) ? "2 - Anterior | " : "") << "0 - Voltar menu principal" << endl;
             cout << "\nDigite a opção desejada: ";
             cin >> responseMenu;
 
@@ -1494,7 +1523,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
     menuDividers();
     do
     {
-        cout << "MENU - COZINHA" << endl;
+        cout << "\nMENU - COZINHA" << endl;
         cout << "**********************************************************" << endl;
         cout << "1 - Exibir fila de preparo" << endl;
         cout << "2 - Iniciar preparo" << endl;
@@ -1504,14 +1533,14 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
         cout << "\nDigite a opção desejada: ";
         cin >> responseMenu;
 
-        deleteTerminal();
-
         switch (responseMenu)
         {
         case 1:
+            deleteTerminal();
             orderPreparationQueue->showQueuePreparation();
             break;
         case 2:
+            deleteTerminal();
             if (!orderPreparationQueue->isEmpty())
             {
                 Order *orderPreparo = orderPreparationQueue->getOrderPreparation();
@@ -1527,8 +1556,10 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             }
             break;
         case 3:
+
         {
             int pedidoIndex;
+            cout << "\n--------------------------------------------------------------------" << endl;
             cout << "\nDigite o numero do pedido que deseja finalizar: ";
             cin >> pedidoIndex;
 
@@ -1536,6 +1567,8 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             {
                 if (kitchen.size() > 0)
                 {
+                    bool isOrderFisinh = false;
+
                     for (size_t i = 0; i < kitchen.size(); i++)
                     {
                         if (kitchen[i]->getNumberOrder() == pedidoIndex)
@@ -1554,17 +1587,22 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
                                 kitchen[i]->setStatusOrder(StatusOrder::PRONTO);
                                 kitchen.erase(kitchen.begin() + i);
                                 orderPickupStack.push(kitchen[i]);
+                                isOrderFisinh = true;
                             }
                             else
                             {
                                 messagesErrorsWarning("Pedido " + to_string(kitchen[i]->getNumberOrder()) + " nao finalizado!");
                             }
 
-                            return;
+                            break;
+                            
                         }
                     }
 
-                    messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] é inexistente. Tente novamente!");
+                    if (!isOrderFisinh)
+                    {
+                        messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] é inexistente. Tente novamente!");
+                    }
                 }
                 else
                 {
@@ -1579,7 +1617,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
 
         break;
         case 4:
-
+            deleteTerminal();
             if (kitchen.size() > 0)
             {
                 cout << "\n\nRELATORIO DE PEDIDOS NA COZINHA " << endl;
@@ -1597,6 +1635,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
 
             break;
         case 5:
+            deleteTerminal();
             repeat = false;
             break;
         default:
@@ -1609,28 +1648,38 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
 void menuPickupStack(OrderPickupStack &orderPickupStack)
 {
     int responseMenu = 0;
+    bool repeat = true;
 
     menuDividers();
-
-    cout << "MENU - PEDIDOS PRONTOS" << endl;
-    cout << "**********************************************************" << endl;
-    cout << "1 - Exibir pedidos prontos" << endl;
-    cout << "2 - Entregar pedido (topo)" << endl;
-    cout << "\nDigite a opção desejada: ";
-    cin >> responseMenu;
-
-    switch (responseMenu)
+    do
     {
-    case 1:
-        orderPickupStack.printReadyOrders();
-        break;
-    case 2:
-        orderPickupStack.pop();
-        break;
-    default:
-        messagesErrorsWarning("Opção invalida, tente novamente!");
-        break;
-    }
+        cout << "MENU - PEDIDOS PRONTOS" << endl;
+        cout << "**********************************************************" << endl;
+        cout << "1 - Exibir pedidos prontos" << endl;
+        cout << "2 - Entregar pedido (topo)" << endl;
+        cout << "3 - Voltar ao menu principl" << endl;
+        cout << "--------------------------------------------" << endl;
+        cout << "\nDigite a opção desejada: ";
+        cin >> responseMenu;
+
+        switch (responseMenu)
+        {
+        case 1:
+            orderPickupStack.printReadyOrders();
+
+            break;
+        case 2:
+            orderPickupStack.pop();
+            break;
+        case 3:
+            deleteTerminal();
+            repeat = false;
+            break;
+        default:
+            messagesErrorsWarning("Opção invalida, tente novamente!");
+            break;
+        }
+    } while (repeat);
 }
 
 // =======================================================

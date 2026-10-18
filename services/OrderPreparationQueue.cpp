@@ -34,6 +34,40 @@ void OrderPreparationQueue::enqueue(Order *orderInHistory)
     current->setNext(this->preparationQueue);
 }
 
+bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
+{
+    if (isEmpty())
+    {
+        return false;
+    }
+
+    // Se há 2 ou mais elementos na fila
+    PreparationQueue *aux = this->head;
+
+    if (aux->getOrder()->getNumberOrder() == orderNumber)
+    {
+
+        this->head = aux->getNext();
+        delete aux;
+        this->n_elements--;
+        return true;
+    }
+
+    while (aux->getNext() != nullptr)
+    {
+        if (aux->getNext()->getOrder()->getNumberOrder() == orderNumber)
+        {
+            aux->setNext(aux->getNext()->getNext());
+
+            delete aux->getNext();
+            this->n_elements--;
+            return true;
+        }
+        aux = aux->getNext();
+    }
+
+    return false;
+}
 // ponteiro ou não
 void OrderPreparationQueue::dequeue()
 {
@@ -47,15 +81,21 @@ void OrderPreparationQueue::dequeue()
     // Se há apenas 1 elemento na fila
     if (this->n_elements == 1)
     {
+        delete this->head;
         this->head = nullptr;
+        this->n_elements--;
         return;
     }
 
     // Se há 2 ou mais elementos na fila
-    PreparationQueue *temp = this->head; // Pega o ponteiro do primeiro nó 
+    PreparationQueue *temp = this->head; // Pega o ponteiro do primeiro nó
 
-    this->head = temp->getNext(); // atualaliza a cabeça apontando ela para o proximo  nó
+    this->head = this->head->getNext();
 
+    this->n_elements--;
+
+    delete temp;
+    // atualaliza a cabeça apontando ela para o proximo  nó
 }
 
 bool OrderPreparationQueue::isEmpty()
@@ -91,7 +131,7 @@ void OrderPreparationQueue::showQueuePreparation()
     cout << "\nFILA DE PREPARO" << " [ total de pedidos: " << this->n_elements << " ]" << endl;
     cout << "**************************************************************" << endl;
     int sequencia = 1;
- 
+
     if (!isEmpty())
     {
         PreparationQueue *aux = this->head;
@@ -101,7 +141,8 @@ void OrderPreparationQueue::showQueuePreparation()
             cout << "Ordem preparo: " << sequencia << endl;
             aux->getOrder()->showResumeOrder();
             aux = aux->getNext();
-
+            sequencia++;
+            cout << "\n";
         } while (aux != nullptr);
     }
     else

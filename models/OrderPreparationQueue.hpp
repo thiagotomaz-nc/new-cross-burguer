@@ -18,6 +18,7 @@ public:
 
     void enqueue(Order* PreparationQueue); // ponteiro
     void dequeue();
+    bool dequeueOrderNumber(int orderNumber);
     bool isEmpty();
 
     void displayMessage(string displayMessage);
