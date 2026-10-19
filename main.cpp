@@ -33,7 +33,6 @@ void showOrders(vector<Order> &order);
 int searchOrderNumber(vector<Order> &order);
 void menuInitialOrder(vector<Product> &menu, OrderHistoryList *orderHistoryList, OrderPreparationQueue &orderPreparationQueue, int *orderNumber);
 void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategories, Order *currentOrder, int *orderNumber);
-void menuEditOrder(vector<Order> &orders, vector<Product> &menu);
 void menuSelectItemOrder(Order *order, vector<Product> &menu, int *orderNumber);
 bool closeOrder(Order *order, OrderHistoryList *OrderHistoryList, OrderPreparationQueue &orderPreparationQueue);
 
@@ -57,7 +56,6 @@ int main()
     bool repeat = true;
     Product product;
     vector<Product> menu_products;
-    vector<Order> orders;
     vector<Order *> kitchen;
 
     OrderHistoryList orderHistoryList;
