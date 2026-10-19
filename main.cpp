@@ -1451,7 +1451,6 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             {
                 Order *orderPreparo = orderPreparationQueue->getOrderPreparation();
                 orderPreparo->showResumeOrder();
-
             }
             else
             {
@@ -1475,16 +1474,17 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             }
             break;
         case 4:
-        {
-            int pedidoIndex;
-            cout << "\n--------------------------------------------------------------------" << endl;
-            cout << "\nDigite o numero do pedido que deseja finalizar ou 0 para voltar: ";
-            cin >> pedidoIndex;
 
-            if (pedidoIndex > 0)
+            if (!kitchen.empty())
             {
-                if (!kitchen.empty())
+                int pedidoIndex;
+                cout << "\n--------------------------------------------------------------------" << endl;
+                cout << "\nDigite o numero do pedido que deseja finalizar ou 0 para voltar: ";
+                cin >> pedidoIndex;
+
+                if (pedidoIndex > 0)
                 {
+
                     bool isOrderFinish = false;
 
                     for (size_t i = 0; i < kitchen.size(); i++)
@@ -1520,23 +1520,22 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
                         messagesErrorsWarning("O pedido [ " + to_string(pedidoIndex) + " ] e inexistente. Tente novamente!");
                     }
                 }
+                else if (pedidoIndex == 0)
+                {
+                    deleteTerminal();
+                    continue;
+                }
                 else
                 {
-                    messagesErrorsWarning("Nenhum pedido na cozinha!");
+                    messagesErrorsWarning("Digite um valor positivo!");
                 }
-            }
-            else if (pedidoIndex == 0)
-            {
-                deleteTerminal();
-                continue;
             }
             else
             {
-                messagesErrorsWarning("Digite um valor positivo!");
+                messagesErrorsWarning("Nenhum pedido na cozinha!");
             }
-        }
 
-        break;
+            break;
         case 5:
             deleteTerminal();
             if (kitchen.size() > 0)
