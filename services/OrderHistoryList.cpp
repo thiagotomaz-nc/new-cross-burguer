@@ -9,73 +9,44 @@ OrderHistoryList::OrderHistoryList()
 
 void OrderHistoryList::insertBegin(Order newOrder)
 {
-    this->orderHistory = new OrderHistory(newOrder);
+    OrderHistory *newNode = new OrderHistory(newOrder);
 
-    // Adiciona o primeiro elemento na lista de historico;
+    // Caso 1: Lista vazia
     if (this->head == nullptr)
     {
-        this->head = orderHistory;
-        this->tail = this->head;
-        this->orderHistory->setNext(nullptr);
-        this->orderHistory->setPrevious(nullptr);
+        newNode->setNext(nullptr);
+        newNode->setPrevious(nullptr);
+        this->head = newNode;
+        this->tail = newNode;
         return;
     }
-    else
-    {
 
-        // alterar o proximo e o anterior do OrderHistory
-        orderHistory->setNext(this->head);
-        orderHistory->setPrevious(nullptr);
-
-        this->head->setPrevious(orderHistory);
-
-        OrderHistory *aux = this->head;
-
-        while (aux->getNext() != nullptr)
-        {
-            aux = aux->getNext();
-        }
-
-        aux->setNext(nullptr);
-        this->tail = aux;
-        this->head = orderHistory;
-
-        return;
-    }
+    // Caso 2: Lista com elementos
+    newNode->setNext(this->head);
+    newNode->setPrevious(nullptr);
+    this->head->setPrevious(newNode);
+    this->head = newNode;
 }
 
 void OrderHistoryList::insertEnd(Order newOrder)
 {
-    this->orderHistory = new OrderHistory(newOrder);
+    OrderHistory *newNode = new OrderHistory(newOrder);
 
+    // Caso 1: Lista vazia
     if (this->head == nullptr)
     {
-        this->head = this->orderHistory;
-        this->tail = this->head;
-        this->orderHistory->setNext(nullptr);
-        this->orderHistory->setPrevious(nullptr);
+        newNode->setNext(nullptr);
+        newNode->setPrevious(nullptr);
+        this->head = newNode;
+        this->tail = newNode;
         return;
     }
-    else
-    {
 
-        // apontar o ultimo ponteiro para o inicio;
-        this->orderHistory->setNext(nullptr);
-
-        OrderHistory *aux = this->head;
-
-        while (aux->getNext() != nullptr)
-        {
-            aux = aux->getNext();
-        }
-
-        // apontar o primeiro para o ultimo elemento;
-        this->orderHistory->setPrevious(aux);
-        aux->setNext(this->orderHistory);
-        this->tail = this->orderHistory;
-
-        return;
-    }
+    // Caso 2: Insere diretamente no tail
+    newNode->setNext(nullptr);
+    newNode->setPrevious(this->tail);
+    this->tail->setNext(newNode);
+    this->tail = newNode;
 }
 
 int OrderHistoryList::getSize()

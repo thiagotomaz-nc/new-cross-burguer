@@ -1,5 +1,5 @@
-#ifndef _ORDER_REPARATION_QUEUE_HPP_
-#define _ORDER__PREPARATION_QUEUE_HPP_
+#ifndef _ORDER_PREPARATION_QUEUE_HPP_
+#define _ORDER_PREPARATION_QUEUE_HPP_
 
 #include "PreparationQueue.hpp"
 
@@ -9,14 +9,13 @@
 class OrderPreparationQueue
 {
 private:
-    PreparationQueue * preparationQueue;
     PreparationQueue * head;
     int n_elements;
 
 public:
     OrderPreparationQueue();
 
-    void enqueue(Order* PreparationQueue); // ponteiro
+    void enqueue(Order* orderInHistory);
     void dequeue();
     bool dequeueOrderNumber(int orderNumber);
     bool isEmpty();
@@ -24,9 +23,7 @@ public:
     void displayMessage(string displayMessage);
 
     Order* getOrderPreparation();
-    
     Order getPeek();
-    // utilizar a copia do primeiro elemento da pilha,para não permitir exclusão;
 
     void showQueuePreparation();
 

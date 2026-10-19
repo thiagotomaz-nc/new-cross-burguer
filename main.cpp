@@ -212,10 +212,9 @@ void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHisto
             break;
         case 3:
         {
-            // cancelar um pedido, e remover ele da fila de preparo e da cozinha
             bool isDeleteOrderNumber = true;
             int orderNumberDeleteSearch;
-            bool isKitchen;
+
             do
             {
                 cin.ignore();
@@ -227,26 +226,32 @@ void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHisto
 
                 if (orderNumberDeleteSearch > 0)
                 {
+                    bool isDeleted = orderHistoryList->removeOrder(orderNumberDeleteSearch);
 
-                    // remove da cozinha e da fila de preparo
-                    isKitchen = orderPreparationQueue.dequeueOrderNumber(orderNumberDeleteSearch);
-
-                    if (!isKitchen)
+                    if (isDeleted)
                     {
-                        if (kitchen.size() > 0)
+                        // Remove da fila de preparação
+                        bool isKitchen = orderPreparationQueue.dequeueOrderNumber(orderNumberDeleteSearch);
+
+                        // Se não estava na fila de preparação, procura e remove da cozinha
+                        if (!isKitchen)
                         {
-                            for (size_t i = 0; i < kitchen.size(); i++)
+                            if (kitchen.size() > 0)
                             {
-                                if (kitchen[i]->getNumberOrder() == orderNumberDeleteSearch)
+                                for (size_t i = 0; i < kitchen.size(); i++)
                                 {
-                                    kitchen.erase(kitchen.begin() + i);
+                                    if (kitchen[i]->getNumberOrder() == orderNumberDeleteSearch)
+                                    {
+                                        kitchen.erase(kitchen.begin() + i);
+                                        break; // Sai do loop após encontrar e remover
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // Apaga o pedido, em qualquer posição do lista duplamente encadeada
-                    isDeleteOrderNumber = !orderHistoryList->removeOrder(orderNumberDeleteSearch);
+                    // Se o pedido foi removido com sucesso, encerra o loop desta remoção
+                    isDeleteOrderNumber = !isDeleted;
                 }
                 else if (orderNumberDeleteSearch == 0)
                 {
@@ -261,7 +266,7 @@ void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHisto
 
             } while (isDeleteOrderNumber);
         }
-        break;
+            break;
         case 4:
             // consultar pedido por nome
             deleteTerminal();
@@ -600,7 +605,7 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                 do
                 {
                     cout << "---------------------------------------------------------------" << endl;
-                    cout << "Informe o numero do item que deseja remover ou 0 para voltar ";
+                    cout << "Informe o codigo do item que deseja remover ou 0 para voltar: ";
                     cin >> itemNumberDelete;
 
                     if (itemNumberDelete == 0)
@@ -621,7 +626,7 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                         {
                             // Remove o produto utilizando o índice relativo ao vetor de itens do pedido
                             currentOrder.removeItemFromOrder(productIndex);
-                            messagesSucess("Produto removido com sucesso!");
+                            messagesSucess("Item removido com sucesso!");
                         }
                         else
                         {
@@ -644,7 +649,6 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
         case 3:
             if (currentOrder.getItemsCount() > 0)
             {
-
                 char optionCloseOrder;
                 cout << "\n----------------------------------------------------------------------------------------------  ";
                 cout << "\nDigite [ s ] para fechar o pedido ou qualquer tecla para continuar adicionando itens ao pedido!  ";
@@ -677,6 +681,7 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                     currentOrder.setNumberTable(clientSeat);
                     currentOrder.sumTotalPriceToOrder();
 
+                    // Fecha o pedido
                     repeat = !closeOrder(&currentOrder, history, orderPreparationQueue);
 
                     cout << "\n========================================" << endl;
@@ -684,14 +689,17 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                     cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
                     cout << " Status: " << currentOrder.statusToString(currentOrder.getStatusOrder()) << endl;
                     cout << "========================================\n"
-                         << endl;
+                        << endl;
 
                     (*orderNumber)++;
+
+                    //Reseta o objeto para o próximo pedido do menu vir limpo
+                    currentOrder = Order(); 
                 }
                 else
                 {
                     deleteTerminal();
-                } // Lê os dados cadastrais
+                }
             }
             else
             {
@@ -856,6 +864,7 @@ bool closeOrder(Order *order, OrderHistoryList *orderHistoryList, OrderPreparati
         return false;
     }
 }
+
 // =======================================================
 // MENU PRODUTOS
 // =======================================================
@@ -1404,7 +1413,7 @@ void resumeHistory(OrderHistoryList *orderHistoryList)
 
                 break;
             default:
-                messagesErrorsWarning("Opcao invaldia. Tente novamente!");
+                messagesErrorsWarning("Opcao invalida. Tente novamente!");
                 break;
             }
         } while (repeat);

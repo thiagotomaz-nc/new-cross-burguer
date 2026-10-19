@@ -32,7 +32,7 @@ void Order::removeItemFromOrder(int index)
     {
         // Apaga o produto do vetor usando o iterador
         this->items.erase(items.begin() + index);
-        // adicionar a pilha de ações;
+        this->sumTotalPriceToOrder();
     }
 }
 

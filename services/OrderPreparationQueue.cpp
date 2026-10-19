@@ -8,30 +8,28 @@ OrderPreparationQueue::OrderPreparationQueue()
 
 void OrderPreparationQueue::enqueue(Order *orderInHistory)
 {
+    if (orderInHistory == nullptr) return;
 
-    this->preparationQueue = new PreparationQueue();
-    this->preparationQueue->setOrder(orderInHistory);
-    this->preparationQueue->setNext(nullptr);
+    // Alocação em ponteiro LOCAL (não guarda em membro da classe)
+    PreparationQueue *newNode = new PreparationQueue();
+    newNode->setOrder(orderInHistory);
+    newNode->setNext(nullptr);
 
     this->n_elements++;
 
-    // Se o elemento principal (head) não tiver dados ainda, preenche direto
     if (this->head == nullptr)
     {
-        this->head = this->preparationQueue;
+        this->head = newNode;
         return;
     }
 
-    // Caso contrário, navega até o último nó da fila
     PreparationQueue *current = this->head;
-
     while (current->getNext() != nullptr)
     {
         current = current->getNext();
     }
 
-    // Conecta o novo nó ao final
-    current->setNext(this->preparationQueue);
+    current->setNext(newNode);
 }
 
 bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
@@ -44,7 +42,7 @@ bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
     PreparationQueue *aux = this->head;
 
     // Caso 1: O elemento a ser removido é o HEAD
-    if (aux->getOrder()->getNumberOrder() == orderNumber)
+    if (aux->getOrder() != nullptr && aux->getOrder()->getNumberOrder() == orderNumber)
     {
         this->head = aux->getNext();
         delete aux;
@@ -55,11 +53,11 @@ bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
     // Caso 2: O elemento está no meio ou fim da fila
     while (aux->getNext() != nullptr)
     {
-        if (aux->getNext()->getOrder()->getNumberOrder() == orderNumber)
+        if (aux->getNext()->getOrder() != nullptr && aux->getNext()->getOrder()->getNumberOrder() == orderNumber)
         {
-            PreparationQueue *nodeToDelete = aux->getNext(); // Guarda o nó que será apagado
-            aux->setNext(nodeToDelete->getNext());           // Desconecta o nó da fila
-            delete nodeToDelete;                             // Liberta APENAS o nó correto
+            PreparationQueue *nodeToDelete = aux->getNext();
+            aux->setNext(nodeToDelete->getNext());
+            delete nodeToDelete;
             
             this->n_elements--;
             return true;
@@ -70,34 +68,19 @@ bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)
     return false;
 }
 
-// ponteiro ou não
 void OrderPreparationQueue::dequeue()
 {
-    // Se a fila está vazia (cabeça sem pedido), não faz nada
     if (isEmpty())
     {
         displayMessage("Fila de preparo esta vazia!");
         return;
     }
 
-    // Se há apenas 1 elemento na fila
-    if (this->n_elements == 1)
-    {
-        delete this->head;
-        this->head = nullptr;
-        this->n_elements--;
-        return;
-    }
-
-    // Se há 2 ou mais elementos na fila
-    PreparationQueue *temp = this->head; // Pega o ponteiro do primeiro nó
-
+    PreparationQueue *temp = this->head;
     this->head = this->head->getNext();
-
     this->n_elements--;
 
     delete temp;
-    // atualaliza a cabeça apontando ela para o proximo  nó
 }
 
 bool OrderPreparationQueue::isEmpty()
@@ -105,14 +88,14 @@ bool OrderPreparationQueue::isEmpty()
     return this->head == nullptr;
 }
 
-// retorno o objeto OrderStory;
 Order OrderPreparationQueue::getPeek()
 {
-    return *this->head->getOrder();
+    if (this->head != nullptr && this->head->getOrder() != nullptr)
+    {
+        return *this->head->getOrder();
+    }
+    return Order();
 }
-
-// utilizar a copia do primeiro elemento da pilha,para não permitir exclusão;
-// protegendo a estrutura;
 
 OrderPreparationQueue::~OrderPreparationQueue()
 {
@@ -126,33 +109,38 @@ OrderPreparationQueue::~OrderPreparationQueue()
 
 Order *OrderPreparationQueue::getOrderPreparation()
 {
-    return this->head->getOrder();
+    if (this->head != nullptr)
+    {
+        return this->head->getOrder();
+    }
+    return nullptr;
 }
 
 void OrderPreparationQueue::showQueuePreparation()
 {
-    // Caso contrário, navega até o último nó da fila
-    // Sempre vou exibir toda a minha fila de preparo
     cout << "\nFILA DE PREPARO" << " [ total de pedidos: " << this->n_elements << " ]" << endl;
     cout << "**************************************************************" << endl;
-    int sequencia = 1;
 
-    if (!isEmpty())
-    {
-        PreparationQueue *aux = this->head;
-
-        do
-        {
-            cout << "Ordem preparo: " << sequencia << endl;
-            aux->getOrder()->showResumeOrder();
-            aux = aux->getNext();
-            sequencia++;
-            cout << "\n";
-        } while (aux != nullptr);
-    }
-    else
+    if (isEmpty())
     {
         displayMessage("Fila de preparo esta vazia!");
+        return;
+    }
+
+    PreparationQueue *aux = this->head;
+    int sequencia = 1;
+
+    // Usa loop while limpo para evitar imprimir lixo de memória
+    while (aux != nullptr)
+    {
+        cout << "Ordem preparo: " << sequencia << endl;
+        if (aux->getOrder() != nullptr)
+        {
+            aux->getOrder()->showResumeOrder();
+        }
+        aux = aux->getNext();
+        sequencia++;
+        cout << "\n";
     }
 }
 
