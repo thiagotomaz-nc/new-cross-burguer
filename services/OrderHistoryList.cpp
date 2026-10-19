@@ -253,7 +253,7 @@ bool OrderHistoryList::removeOrder(int number)
         if (auxOrderRemove->getOrder().getNumberOrder() == number)
         {
 
-            if (auxOrderRemove->getOrder().getStatusOrder() != StatusOrder::PRONTO && auxOrderRemove->getOrder().getStatusOrder() != StatusOrder::FINALIZADO)
+            if (auxOrderRemove->getOrder().getStatusOrder() == StatusOrder::CANCELADO  )
             {
 
                 char confirm;
@@ -308,7 +308,7 @@ bool OrderHistoryList::removeOrder(int number)
             else
             {
                 cout << "\n<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n";
-                cout << "Operacao cancelada, pois o pedido ja esta com status de PRONTO ou FINALIZADO\n";
+                cout << "Operacao cancelada, pois o pedido ainda nao estar cancelado\n";
                 cout << "<>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<><>-_-<>\n\n";
                 return false;
             }

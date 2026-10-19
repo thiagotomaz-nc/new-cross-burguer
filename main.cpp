@@ -266,7 +266,7 @@ void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHisto
 
             } while (isDeleteOrderNumber);
         }
-            break;
+        break;
         case 4:
             // consultar pedido por nome
             deleteTerminal();
@@ -626,6 +626,7 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                         {
                             // Remove o produto utilizando o índice relativo ao vetor de itens do pedido
                             currentOrder.removeItemFromOrder(productIndex);
+                            currentOrder.sumTotalPriceToOrder();
                             messagesSucess("Item removido com sucesso!");
                         }
                         else
@@ -689,12 +690,12 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                     cout << " Total: R$ " << currentOrder.getTotalPriceToOrder() << endl;
                     cout << " Status: " << currentOrder.statusToString(currentOrder.getStatusOrder()) << endl;
                     cout << "========================================\n"
-                        << endl;
+                         << endl;
 
                     (*orderNumber)++;
 
-                    //Reseta o objeto para o próximo pedido do menu vir limpo
-                    currentOrder = Order(); 
+                    // Reseta o objeto para o próximo pedido do menu vir limpo
+                    currentOrder = Order();
                 }
                 else
                 {
