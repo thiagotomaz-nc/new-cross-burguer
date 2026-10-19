@@ -221,7 +221,7 @@ void menuManageOrder(vector<Order *> &kitchen, vector<Product> &menu, OrderHisto
                 cin.ignore();
                 cout << "\nRemover um pedido " << endl;
                 cout << "---------------------------------------------------------" << endl;
-                cout << "\n Digite o numero do pedido que deseja Remover ou [ 0 ] para sair: ";
+                cout << "\n Digite o numero do pedido que deseja Remover ou [ 0 ] para voltar: ";
                 cin >> orderNumberDeleteSearch;
                 cout << "\n---------------------------------------------------------" << endl;
 
@@ -600,10 +600,11 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                 do
                 {
                     cout << "---------------------------------------------------------------" << endl;
-                    cout << "Informe o numero do item que deseja remover ou 0 para desistir ";
+                    cout << "Informe o numero do item que deseja remover ou 0 para voltar ";
                     cin >> itemNumberDelete;
 
-                    if (itemNumberDelete == 0){
+                    if (itemNumberDelete == 0)
+                    {
                         break;
                     }
                     // Busca o índice do produto no cardápio geral
@@ -621,7 +622,9 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                             // Remove o produto utilizando o índice relativo ao vetor de itens do pedido
                             currentOrder.removeItemFromOrder(productIndex);
                             messagesSucess("Produto removido com sucesso!");
-                        }else{
+                        }
+                        else
+                        {
                             messagesErrorsWarning("Exclusão cancelada: o item permanece no pedido.");
                         }
                     }
@@ -781,7 +784,7 @@ void menuAddOrderItem(vector<Order> &orders, vector<Product> &menu)
             if (index == -1)
             {
                 messagesErrorsWarning("Nenhum produto cadastrado com esse codigo");
-                cout << "\nDigite [s] para continuar ou qualquer tecla para sair....: ";
+                cout << "\nDigite [s] para continuar ou qualquer tecla para voltar....: ";
                 cin >> confirm;
 
                 if (confirm == 's' || confirm == 'S')
@@ -1428,10 +1431,11 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
         cout << "\nMENU - COZINHA" << endl;
         cout << "**********************************************************" << endl;
         cout << "1 - Exibir fila de preparo" << endl;
-        cout << "2 - Iniciar preparo" << endl;
-        cout << "3 - Finalizar Preparo" << endl;
-        cout << "4 - Pedidos na cozinha " << endl;
-        cout << "5 - Voltar ao menu anterior " << endl;
+        cout << "2 - Proximo pedido a ser preparado" << endl;
+        cout << "3 - Iniciar preparo" << endl;
+        cout << "4 - Finalizar Preparo" << endl;
+        cout << "5 - Pedidos na cozinha " << endl;
+        cout << "6 - Voltar ao menu anterior " << endl;
         cout << "\nDigite a opção desejada: ";
         cin >> responseMenu;
 
@@ -1442,6 +1446,19 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             orderPreparationQueue->showQueuePreparation();
             break;
         case 2:
+            deleteTerminal();
+            if (!orderPreparationQueue->isEmpty())
+            {
+                Order *orderPreparo = orderPreparationQueue->getOrderPreparation();
+                orderPreparo->showResumeOrder();
+
+            }
+            else
+            {
+                messagesErrorsWarning("Nenhum pedido na Fila de preparo");
+            }
+            break;
+        case 3:
             deleteTerminal();
             if (!orderPreparationQueue->isEmpty())
             {
@@ -1457,7 +1474,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
                 messagesErrorsWarning("Nenhum pedido na Fila de preparo");
             }
             break;
-        case 3:
+        case 4:
         {
             int pedidoIndex;
             cout << "\n--------------------------------------------------------------------" << endl;
@@ -1520,7 +1537,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
         }
 
         break;
-        case 4:
+        case 5:
             deleteTerminal();
             if (kitchen.size() > 0)
             {
@@ -1538,7 +1555,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
             }
 
             break;
-        case 5:
+        case 6:
             deleteTerminal();
             repeat = false;
             break;
@@ -1554,10 +1571,9 @@ void menuPickupStack(OrderPickupStack &orderPickupStack)
     int responseMenu = 0;
     bool repeat = true;
 
-    menuDividers();
     do
     {
-        cout << "MENU - PEDIDOS PRONTOS" << endl;
+        cout << "\nMENU - PEDIDOS PRONTOS" << endl;
         cout << "**********************************************************" << endl;
         cout << "1 - Exibir pedidos prontos" << endl;
         cout << "2 - Entregar pedido (topo)" << endl;
@@ -1609,15 +1625,7 @@ void menuDividers()
 void deleteTerminal()
 {
 
-    /*
-    char continueClear;
-    cout << "\nPressione a tecla [s] para Limpar o terminal ou qualquer outra para continuar..." << endl;
-    cin >> continueClear;
-
-    if (continueClear == 's' || continueClear == 'S')
-    {
-        system("clear");
-    }*/
+    // system("cls");
 
     system("clear");
 }
