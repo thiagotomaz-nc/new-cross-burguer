@@ -43,6 +43,7 @@ public:
 
     pair<bool, Item> getItemToIndex(int index);
     int getOdeItemIndex(int numberItemOrder);
+    string  getOdeItemName(int numberItemOrder);
 
     void sumTotalPriceToOrder();
     double getTotalPriceToOrder();

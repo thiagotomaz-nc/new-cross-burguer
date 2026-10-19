@@ -47,7 +47,7 @@ int Order::getOdeItemIndex(int numberItemOrder){
     return -1;
 }
 
-// optional armazena o objeto diretamente quando existe
+// armazena o objeto diretamente quando existe
 pair<bool, Item> Order::getItemToIndex(int index)
 {
     if (index >= 0 && static_cast<size_t>(index) < this->items.size())
@@ -56,6 +56,10 @@ pair<bool, Item> Order::getItemToIndex(int index)
     }
     return {false, Item{}};
 }
+
+ string  Order::getOdeItemName(int numberItemOrder){
+    return this->items[numberItemOrder].getProductItem().second.getName();
+ }
 
 void Order::sumTotalPriceToOrder()
 {
@@ -142,6 +146,8 @@ string Order::statusToString(StatusOrder status)
     }
 }
 
+
+
 void Order::showResumeOrder()
 {
     cout <<"\nPEDIDO: " <<setfill('0') << setw(DECIMAL_PLACES_ORDER) << this->numberOrder << endl ;    
@@ -150,7 +156,7 @@ void Order::showResumeOrder()
     cout << this->numberTable << " | " << this->nameClient << " | " << statusToString(this->statusOrder) << endl;
     cout << "----------------------------------------------------------------"<< endl;
     cout << "\nITENS " << endl;
-    cout << "Numero | cod. produto | Descricao | Preco unit. x quant.  =  total R$" << endl;
+    cout << "#     | cod. produto | Descricao | Preco unit. x quant.  =  total R$" << endl;
     cout << "----------------------------------------------------------------" << endl;
 
     if (this->items.size() > 0)

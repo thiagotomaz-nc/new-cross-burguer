@@ -477,7 +477,7 @@ void menuAddOrder(vector<Product> &menu, StatusProductCategories selectCategorie
     } while (repeat);
 }
 
-void menuSelectItemOrder(Order *order, vector<Product> &menu,  int *orderNumber)
+void menuSelectItemOrder(Order *order, vector<Product> &menu, int *orderNumber)
 {
     bool repeat = true;
     int categoriesSelect;
@@ -602,9 +602,12 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                 do
                 {
                     cout << "---------------------------------------------------------------" << endl;
-                    cout << "Informe o numero do item que deseja remover " << endl;
+                    cout << "Informe o numero do item que deseja remover ou 0 para desistir ";
                     cin >> itemNumberDelete;
 
+                    if (itemNumberDelete == 0){
+                        break;
+                    }
                     // Busca o índice do produto no cardápio geral
                     int productIndex = currentOrder.getOdeItemIndex(itemNumberDelete);
 
@@ -612,7 +615,7 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                     {
 
                         cout << "\nTem certeza que deseja apagar o produto: "
-                        << menu[productIndex].getName() << "? (s/n): ";
+                             << currentOrder.getOdeItemName(productIndex) << "? (s/n): ";
                         cin >> confirm;
 
                         if (confirm == 's' || confirm == 'S')
@@ -620,6 +623,8 @@ void menuInitialOrder(vector<Product> &menu, OrderHistoryList *history, OrderPre
                             // Remove o produto utilizando o índice relativo ao vetor de itens do pedido
                             currentOrder.removeItemFromOrder(productIndex);
                             messagesSucess("Produto removido com sucesso!");
+                        }else{
+                            messagesErrorsWarning("Exclusão cancelada: o item permanece no pedido.");
                         }
                     }
                     else
@@ -1458,7 +1463,7 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
         {
             int pedidoIndex;
             cout << "\n--------------------------------------------------------------------" << endl;
-            cout << "\nDigite o numero do pedido que deseja finalizar: ";
+            cout << "\nDigite o numero do pedido que deseja finalizar ou 0 para voltar: ";
             cin >> pedidoIndex;
 
             if (pedidoIndex > 0)
@@ -1504,6 +1509,11 @@ void menuKitchen(OrderPreparationQueue *orderPreparationQueue, vector<Order *> &
                 {
                     messagesErrorsWarning("Nenhum pedido na cozinha!");
                 }
+            }
+            else if (pedidoIndex == 0)
+            {
+                deleteTerminal();
+                continue;
             }
             else
             {
@@ -1553,7 +1563,8 @@ void menuPickupStack(OrderPickupStack &orderPickupStack)
         cout << "**********************************************************" << endl;
         cout << "1 - Exibir pedidos prontos" << endl;
         cout << "2 - Entregar pedido (topo)" << endl;
-        cout << "3 - Voltar ao menu principl" << endl;
+        cout << "3 - Exibir proximo pedido a disponivel para entrega " << endl;
+        cout << "4 - Voltar ao menu principl" << endl;
         cout << "--------------------------------------------" << endl;
         cout << "\nDigite a opção desejada: ";
         cin >> responseMenu;
@@ -1562,12 +1573,22 @@ void menuPickupStack(OrderPickupStack &orderPickupStack)
         {
         case 1:
             orderPickupStack.printReadyOrders();
-
             break;
         case 2:
             orderPickupStack.pop();
             break;
         case 3:
+            if (!orderPickupStack.isEmpty())
+            {
+                orderPickupStack.peek().showResumeOrder();
+            }
+            else
+            {
+                messagesErrorsWarning("Nenhum pedido disponivel para entrega!");
+            }
+
+            break;
+        case 4:
             deleteTerminal();
             repeat = false;
             break;
