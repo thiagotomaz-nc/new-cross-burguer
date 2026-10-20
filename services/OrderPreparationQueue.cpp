@@ -3,6 +3,7 @@
 OrderPreparationQueue::OrderPreparationQueue()
 {
     this->head = nullptr;
+    this->tail = nullptr;
     this->n_elements = 0;
 }
 
@@ -18,18 +19,15 @@ void OrderPreparationQueue::enqueue(Order *orderInHistory)
     this->n_elements++;
 
     if (this->head == nullptr)
-    {
-        this->head = newNode;
+    {        
+        this->tail = this->head = newNode;
         return;
     }
 
-    PreparationQueue *current = this->head;
-    while (current->getNext() != nullptr)
-    {
-        current = current->getNext();
-    }
-
-    current->setNext(newNode);
+    
+    this->tail->setNext(newNode);
+    this->tail = newNode;
+    
 }
 
 bool OrderPreparationQueue::dequeueOrderNumber(int orderNumber)

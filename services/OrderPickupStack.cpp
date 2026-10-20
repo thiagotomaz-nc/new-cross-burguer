@@ -29,14 +29,7 @@ void OrderPickupStack::push(Order *order)
     }
     else
     {
-        PickupStack *aux = this->head;
-
-        while (aux->getNext() != nullptr)
-        {
-            aux = aux->getNext();
-        }
-
-        aux->setNext(newNode);
+        newNode->setNext(this->top);
         this->top = newNode;
     }
 
@@ -49,7 +42,8 @@ void OrderPickupStack::pop()
     {
         cout << "\n---------------------------------------------------------" << endl;
         cout << "Nenhum pedido disponivel para retirada." << endl;
-        cout << "---------------------------------------------------------\n" << endl;
+        cout << "---------------------------------------------------------\n"
+             << endl;
         return;
     }
 
@@ -58,33 +52,31 @@ void OrderPickupStack::pop()
 
     cout << "\n---------------------------------------------------------" << endl;
     cout << "Pedido [ " << this->top->getOrder()->getNumberOrder() << " ] entregue!" << endl;
-    cout << "---------------------------------------------------------\n" << endl;
+    cout << "---------------------------------------------------------\n"
+         << endl;
 
     // Caso 1: Apenas 1 elemento na pilha
     if (this->head == this->top)
     {
         delete this->head;
-        
+
         // Zera TODOS os ponteiros para evitar acesso a memória libertada
         this->head = nullptr;
         this->top = nullptr;
-        this->pickupStack = nullptr; 
+        this->pickupStack = nullptr;
         this->size = 0;
         return;
     }
 
-    // Caso 2: Mais de 1 elemento (encontra o nó anterior ao top)
-    PickupStack *aux = this->head;
-    while (aux->getNext() != this->top)
-    {
-        aux = aux->getNext();
-    }
+    PickupStack *aux = this->top;
 
-    delete this->top; // Liberta a memória do topo atual
+    this->top = this->top->getNext();
 
-    aux->setNext(nullptr);
-    this->top = aux; // O anterior passa a ser o novo topo
+    delete aux; // Liberta a memória do topo atual
+
+   // O anterior passa a ser o novo topo
     this->size--;
+
 }
 
 Order OrderPickupStack::peek()
@@ -105,17 +97,17 @@ void OrderPickupStack::printReadyOrders()
 {
     if (!isEmpty())
     {
-        int deliverySequence = this->size;
+        int deliverySequence = 1;
 
         cout << "\n\nFILA DE RETIRADA" << " [ total de pedidos prontos: " << this->size << " ]" << endl;
         cout << "**************************************************************" << endl;
 
-        PickupStack *aux = this->head;
+        PickupStack *aux = this->top;
 
         do
         {
             cout << "-------" << endl;
-            cout << "ORDEM PARA RETIRADA:  " << deliverySequence-- << endl;
+            cout << "ORDEM PARA RETIRADA:  " << deliverySequence++ << endl;
             cout << "-------" << endl;
             aux->getOrder()->showResumeOrder();
             aux = aux->getNext();

@@ -10,6 +10,7 @@ class OrderPreparationQueue
 {
 private:
     PreparationQueue * head;
+    PreparationQueue * tail;
     int n_elements;
 
 public:
